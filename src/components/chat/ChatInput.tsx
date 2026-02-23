@@ -42,7 +42,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         placeholder="Ask a question..."
         rows={1}
         disabled={disabled}
-        className="flex-1 resize-none bg-stone-50 rounded-xl px-4 py-3 text-sm
+        className="flex-1 resize-none bg-stone-50 rounded-xl px-4 py-3 text-sm text-stone-900
                    border border-stone-200 focus:outline-none focus:ring-2
                    focus:ring-stone-900 focus:border-transparent
                    disabled:opacity-50 max-h-32"
