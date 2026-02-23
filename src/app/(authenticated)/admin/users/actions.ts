@@ -1,12 +1,15 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { Database } from '@/lib/supabase/types'
+
+type AccessTier = Database['public']['Enums']['access_tier']
 
 export async function updateUserTier(userId: string, tier: string) {
   const supabase = createAdminClient()
   const { error } = await supabase
     .from('profiles')
-    .update({ access_tier: tier })
+    .update({ access_tier: tier as AccessTier })
     .eq('id', userId)
 
   if (error) return { error: error.message }

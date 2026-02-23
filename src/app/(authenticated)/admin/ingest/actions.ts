@@ -3,13 +3,16 @@
 import { chunkText } from '@/lib/ingest/chunker'
 import { generateEmbeddings } from '@/lib/ingest/embeddings'
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { Database } from '@/lib/supabase/types'
+
+type AccessTier = Database['public']['Enums']['access_tier']
 
 export async function ingestContent(formData: FormData) {
   const portraitId = formData.get('portrait_id') as string
   const content = formData.get('content') as string
   const sourceTitle = formData.get('source_title') as string
   const sourceType = formData.get('source_type') as string
-  const minTier = formData.get('min_tier') as string
+  const minTier = (formData.get('min_tier') as AccessTier) || 'public'
 
   if (!portraitId || !content) {
     return { error: 'Portrait and content are required' }
@@ -25,7 +28,7 @@ export async function ingestContent(formData: FormData) {
     embedding: JSON.stringify(embeddings[i]),
     source_title: sourceTitle || null,
     source_type: sourceType || 'transcript',
-    min_tier: minTier || 'public',
+    min_tier: minTier,
     chunk_index: i,
   }))
 

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { chunkText } from '@/lib/ingest/chunker'
 import { generateEmbeddings } from '@/lib/ingest/embeddings'
+import type { Database } from '@/lib/supabase/types'
+
+type AccessTier = Database['public']['Enums']['access_tier']
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -16,7 +19,7 @@ export async function POST(request: NextRequest) {
     source_title,
     source_type = 'transcript',
     source_date,
-    min_tier = 'public',
+    min_tier = 'public' as AccessTier,
     chunk_options,
   } = body
 

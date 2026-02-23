@@ -8,7 +8,7 @@ interface User {
   email: string
   full_name: string | null
   access_tier: string
-  created_at: string
+  created_at: string | null
 }
 
 interface Portrait {
@@ -123,7 +123,7 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
                   </select>
                 </td>
                 <td className="px-4 py-3 text-stone-400 text-xs">
-                  {new Date(user.created_at).toLocaleDateString()}
+                  {user.created_at ? new Date(user.created_at).toLocaleDateString() : '\u2014'}
                 </td>
               </tr>
             ))}
