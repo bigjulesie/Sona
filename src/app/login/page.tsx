@@ -15,46 +15,19 @@ function LoginForm() {
     setLoading(true)
     setError('')
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    console.log('[login] supabase url:', supabaseUrl)
-    console.log('[login] anon key present:', !!supabaseKey)
-
-    if (!supabaseUrl || !supabaseKey) {
-      setError('Missing Supabase configuration. Check environment variables.')
-      setLoading(false)
-      return
-    }
-
     const supabase = createClient()
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
 
-    const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Request timed out after 15s')), 15000)
-    )
-
-    try {
-      const { error: otpError } = await Promise.race([
-        supabase.auth.signInWithOtp({
-          email,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
-        }),
-        timeout,
-      ])
-
-      if (otpError) {
-        console.error('[login] OTP error:', otpError)
-        setError(otpError.message)
-      } else {
-        setSent(true)
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unknown error'
-      console.error('[login] caught error:', msg)
-      setError(msg)
+    if (otpError) {
+      setError(otpError.message)
+    } else {
+      setSent(true)
     }
-
     setLoading(false)
   }
 
