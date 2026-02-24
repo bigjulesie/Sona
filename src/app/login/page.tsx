@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-import { loginWithMagicLink } from './actions'
+import { createClient } from '@/lib/supabase/client'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
@@ -18,12 +18,16 @@ function LoginForm() {
     setLoading(true)
     setError('')
 
-    const formData = new FormData()
-    formData.set('email', email)
-    const result = await loginWithMagicLink(formData)
+    const supabase = createClient()
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
 
-    if (result.error) {
-      setError(result.error)
+    if (otpError) {
+      setError(otpError.message)
     } else {
       setSent(true)
     }
