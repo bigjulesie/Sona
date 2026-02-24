@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { updateUserTier, inviteUser } from './actions'
+import { updateUserTier, updateUserAdmin, inviteUser } from './actions'
 
 interface User {
   id: string
   email: string
   full_name: string | null
   access_tier: string
+  is_admin: boolean
   created_at: string | null
 }
 
@@ -23,6 +24,7 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteTier, setInviteTier] = useState('public')
   const [invitePortrait, setInvitePortrait] = useState(portraits[0]?.id ?? '')
+  const [inviteAdmin, setInviteAdmin] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -30,18 +32,23 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
     e.preventDefault()
     setLoading(true)
     setMessage('')
-    const result = await inviteUser(inviteEmail, inviteTier, invitePortrait)
+    const result = await inviteUser(inviteEmail, inviteTier, invitePortrait, inviteAdmin)
     if (result.error) {
       setMessage(`Error: ${result.error}`)
     } else {
       setMessage('Invitation sent.')
       setInviteEmail('')
+      setInviteAdmin(false)
     }
     setLoading(false)
   }
 
   async function handleTierChange(userId: string, tier: string) {
     await updateUserTier(userId, tier)
+  }
+
+  async function handleAdminToggle(userId: string, isAdmin: boolean) {
+    await updateUserAdmin(userId, isAdmin)
   }
 
   return (
@@ -59,7 +66,7 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
           />
         </div>
         <div>
-          <label className="block text-xs tracking-widest uppercase text-mist mb-2">Tier</label>
+          <label className="block text-xs tracking-widest uppercase text-mist mb-2">Access Tier</label>
           <select value={inviteTier} onChange={e => setInviteTier(e.target.value)} className={selectClass}>
             <option value="public">Public</option>
             <option value="acquaintance">Acquaintance</option>
@@ -74,6 +81,18 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
               <option key={p.id} value={p.id}>{p.display_name}</option>
             ))}
           </select>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="block text-xs tracking-widest uppercase text-mist">Admin</label>
+          <label className="flex items-center gap-2 cursor-pointer pb-1.5">
+            <input
+              type="checkbox"
+              checked={inviteAdmin}
+              onChange={e => setInviteAdmin(e.target.checked)}
+              className="accent-ink w-4 h-4"
+            />
+            <span className="text-xs text-mist">Platform admin</span>
+          </label>
         </div>
         <button
           type="submit"
@@ -95,7 +114,7 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
         <table className="w-full text-sm">
           <thead className="border-b border-brass/20">
             <tr>
-              {['Email', 'Name', 'Tier', 'Joined'].map(h => (
+              {['Email', 'Name', 'Access Tier', 'Admin', 'Joined'].map(h => (
                 <th key={h} className="text-left px-4 py-3 text-xs tracking-widest uppercase text-mist font-normal">
                   {h}
                 </th>
@@ -118,6 +137,14 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
                     <option value="colleague">Colleague</option>
                     <option value="family">Family</option>
                   </select>
+                </td>
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    defaultChecked={user.is_admin}
+                    onChange={e => handleAdminToggle(user.id, e.target.checked)}
+                    className="accent-ink w-4 h-4 cursor-pointer"
+                  />
                 </td>
                 <td className="px-4 py-3 text-mist text-xs">
                   {user.created_at ? new Date(user.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}

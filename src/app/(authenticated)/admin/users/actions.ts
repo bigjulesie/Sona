@@ -24,7 +24,25 @@ export async function updateUserTier(userId: string, tier: string) {
   return { success: true }
 }
 
-export async function inviteUser(email: string, tier: string, portraitId: string) {
+export async function updateUserAdmin(userId: string, isAdmin: boolean) {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('profiles')
+    .update({ is_admin: isAdmin })
+    .eq('id', userId)
+
+  if (error) return { error: error.message }
+
+  await supabase.from('audit_log').insert({
+    action: isAdmin ? 'grant_admin' : 'revoke_admin',
+    resource_type: 'profile',
+    resource_id: userId,
+  })
+
+  return { success: true }
+}
+
+export async function inviteUser(email: string, tier: string, portraitId: string, isAdmin: boolean) {
   const supabase = createAdminClient()
 
   const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
@@ -34,18 +52,17 @@ export async function inviteUser(email: string, tier: string, portraitId: string
 
   if (error) return { error: error.message }
 
-  // Update portrait_id on the auto-created profile
   if (data.user) {
     await supabase
       .from('profiles')
-      .update({ portrait_id: portraitId })
+      .update({ portrait_id: portraitId || null, is_admin: isAdmin })
       .eq('id', data.user.id)
   }
 
   await supabase.from('audit_log').insert({
     action: 'invite_user',
     resource_type: 'profile',
-    metadata: { email, tier },
+    metadata: { email, tier, is_admin: isAdmin },
   })
 
   return { success: true }

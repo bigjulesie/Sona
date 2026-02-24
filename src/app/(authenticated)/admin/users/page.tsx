@@ -5,7 +5,7 @@ export default async function UsersPage() {
   const supabase = createAdminClient()
   const { data: users } = await supabase
     .from('profiles')
-    .select('id, email, full_name, access_tier, created_at')
+    .select('id, email, full_name, access_tier, is_admin, created_at')
     .order('created_at', { ascending: false })
 
   const { data: portraits } = await supabase

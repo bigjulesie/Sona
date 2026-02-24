@@ -9,15 +9,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!user) redirect('/login')
 
-  // Check admin status — for Phase 1, admin = family tier
   const admin = createAdminClient()
   const { data: profile } = await admin
     .from('profiles')
-    .select('access_tier')
+    .select('is_admin')
     .eq('id', user.id)
     .single()
 
-  if (profile?.access_tier !== 'family') {
+  if (!profile?.is_admin) {
     redirect('/chat')
   }
 
