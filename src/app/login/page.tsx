@@ -1,14 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { loginWithMagicLink } from './actions'
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const searchParams = useSearchParams()
+  const authError = searchParams.get('detail')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -37,7 +40,7 @@ export default function LoginPage() {
       <div className="fixed bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: '#8B7355', opacity: 0.5 }} />
 
       <div className="w-full max-w-xs">
-        {/* Logo — larger, more presence */}
+        {/* Logo */}
         <div className="flex justify-center mb-12">
           <Image
             src="/brand_assets/logo.svg"
@@ -85,7 +88,9 @@ export default function LoginPage() {
               />
             </div>
 
-            {error && <p className="text-red-700 text-sm">{error}</p>}
+            {(error || authError) && (
+              <p className="text-red-700 text-sm">{error || authError}</p>
+            )}
 
             <button
               type="submit"
@@ -103,5 +108,13 @@ export default function LoginPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }
