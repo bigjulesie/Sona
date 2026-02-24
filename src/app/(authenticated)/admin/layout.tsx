@@ -33,6 +33,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link href="/admin/ingest" className="block text-sm text-stone-600 hover:text-stone-900 px-2 py-1.5 rounded hover:bg-stone-50">
           Ingestion
         </Link>
+        <Link href="/admin/portrait" className="block text-sm text-stone-600 hover:text-stone-900 px-2 py-1.5 rounded hover:bg-stone-50">
+          Portrait
+        </Link>
       </nav>
       <div className="flex-1 p-6">{children}</div>
     </div>
