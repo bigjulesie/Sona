@@ -1,43 +1,29 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
-          supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+  const isPublicRoute =
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/api') ||
+    pathname === '/login'
 
-  const { data: { user } } = await supabase.auth.getUser()
+  if (isPublicRoute) {
+    return NextResponse.next()
+  }
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
-  const isApiRoute = request.nextUrl.pathname.startsWith('/api')
-  const isLoginPage = request.nextUrl.pathname === '/login'
+  // Check for a Supabase session cookie (sb-<projectRef>-auth-token)
+  const hasSession = request.cookies
+    .getAll()
+    .some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'))
 
-  if (!user && !isAuthRoute && !isApiRoute && !isLoginPage) {
+  if (!hasSession) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  return supabaseResponse
+  return NextResponse.next()
 }
 
 export const config = {
