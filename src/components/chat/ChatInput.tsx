@@ -33,25 +33,28 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-end gap-3 p-4 border-t border-stone-200">
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-end gap-3 px-6 py-4 border-t border-brass/20 bg-parchment"
+    >
       <textarea
         ref={textareaRef}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Ask a question..."
+        placeholder="Ask a question…"
         rows={1}
         disabled={disabled}
-        className="flex-1 resize-none bg-stone-50 rounded-xl px-4 py-3 text-sm text-stone-900
-                   border border-stone-200 focus:outline-none focus:ring-2
-                   focus:ring-stone-900 focus:border-transparent
-                   disabled:opacity-50 max-h-32"
+        className="flex-1 resize-none bg-vellum border border-brass/20 rounded-xl px-4 py-3
+                   text-sm text-ink placeholder:text-mist/60
+                   focus:outline-none focus:border-brass
+                   disabled:opacity-50 max-h-32 transition-colors"
       />
       <button
         type="submit"
         disabled={disabled || !value.trim()}
-        className="px-4 py-3 bg-stone-900 text-white rounded-xl text-sm font-medium
-                   hover:bg-stone-800 disabled:opacity-50 transition-colors shrink-0"
+        className="px-5 py-3 bg-ink text-parchment rounded-xl text-xs tracking-widest uppercase
+                   hover:bg-ink/90 disabled:opacity-40 transition-colors shrink-0"
       >
         Send
       </button>

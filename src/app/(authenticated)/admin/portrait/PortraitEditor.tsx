@@ -39,11 +39,11 @@ export default function PortraitEditor({ portraits }: { portraits: Portrait[] })
     <div className="space-y-4 max-w-3xl">
       {portraits.length > 1 && (
         <div>
-          <label className="text-xs text-stone-500 block mb-1">Portrait</label>
+          <label className="block text-xs tracking-widest uppercase text-mist mb-2">Portrait</label>
           <select
             value={selected}
             onChange={e => handlePortraitChange(e.target.value)}
-            className="px-3 py-2 border border-stone-200 rounded text-sm"
+            className="bg-parchment border border-brass/20 rounded px-3 py-2 text-sm text-ink focus:outline-none focus:border-brass"
           >
             {portraits.map(p => (
               <option key={p.id} value={p.id}>{p.display_name} ({p.slug})</option>
@@ -53,20 +53,22 @@ export default function PortraitEditor({ portraits }: { portraits: Portrait[] })
       )}
 
       {currentPortrait && portraits.length === 1 && (
-        <p className="text-sm text-stone-500">
-          <span className="font-medium text-stone-700">{currentPortrait.display_name}</span>
-          {' '}<span className="text-stone-400">· {currentPortrait.slug}</span>
+        <p className="text-sm text-mist">
+          <span className="text-ink">{currentPortrait.display_name}</span>
+          <span className="mx-2 text-brass/40">·</span>
+          <span>{currentPortrait.slug}</span>
         </p>
       )}
 
-      <div className="bg-white border border-stone-200 rounded-lg p-6 space-y-4">
+      <div className="bg-vellum border border-brass/20 rounded p-6 space-y-4">
         <div>
-          <label className="text-xs text-stone-500 block mb-1">System Prompt</label>
+          <label className="block text-xs tracking-widest uppercase text-mist mb-2">System Prompt</label>
           <textarea
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
             rows={24}
-            className="w-full px-3 py-2 border border-stone-200 rounded text-sm font-mono resize-y leading-relaxed"
+            className="w-full bg-parchment border border-brass/20 rounded px-3 py-2 text-sm font-mono
+                       text-ink resize-y leading-relaxed focus:outline-none focus:border-brass transition-colors"
           />
         </div>
 
@@ -74,18 +76,18 @@ export default function PortraitEditor({ portraits }: { portraits: Portrait[] })
           <button
             onClick={handleSave}
             disabled={loading || !selected}
-            className="px-4 py-2 bg-stone-900 text-white rounded text-sm hover:bg-stone-800 disabled:opacity-50"
+            className="px-6 py-2.5 bg-ink text-parchment text-xs tracking-widest uppercase hover:bg-ink/90 disabled:opacity-50 transition-colors"
           >
-            {loading ? 'Saving...' : 'Save'}
+            {loading ? 'Saving…' : 'Save'}
           </button>
-          <span className="text-xs text-stone-400">{prompt.length} characters</span>
+          <span className="text-xs text-mist">{prompt.length} characters</span>
         </div>
 
         {status?.success && (
-          <p className="text-green-700 text-sm bg-green-50 rounded p-3">Saved.</p>
+          <p className="text-brass text-sm">Saved.</p>
         )}
         {status?.error && (
-          <p className="text-red-700 text-sm bg-red-50 rounded p-3">{status.error}</p>
+          <p className="text-red-700 text-sm">{status.error}</p>
         )}
       </div>
     </div>

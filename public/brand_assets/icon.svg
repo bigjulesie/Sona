@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Neural Heirloom Icon - Standalone mark for favicon/social -->
+
+  <!-- Abstract interlocking rings - representing continuity and legacy -->
+  <!-- Outer ring - the legacy passed down -->
+  <circle cx="20" cy="20" r="18" stroke="#2C2416" stroke-width="1.5" fill="none" opacity="0.9"/>
+
+  <!-- Inner ring - the wisdom preserved -->
+  <circle cx="20" cy="20" r="11" stroke="#2C2416" stroke-width="1.5" fill="none" opacity="0.9"/>
+
+  <!-- Center point - the essence of the individual -->
+  <circle cx="20" cy="20" r="3" fill="#8B7355"/>
+
+  <!-- Connecting arc - the transfer between generations -->
+  <path d="M 8 20 A 12 12 0 0 1 32 20" stroke="#8B7355" stroke-width="1.5" fill="none"/>
+</svg>

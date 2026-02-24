@@ -15,16 +15,16 @@ export default async function AdminOverview() {
 
   return (
     <div>
-      <h2 className="text-lg font-medium text-stone-900 mb-6">Admin Overview</h2>
+      <h2 className="font-display text-2xl text-ink mb-6 font-normal">Overview</h2>
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Users', value: userCount ?? 0 },
           { label: 'Knowledge Chunks', value: chunkCount ?? 0 },
           { label: 'Conversations', value: conversationCount ?? 0 },
         ].map(stat => (
-          <div key={stat.label} className="bg-white border border-stone-200 rounded-lg p-4">
-            <p className="text-xs text-stone-500">{stat.label}</p>
-            <p className="text-2xl font-light text-stone-900 mt-1">{stat.value}</p>
+          <div key={stat.label} className="bg-vellum border border-brass/20 rounded p-5">
+            <p className="text-xs tracking-widest uppercase text-mist mb-2">{stat.label}</p>
+            <p className="font-display text-4xl text-ink font-light">{stat.value}</p>
           </div>
         ))}
       </div>
