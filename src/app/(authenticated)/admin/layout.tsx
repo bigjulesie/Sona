@@ -21,21 +21,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect('/chat')
   }
 
+  const navLink = 'block text-sm text-mist hover:text-ink px-3 py-2 rounded hover:bg-vellum transition-colors tracking-wide'
+
   return (
     <div className="flex flex-1">
-      <nav className="w-48 border-r border-stone-200 bg-white p-4 space-y-1">
-        <Link href="/admin" className="block text-sm text-stone-600 hover:text-stone-900 px-2 py-1.5 rounded hover:bg-stone-50">
-          Overview
-        </Link>
-        <Link href="/admin/users" className="block text-sm text-stone-600 hover:text-stone-900 px-2 py-1.5 rounded hover:bg-stone-50">
-          Users
-        </Link>
-        <Link href="/admin/ingest" className="block text-sm text-stone-600 hover:text-stone-900 px-2 py-1.5 rounded hover:bg-stone-50">
-          Ingestion
-        </Link>
-        <Link href="/admin/portrait" className="block text-sm text-stone-600 hover:text-stone-900 px-2 py-1.5 rounded hover:bg-stone-50">
-          Portrait
-        </Link>
+      <nav className="w-48 border-r border-brass/20 bg-parchment p-4 space-y-0.5">
+        <Link href="/admin" className={navLink}>Overview</Link>
+        <Link href="/admin/users" className={navLink}>Users</Link>
+        <Link href="/admin/ingest" className={navLink}>Ingestion</Link>
+        <Link href="/admin/portrait" className={navLink}>Portrait</Link>
       </nav>
       <div className="flex-1 p-6">{children}</div>
     </div>

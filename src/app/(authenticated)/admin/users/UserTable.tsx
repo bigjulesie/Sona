@@ -16,6 +16,9 @@ interface Portrait {
   display_name: string
 }
 
+const inputClass = 'w-full bg-transparent border-b border-brass/30 py-1.5 text-ink text-sm focus:outline-none focus:border-brass placeholder:text-mist/50 transition-colors'
+const selectClass = 'bg-parchment border border-brass/20 rounded px-3 py-1.5 text-sm text-ink focus:outline-none focus:border-brass transition-colors'
+
 export function UserTable({ users, portraits }: { users: User[]; portraits: Portrait[] }) {
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteTier, setInviteTier] = useState('public')
@@ -31,7 +34,7 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
     if (result.error) {
       setMessage(`Error: ${result.error}`)
     } else {
-      setMessage('Invitation sent!')
+      setMessage('Invitation sent.')
       setInviteEmail('')
     }
     setLoading(false)
@@ -44,24 +47,20 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
   return (
     <>
       {/* Invite form */}
-      <form onSubmit={handleInvite} className="bg-white border border-stone-200 rounded-lg p-4 mb-6 flex gap-3 items-end">
-        <div className="flex-1">
-          <label className="text-xs text-stone-500 block mb-1">Email</label>
+      <form onSubmit={handleInvite} className="bg-vellum border border-brass/20 rounded p-5 mb-6 flex gap-4 items-end flex-wrap">
+        <div className="flex-1 min-w-[180px]">
+          <label className="block text-xs tracking-widest uppercase text-mist mb-2">Email</label>
           <input
             value={inviteEmail}
             onChange={e => setInviteEmail(e.target.value)}
             type="email"
             required
-            className="w-full px-3 py-2 border border-stone-200 rounded text-sm"
+            className={inputClass}
           />
         </div>
         <div>
-          <label className="text-xs text-stone-500 block mb-1">Tier</label>
-          <select
-            value={inviteTier}
-            onChange={e => setInviteTier(e.target.value)}
-            className="px-3 py-2 border border-stone-200 rounded text-sm"
-          >
+          <label className="block text-xs tracking-widest uppercase text-mist mb-2">Tier</label>
+          <select value={inviteTier} onChange={e => setInviteTier(e.target.value)} className={selectClass}>
             <option value="public">Public</option>
             <option value="acquaintance">Acquaintance</option>
             <option value="colleague">Colleague</option>
@@ -69,12 +68,8 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
           </select>
         </div>
         <div>
-          <label className="text-xs text-stone-500 block mb-1">Portrait</label>
-          <select
-            value={invitePortrait}
-            onChange={e => setInvitePortrait(e.target.value)}
-            className="px-3 py-2 border border-stone-200 rounded text-sm"
-          >
+          <label className="block text-xs tracking-widest uppercase text-mist mb-2">Portrait</label>
+          <select value={invitePortrait} onChange={e => setInvitePortrait(e.target.value)} className={selectClass}>
             {portraits.map(p => (
               <option key={p.id} value={p.id}>{p.display_name}</option>
             ))}
@@ -83,38 +78,40 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 bg-stone-900 text-white rounded text-sm hover:bg-stone-800 disabled:opacity-50"
+          className="px-5 py-2 bg-ink text-parchment text-xs tracking-widest uppercase hover:bg-ink/90 disabled:opacity-50 transition-colors"
         >
-          {loading ? 'Sending...' : 'Invite'}
+          {loading ? 'Sending…' : 'Invite'}
         </button>
       </form>
+
       {message && (
-        <p className={`text-sm mb-4 ${message.startsWith('Error') ? 'text-red-600' : 'text-green-700'}`}>
+        <p className={`text-sm mb-4 ${message.startsWith('Error') ? 'text-red-700' : 'text-brass'}`}>
           {message}
         </p>
       )}
 
       {/* Users table */}
-      <div className="bg-white border border-stone-200 rounded-lg overflow-hidden">
+      <div className="bg-vellum border border-brass/20 rounded overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-stone-50 text-stone-500 text-xs">
+          <thead className="border-b border-brass/20">
             <tr>
-              <th className="text-left px-4 py-3">Email</th>
-              <th className="text-left px-4 py-3">Name</th>
-              <th className="text-left px-4 py-3">Tier</th>
-              <th className="text-left px-4 py-3">Joined</th>
+              {['Email', 'Name', 'Tier', 'Joined'].map(h => (
+                <th key={h} className="text-left px-4 py-3 text-xs tracking-widest uppercase text-mist font-normal">
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {users.map(user => (
-              <tr key={user.id} className="border-t border-stone-100">
-                <td className="px-4 py-3">{user.email}</td>
-                <td className="px-4 py-3 text-stone-600">{user.full_name || '\u2014'}</td>
+              <tr key={user.id} className="border-t border-brass/10">
+                <td className="px-4 py-3 text-ink">{user.email}</td>
+                <td className="px-4 py-3 text-mist">{user.full_name || '—'}</td>
                 <td className="px-4 py-3">
                   <select
                     defaultValue={user.access_tier}
                     onChange={e => handleTierChange(user.id, e.target.value)}
-                    className="px-2 py-1 border border-stone-200 rounded text-xs"
+                    className="bg-parchment border border-brass/20 rounded px-2 py-1 text-xs text-ink focus:outline-none focus:border-brass"
                   >
                     <option value="public">Public</option>
                     <option value="acquaintance">Acquaintance</option>
@@ -122,8 +119,8 @@ export function UserTable({ users, portraits }: { users: User[]; portraits: Port
                     <option value="family">Family</option>
                   </select>
                 </td>
-                <td className="px-4 py-3 text-stone-400 text-xs">
-                  {user.created_at ? new Date(user.created_at).toLocaleDateString() : '\u2014'}
+                <td className="px-4 py-3 text-mist text-xs">
+                  {user.created_at ? new Date(user.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}
                 </td>
               </tr>
             ))}
