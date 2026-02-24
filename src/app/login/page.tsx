@@ -28,41 +28,47 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-parchment flex flex-col items-center justify-center px-6">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-6"
+      style={{ backgroundColor: '#F5F0E8' }}
+    >
       {/* Brass accent lines */}
-      <div className="fixed top-0 left-0 right-0 h-[2px] bg-brass opacity-50" />
-      <div className="fixed bottom-0 left-0 right-0 h-[2px] bg-brass opacity-50" />
+      <div className="fixed top-0 left-0 right-0 h-[2px]" style={{ backgroundColor: '#8B7355', opacity: 0.5 }} />
+      <div className="fixed bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: '#8B7355', opacity: 0.5 }} />
 
       <div className="w-full max-w-xs">
-        {/* Logo */}
-        <div className="flex justify-center mb-10">
+        {/* Logo — larger, more presence */}
+        <div className="flex justify-center mb-12">
           <Image
             src="/brand_assets/logo.svg"
             alt="Neural Heirloom"
-            width={180}
-            height={54}
+            width={210}
+            height={63}
             priority
           />
         </div>
 
         {/* Divider with icon */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="flex-1 h-px bg-brass/30" />
-          <Image src="/brand_assets/icon.svg" alt="" width={16} height={16} className="opacity-40" />
-          <div className="flex-1 h-px bg-brass/30" />
+        <div className="flex items-center gap-3 mb-10">
+          <div className="flex-1 h-px" style={{ backgroundColor: '#8B7355', opacity: 0.3 }} />
+          <Image src="/brand_assets/icon.svg" alt="" width={14} height={14} className="opacity-30" />
+          <div className="flex-1 h-px" style={{ backgroundColor: '#8B7355', opacity: 0.3 }} />
         </div>
 
         {sent ? (
           <div className="text-center space-y-2">
-            <p className="font-display text-2xl text-ink">Check your email</p>
-            <p className="text-mist text-sm">
+            <p className="font-display text-2xl" style={{ color: '#2C2416' }}>Check your email</p>
+            <p className="text-sm" style={{ color: '#9B9086' }}>
               A sign-in link has been sent to {email}
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-7">
             <div>
-              <label className="block text-xs tracking-widest uppercase text-mist mb-2">
+              <label
+                className="block text-xs tracking-widest uppercase mb-2"
+                style={{ color: '#9B9086' }}
+              >
                 Email address
               </label>
               <input
@@ -71,9 +77,11 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full bg-transparent border-b border-brass/40 py-2 text-ink text-sm
-                           focus:outline-none focus:border-brass placeholder:text-mist/50
-                           transition-colors"
+                className="w-full bg-transparent py-2 text-sm focus:outline-none transition-colors"
+                style={{
+                  borderBottom: '1px solid rgba(139, 115, 85, 0.4)',
+                  color: '#2C2416',
+                }}
               />
             </div>
 
@@ -82,8 +90,12 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-ink text-parchment text-xs tracking-widest uppercase
-                         hover:bg-ink/90 disabled:opacity-50 transition-colors"
+              className="w-full py-3 text-xs tracking-widest uppercase transition-colors disabled:opacity-50"
+              style={{
+                backgroundColor: '#2C2416',
+                color: '#F5F0E8',
+                border: '1px solid #2C2416',
+              }}
             >
               {loading ? 'Sending…' : 'Continue'}
             </button>

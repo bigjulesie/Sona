@@ -30,8 +30,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${cormorant.variable} ${lora.variable} antialiased`}>
+    <html lang="en" style={{ colorScheme: 'light' }}>
+      <head>
+        <meta name="color-scheme" content="light" />
+      </head>
+      <body
+        className={`${cormorant.variable} ${lora.variable} antialiased`}
+        style={{ backgroundColor: '#F5F0E8', color: '#2C2416' }}
+      >
         {children}
       </body>
     </html>
