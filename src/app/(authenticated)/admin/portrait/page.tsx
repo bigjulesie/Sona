@@ -12,25 +12,21 @@ export default async function PortraitPage() {
   if (error) {
     return (
       <div>
-        <h2 className="text-lg font-medium text-stone-900 mb-6">Portrait</h2>
+        <h2 className="font-display text-2xl text-ink mb-6 font-normal">Sona</h2>
         <p className="text-red-700 text-sm bg-red-50 rounded p-3">{error.message}</p>
-      </div>
-    )
-  }
-
-  if (!portraits || portraits.length === 0) {
-    return (
-      <div>
-        <h2 className="text-lg font-medium text-stone-900 mb-6">Portrait</h2>
-        <p className="text-sm text-stone-500">No portraits found. Create one in the database first.</p>
       </div>
     )
   }
 
   return (
     <div>
-      <h2 className="text-lg font-medium text-stone-900 mb-6">Portrait</h2>
-      <PortraitEditor portraits={portraits} />
+      <h2 className="font-display text-2xl text-ink mb-1 font-normal">Sona</h2>
+      <p className="text-sm text-mist mb-6">
+        {portraits && portraits.length > 0
+          ? 'Edit a Sona\'s identity and system prompt.'
+          : 'No Sonas yet. Create your first one below.'}
+      </p>
+      <PortraitEditor portraits={portraits ?? []} />
     </div>
   )
 }
