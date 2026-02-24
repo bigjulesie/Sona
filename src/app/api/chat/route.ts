@@ -3,9 +3,8 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { retrieveRelevantChunks } from '@/lib/rag/retrieve'
 import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic()
-
 export async function POST(request: NextRequest) {
+  const anthropic = new Anthropic()
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
 
