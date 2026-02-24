@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 
@@ -10,8 +9,6 @@ function LoginForm() {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const searchParams = useSearchParams()
-  const authError = searchParams.get('detail')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -92,9 +89,7 @@ function LoginForm() {
               />
             </div>
 
-            {(error || authError) && (
-              <p className="text-red-700 text-sm">{error || authError}</p>
-            )}
+            {error && <p className="text-red-700 text-sm">{error}</p>}
 
             <button
               type="submit"
