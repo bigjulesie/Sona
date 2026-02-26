@@ -46,16 +46,6 @@ export function ChatInterface({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // Auto-play TTS when streaming ends in voice mode
-  useEffect(() => {
-    if (!voiceMode || isStreaming || messages.length === 0) return
-    const last = messages[messages.length - 1]
-    if (last.role !== 'assistant' || !last.content) return
-    if (autoPlayedRef.current.has(last.id)) return
-    autoPlayedRef.current.add(last.id)
-    playTTS(last.id, last.content)
-  }, [isStreaming]) // eslint-disable-line react-hooks/exhaustive-deps
-
   const playTTS = useCallback(
     async (messageId: string, text: string) => {
       if (audioRef.current) {
@@ -76,6 +66,7 @@ export function ChatInterface({
         const blob = await res.blob()
         const url = URL.createObjectURL(blob)
         const audio = new Audio(url)
+        audio.dataset.blobUrl = url  // store for cleanup
         audioRef.current = audio
         audio.onended = () => {
           setPlayingMessageId(null)
@@ -89,15 +80,35 @@ export function ChatInterface({
     [portraitId]
   )
 
+  // Auto-play TTS when streaming ends in voice mode
+  useEffect(() => {
+    if (!voiceMode || isStreaming || messages.length === 0) return
+    const last = messages[messages.length - 1]
+    if (last.role !== 'assistant' || !last.content) return
+    if (autoPlayedRef.current.has(last.id)) return
+    autoPlayedRef.current.add(last.id)
+    playTTS(last.id, last.content)
+  }, [isStreaming, voiceMode, playTTS])
+
   function stopTTS() {
-    audioRef.current?.pause()
-    audioRef.current = null
+    if (audioRef.current) {
+      const blobUrl = audioRef.current.dataset.blobUrl
+      audioRef.current.pause()
+      if (blobUrl) URL.revokeObjectURL(blobUrl)
+      audioRef.current = null
+    }
     setPlayingMessageId(null)
   }
 
   // Stop audio when switching portraits or unmounting
   useEffect(() => {
-    return () => { audioRef.current?.pause() }
+    return () => {
+      if (audioRef.current) {
+        const blobUrl = audioRef.current.dataset.blobUrl
+        audioRef.current.pause()
+        if (blobUrl) URL.revokeObjectURL(blobUrl)
+      }
+    }
   }, [portraitId])
 
   return (
