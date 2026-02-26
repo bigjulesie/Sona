@@ -217,9 +217,17 @@ export default function PortraitEditor({ portraits: initial }: { portraits: Port
     formData.set('display_name', fields.display_name)
     formData.set('slug', fields.slug)
     formData.set('system_prompt', fields.system_prompt)
+    // voice fields default to false/null on creation — editable after saving
     const res = await createPortrait(formData)
     if (res.success && res.id) {
-      const newPortrait = { id: res.id, ...fields, voice_enabled: false, voice_provider_id: null }
+      const newPortrait = {
+        id: res.id,
+        display_name: fields.display_name,
+        slug: fields.slug,
+        system_prompt: fields.system_prompt,
+        voice_enabled: false,
+        voice_provider_id: null,
+      }
       setPortraits(prev => [...prev, newPortrait])
       setSelectedId(res.id)
       setCreating(false)
