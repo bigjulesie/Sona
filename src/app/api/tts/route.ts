@@ -11,7 +11,8 @@ export async function POST(req: NextRequest) {
     return new Response('text and portrait_id required', { status: 400 })
   }
 
-  if (!process.env.ELEVENLABS_API_KEY) {
+  const apiKey = process.env.ELEVENLABS_API_KEY
+  if (!apiKey) {
     return new Response('ELEVENLABS_API_KEY not configured', { status: 500 })
   }
 
@@ -21,7 +22,10 @@ export async function POST(req: NextRequest) {
     .eq('id', portrait_id)
     .single()
 
-  if (!portrait?.voice_enabled) {
+  if (!portrait) {
+    return new Response('Portrait not found', { status: 404 })
+  }
+  if (!portrait.voice_enabled) {
     return new Response('Voice not enabled for this portrait', { status: 403 })
   }
 
@@ -37,7 +41,7 @@ export async function POST(req: NextRequest) {
       {
         method: 'POST',
         headers: {
-          'xi-api-key': process.env.ELEVENLABS_API_KEY,
+          'xi-api-key': apiKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
