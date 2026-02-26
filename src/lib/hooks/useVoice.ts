@@ -18,6 +18,7 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
   const audioCtxRef = useRef<AudioContext | null>(null)
 
   const startRecording = useCallback(async () => {
+    if (status !== 'idle') return  // guard against re-entrant calls
     setError(null)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -49,7 +50,7 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
       setError('Could not access microphone. Please check your browser permissions.')
       setStatus('idle')
     }
-  }, [])
+  }, [status])
 
   const stopRecording = useCallback(async () => {
     const recorder = recorderRef.current
@@ -76,6 +77,8 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
       const { transcript } = await res.json()
       if (transcript?.trim()) {
         onTranscript(transcript.trim())
+      } else {
+        setError('No speech detected — please try again.')
       }
     } catch {
       setError('Transcription failed. Please try again.')
