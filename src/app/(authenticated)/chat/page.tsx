@@ -1,6 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { ChatInterface } from '@/components/chat/ChatInterface'
+import { ChatLayout } from '@/components/chat/ChatLayout'
 
 export default async function ChatPage() {
   const supabase = await createServerSupabaseClient()
@@ -8,14 +8,12 @@ export default async function ChatPage() {
 
   if (!user) redirect('/login')
 
-  // Get the first portrait (single-portrait for Phase 1)
-  const { data: portrait } = await supabase
+  const { data: portraits } = await supabase
     .from('portraits')
     .select('id, display_name')
-    .limit(1)
-    .single()
+    .order('created_at', { ascending: true })
 
-  if (!portrait) {
+  if (!portraits || portraits.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center text-stone-500 text-sm">
         No portrait configured yet.
@@ -23,12 +21,5 @@ export default async function ChatPage() {
     )
   }
 
-  return (
-    <div className="flex-1 flex flex-col">
-      <ChatInterface
-        portraitId={portrait.id}
-        portraitName={portrait.display_name}
-      />
-    </div>
-  )
+  return <ChatLayout portraits={portraits} />
 }

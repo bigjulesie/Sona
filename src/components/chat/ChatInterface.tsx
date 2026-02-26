@@ -10,10 +10,11 @@ interface ChatInterfaceProps {
   portraitId: string
   portraitName: string
   initialConversationId?: string
+  onConversationChange?: (id: string) => void
 }
 
-export function ChatInterface({ portraitId, portraitName, initialConversationId }: ChatInterfaceProps) {
-  const { messages, isStreaming, sendMessage, loadConversation } = useChat(portraitId)
+export function ChatInterface({ portraitId, portraitName, initialConversationId, onConversationChange }: ChatInterfaceProps) {
+  const { messages, isStreaming, conversationId, sendMessage, loadConversation } = useChat(portraitId)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -23,12 +24,18 @@ export function ChatInterface({ portraitId, portraitName, initialConversationId 
   }, [initialConversationId, loadConversation])
 
   useEffect(() => {
+    if (conversationId) {
+      onConversationChange?.(conversationId)
+    }
+  }, [conversationId, onConversationChange])
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto px-6 py-8">
+      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-8">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-5 text-center">
             <Image

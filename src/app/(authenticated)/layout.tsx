@@ -14,14 +14,15 @@ export default async function AuthenticatedLayout({
   if (!user) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-parchment flex flex-col">
-      <header className="border-b border-brass/20 bg-parchment px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+    <div className="h-screen bg-parchment flex flex-col overflow-hidden">
+      <header className="border-b border-brass/20 bg-parchment px-4 md:px-6 py-3 flex items-center justify-between sticky top-0 z-10 flex-shrink-0">
         <Image
           src="/brand_assets/logo.svg"
           alt="Neural Heirloom"
-          width={140}
-          height={42}
+          width={120}
+          height={36}
           priority
+          className="md:w-[140px] md:h-[42px]"
         />
         <form action={logout}>
           <button className="text-xs text-mist hover:text-ink tracking-widest uppercase transition-colors">
@@ -29,7 +30,7 @@ export default async function AuthenticatedLayout({
           </button>
         </form>
       </header>
-      <main className="flex-1 flex">{children}</main>
+      <main className="flex-1 flex min-h-0 overflow-hidden">{children}</main>
     </div>
   )
 }
