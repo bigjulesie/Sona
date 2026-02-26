@@ -6,8 +6,8 @@ export default async function PortraitPage() {
 
   const { data: portraits, error } = await supabase
     .from('portraits')
-    .select('id, slug, display_name, system_prompt')
-    .order('created_at')
+    .select('id, slug, display_name, system_prompt, voice_enabled, voice_provider_id')
+    .order('created_at', { ascending: true })
 
   if (error) {
     return (
