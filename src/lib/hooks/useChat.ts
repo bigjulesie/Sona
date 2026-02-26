@@ -94,5 +94,10 @@ export function useChat(portraitId: string) {
     })))
   }, [])
 
-  return { messages, isStreaming, conversationId, sendMessage, loadConversation }
+  const clearConversation = useCallback(() => {
+    setMessages([])
+    setConversationId(null)
+  }, [])
+
+  return { messages, isStreaming, conversationId, sendMessage, loadConversation, clearConversation }
 }
