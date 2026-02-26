@@ -186,6 +186,8 @@ export type Database = {
           slug: string
           system_prompt: string
           updated_at: string | null
+          voice_enabled: boolean
+          voice_provider_id: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -195,6 +197,8 @@ export type Database = {
           slug: string
           system_prompt: string
           updated_at?: string | null
+          voice_enabled?: boolean
+          voice_provider_id?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -204,6 +208,8 @@ export type Database = {
           slug?: string
           system_prompt?: string
           updated_at?: string | null
+          voice_enabled?: boolean
+          voice_provider_id?: string | null
         }
         Relationships: []
       }

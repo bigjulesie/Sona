@@ -8,6 +8,8 @@ interface Portrait {
   slug: string
   display_name: string
   system_prompt: string
+  voice_enabled: boolean
+  voice_provider_id: string | null
 }
 
 const inputClass = 'w-full bg-transparent border-b border-brass/30 py-1.5 text-ink text-sm focus:outline-none focus:border-brass placeholder:text-mist/40 transition-colors'
@@ -19,12 +21,20 @@ function PortraitForm({
   onSave,
 }: {
   portraitId: string | null
-  initial: { display_name: string; slug: string; system_prompt: string }
-  onSave: (fields: { display_name: string; slug: string; system_prompt: string }) => Promise<{ success?: boolean; error?: string }>
+  initial: { display_name: string; slug: string; system_prompt: string; voice_enabled: boolean; voice_provider_id: string | null }
+  onSave: (fields: {
+    display_name: string
+    slug: string
+    system_prompt: string
+    voice_enabled: boolean
+    voice_provider_id: string | null
+  }) => Promise<{ success?: boolean; error?: string }>
 }) {
   const [displayName, setDisplayName] = useState(initial.display_name)
   const [slug, setSlug] = useState(initial.slug)
   const [systemPrompt, setSystemPrompt] = useState(initial.system_prompt)
+  const [voiceEnabled, setVoiceEnabled] = useState(initial.voice_enabled)
+  const [voiceProviderId, setVoiceProviderId] = useState(initial.voice_provider_id ?? '')
   const [status, setStatus] = useState<{ success?: boolean; error?: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [generating, setGenerating] = useState(false)
@@ -39,7 +49,13 @@ function PortraitForm({
   async function handleSave() {
     setLoading(true)
     setStatus(null)
-    const res = await onSave({ display_name: displayName, slug, system_prompt: systemPrompt })
+    const res = await onSave({
+      display_name: displayName,
+      slug,
+      system_prompt: systemPrompt,
+      voice_enabled: voiceEnabled,
+      voice_provider_id: voiceProviderId || null,
+    })
     setStatus(res)
     setLoading(false)
   }
@@ -129,6 +145,41 @@ function PortraitForm({
         />
       </div>
 
+      <div className="border-t border-brass/20 pt-5 space-y-4">
+        <p className="text-xs tracking-widest uppercase text-mist">Voice</p>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setVoiceEnabled(v => !v)}
+            className={`relative inline-flex h-5 w-9 rounded-full border transition-colors ${
+              voiceEnabled ? 'bg-brass border-brass' : 'bg-vellum border-brass/30'
+            }`}
+            aria-pressed={voiceEnabled}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-parchment shadow transition-transform ${
+              voiceEnabled ? 'translate-x-4' : 'translate-x-0'
+            }`} />
+          </button>
+          <span className="text-sm text-ink">Voice enabled</span>
+        </div>
+
+        {voiceEnabled && (
+          <div>
+            <label className={labelClass}>ElevenLabs Voice ID</label>
+            <input
+              value={voiceProviderId}
+              onChange={e => setVoiceProviderId(e.target.value)}
+              placeholder="Leave blank to use default voice"
+              className={inputClass}
+            />
+            <p className="text-xs text-mist/60 mt-1">
+              Override the default voice with a specific ElevenLabs voice clone ID.
+            </p>
+          </div>
+        )}
+      </div>
+
       <div className="flex items-center gap-4">
         <button
           onClick={handleSave}
@@ -155,14 +206,28 @@ export default function PortraitEditor({ portraits: initial }: { portraits: Port
 
   const selected = portraits.find(p => p.id === selectedId)
 
-  async function handleCreate(fields: { display_name: string; slug: string; system_prompt: string }) {
+  async function handleCreate(fields: {
+    display_name: string
+    slug: string
+    system_prompt: string
+    voice_enabled: boolean
+    voice_provider_id: string | null
+  }) {
     const formData = new FormData()
     formData.set('display_name', fields.display_name)
     formData.set('slug', fields.slug)
     formData.set('system_prompt', fields.system_prompt)
+    // voice fields default to false/null on creation — editable after saving
     const res = await createPortrait(formData)
     if (res.success && res.id) {
-      const newPortrait = { id: res.id, ...fields }
+      const newPortrait = {
+        id: res.id,
+        display_name: fields.display_name,
+        slug: fields.slug,
+        system_prompt: fields.system_prompt,
+        voice_enabled: false,
+        voice_provider_id: null,
+      }
       setPortraits(prev => [...prev, newPortrait])
       setSelectedId(res.id)
       setCreating(false)
@@ -170,11 +235,19 @@ export default function PortraitEditor({ portraits: initial }: { portraits: Port
     return res
   }
 
-  async function handleUpdate(fields: { display_name: string; slug: string; system_prompt: string }) {
+  async function handleUpdate(fields: {
+    display_name: string
+    slug: string
+    system_prompt: string
+    voice_enabled: boolean
+    voice_provider_id: string | null
+  }) {
     if (!selectedId) return { error: 'No Sona selected' }
     const res = await updatePortrait(selectedId, fields)
     if (res.success) {
-      setPortraits(prev => prev.map(p => p.id === selectedId ? { ...p, ...fields } : p))
+      setPortraits(prev => prev.map(p =>
+        p.id === selectedId ? { ...p, ...fields } : p
+      ))
     }
     return res
   }
@@ -209,7 +282,7 @@ export default function PortraitEditor({ portraits: initial }: { portraits: Port
         <PortraitForm
           key="new"
           portraitId={null}
-          initial={{ display_name: '', slug: '', system_prompt: '' }}
+          initial={{ display_name: '', slug: '', system_prompt: '', voice_enabled: false, voice_provider_id: null }}
           onSave={handleCreate}
         />
       ) : selected ? (
