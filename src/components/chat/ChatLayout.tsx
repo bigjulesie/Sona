@@ -5,6 +5,7 @@ import { ChatInterface } from './ChatInterface'
 import { ConversationSidebar } from './ConversationSidebar'
 
 interface Portrait {
+  voice_enabled: boolean
   id: string
   display_name: string
 }
@@ -111,6 +112,7 @@ export function ChatLayout({ portraits }: Props) {
             key={selectedPortrait.id}
             portraitId={selectedPortrait.id}
             portraitName={selectedPortrait.display_name}
+            voiceEnabled={selectedPortrait.voice_enabled}
             initialConversationId={activeConversationId ?? undefined}
             onConversationChange={handleConversationChange}
           />

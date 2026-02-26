@@ -10,7 +10,7 @@ export default async function ChatPage() {
 
   const { data: portraits } = await supabase
     .from('portraits')
-    .select('id, display_name')
+    .select('id, display_name, voice_enabled')
     .order('created_at', { ascending: true })
 
   if (!portraits || portraits.length === 0) {
