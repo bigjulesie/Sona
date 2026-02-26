@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createPortrait, updatePortrait } from './actions'
+import { createPortrait, updatePortrait, generateSystemPrompt } from './actions'
 
 interface Portrait {
   id: string
@@ -14,9 +14,11 @@ const inputClass = 'w-full bg-transparent border-b border-brass/30 py-1.5 text-i
 const labelClass = 'block text-xs tracking-widest uppercase text-mist mb-2'
 
 function PortraitForm({
+  portraitId,
   initial,
   onSave,
 }: {
+  portraitId: string | null
   initial: { display_name: string; slug: string; system_prompt: string }
   onSave: (fields: { display_name: string; slug: string; system_prompt: string }) => Promise<{ success?: boolean; error?: string }>
 }) {
@@ -25,8 +27,8 @@ function PortraitForm({
   const [systemPrompt, setSystemPrompt] = useState(initial.system_prompt)
   const [status, setStatus] = useState<{ success?: boolean; error?: string } | null>(null)
   const [loading, setLoading] = useState(false)
+  const [generating, setGenerating] = useState(false)
 
-  // Auto-generate slug from display name (only when slug hasn't been manually edited)
   function handleDisplayNameChange(value: string) {
     setDisplayName(value)
     if (slug === '' || slug === toSlug(displayName)) {
@@ -40,6 +42,20 @@ function PortraitForm({
     const res = await onSave({ display_name: displayName, slug, system_prompt: systemPrompt })
     setStatus(res)
     setLoading(false)
+  }
+
+  async function handleGenerate() {
+    if (!portraitId) return
+    setGenerating(true)
+    setStatus(null)
+    const res = await generateSystemPrompt(portraitId, displayName)
+    if (res.systemPrompt) {
+      setSystemPrompt(res.systemPrompt)
+      setStatus({ success: true })
+    } else if (res.error) {
+      setStatus({ error: res.error })
+    }
+    setGenerating(false)
   }
 
   return (
@@ -65,30 +81,63 @@ function PortraitForm({
           <p className="text-xs text-mist/60 mt-1">Lowercase letters, numbers and hyphens only</p>
         </div>
       </div>
+
       <div>
         <div className="flex items-baseline justify-between mb-2">
           <label className={labelClass}>System Prompt</label>
           <span className="text-xs text-mist/60">{systemPrompt.length} characters</span>
         </div>
+
+        {/* Generate button — only shown when editing an existing portrait */}
+        {portraitId && (
+          <div className="mb-3">
+            <button
+              onClick={handleGenerate}
+              disabled={generating || loading}
+              className="flex items-center gap-2 px-4 py-2 border border-brass/30 text-xs tracking-widest uppercase text-mist hover:text-ink hover:border-brass disabled:opacity-40 transition-colors"
+            >
+              {generating ? (
+                <>
+                  <span className="inline-block w-3 h-3 border border-brass/60 border-t-transparent rounded-full animate-spin" />
+                  Generating…
+                </>
+              ) : (
+                <>
+                  <span className="text-brass">✦</span>
+                  Generate from knowledge base
+                </>
+              )}
+            </button>
+            {generating && (
+              <p className="text-xs text-mist mt-2">
+                Reading ingested material and synthesising — this may take 30–60 seconds.
+              </p>
+            )}
+          </div>
+        )}
+
         <textarea
           value={systemPrompt}
           onChange={e => setSystemPrompt(e.target.value)}
           rows={20}
-          placeholder="You are…"
+          placeholder={portraitId
+            ? 'Ingest content first, then generate — or write a system prompt manually.'
+            : 'You are… (optional — you can generate this after ingesting content)'}
           className="w-full bg-parchment border border-brass/20 rounded px-3 py-2 text-sm font-mono
                      text-ink resize-y leading-relaxed focus:outline-none focus:border-brass transition-colors
                      placeholder:text-mist/40"
         />
       </div>
+
       <div className="flex items-center gap-4">
         <button
           onClick={handleSave}
-          disabled={loading || !displayName || !slug || !systemPrompt}
+          disabled={loading || generating || !displayName || !slug}
           className="px-6 py-2.5 bg-ink text-parchment text-xs tracking-widest uppercase hover:bg-ink/90 disabled:opacity-50 transition-colors"
         >
           {loading ? 'Saving…' : 'Save'}
         </button>
-        {status?.success && <span className="text-brass text-sm">Saved.</span>}
+        {status?.success && !generating && <span className="text-brass text-sm">Saved.</span>}
         {status?.error && <span className="text-red-700 text-sm">{status.error}</span>}
       </div>
     </div>
@@ -122,7 +171,7 @@ export default function PortraitEditor({ portraits: initial }: { portraits: Port
   }
 
   async function handleUpdate(fields: { display_name: string; slug: string; system_prompt: string }) {
-    if (!selectedId) return { error: 'No portrait selected' }
+    if (!selectedId) return { error: 'No Sona selected' }
     const res = await updatePortrait(selectedId, fields)
     if (res.success) {
       setPortraits(prev => prev.map(p => p.id === selectedId ? { ...p, ...fields } : p))
@@ -132,7 +181,6 @@ export default function PortraitEditor({ portraits: initial }: { portraits: Port
 
   return (
     <div className="space-y-5 max-w-3xl">
-      {/* Header with portrait switcher and new button */}
       <div className="flex items-center gap-3">
         {portraits.length > 0 && (
           <select
@@ -160,12 +208,14 @@ export default function PortraitEditor({ portraits: initial }: { portraits: Port
       {creating ? (
         <PortraitForm
           key="new"
+          portraitId={null}
           initial={{ display_name: '', slug: '', system_prompt: '' }}
           onSave={handleCreate}
         />
       ) : selected ? (
         <PortraitForm
           key={selected.id}
+          portraitId={selected.id}
           initial={selected}
           onSave={handleUpdate}
         />
