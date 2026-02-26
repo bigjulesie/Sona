@@ -16,10 +16,26 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
+  const mimeTypeRef = useRef<string>('audio/webm')
 
   const startRecording = useCallback(async () => {
     if (status !== 'idle') return  // guard against re-entrant calls
     setError(null)
+
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : MediaRecorder.isTypeSupported('audio/webm')
+        ? 'audio/webm'
+        : null
+
+    if (!mimeType) {
+      setError('Your browser does not support audio recording.')
+      setStatus('idle')
+      return
+    }
+
+    mimeTypeRef.current = mimeType
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
@@ -32,10 +48,6 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
       analyserNode.fftSize = 256
       source.connect(analyserNode)
       setAnalyser(analyserNode)
-
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-        ? 'audio/webm;codecs=opus'
-        : 'audio/webm'
 
       const recorder = new MediaRecorder(stream, { mimeType })
       chunksRef.current = []
@@ -55,6 +67,7 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
   const stopRecording = useCallback(async () => {
     const recorder = recorderRef.current
     if (!recorder || recorder.state === 'inactive') return
+    if (status !== 'recording') return
 
     setStatus('transcribing')
     setAnalyser(null)
@@ -67,9 +80,10 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
     streamRef.current?.getTracks().forEach((t) => t.stop())
     audioCtxRef.current?.close()
 
-    const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
+    const blob = new Blob(chunksRef.current, { type: mimeTypeRef.current })
     const formData = new FormData()
     formData.append('audio', blob, 'recording.webm')
+    formData.append('mimeType', mimeTypeRef.current)
 
     try {
       const res = await fetch('/api/transcribe', { method: 'POST', body: formData })
@@ -85,7 +99,7 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
     } finally {
       setStatus('idle')
     }
-  }, [onTranscript])
+  }, [onTranscript, status])
 
   return { status, error, analyser, startRecording, stopRecording }
 }

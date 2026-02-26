@@ -14,6 +14,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'DEEPGRAM_API_KEY not configured' }, { status: 500 })
   }
 
+  const mimeType = (formData.get('mimeType') as string | null) ?? 'audio/webm'
+
   const buffer = await audio.arrayBuffer()
 
   try {
@@ -23,7 +25,7 @@ export async function POST(req: NextRequest) {
         method: 'POST',
         headers: {
           Authorization: `Token ${process.env.DEEPGRAM_API_KEY}`,
-          'Content-Type': 'audio/webm',
+          'Content-Type': mimeType.split(';')[0], // strip codec param, keep container type
         },
         body: buffer,
       }

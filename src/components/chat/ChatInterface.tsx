@@ -74,6 +74,11 @@ export function ChatInterface({
         }
         await audio.play()
       } catch {
+        if (audioRef.current) {
+          const blobUrl = audioRef.current.dataset.blobUrl
+          if (blobUrl) URL.revokeObjectURL(blobUrl)
+          audioRef.current = null
+        }
         setPlayingMessageId(null)
       }
     },
