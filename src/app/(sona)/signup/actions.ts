@@ -14,6 +14,6 @@ export async function signUpWithMagicLink(formData: FormData) {
     },
   })
 
-  if (error) return { error: error.message }
+  if (error) redirect(`/signup?error=${encodeURIComponent(error.message)}`)
   redirect('/signup?sent=true')
 }

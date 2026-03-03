@@ -1,11 +1,11 @@
 import { signUpWithMagicLink } from './actions'
 
 interface PageProps {
-  searchParams: Promise<{ sent?: string }>
+  searchParams: Promise<{ sent?: string; error?: string }>
 }
 
 export default async function SignUpPage({ searchParams }: PageProps) {
-  const { sent } = await searchParams
+  const { sent, error } = await searchParams
 
   if (sent) {
     return (
@@ -26,6 +26,7 @@ export default async function SignUpPage({ searchParams }: PageProps) {
         <form action={signUpWithMagicLink} className="space-y-4">
           <input type="email" name="email" placeholder="your@email.com" required
             className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+          {error && <p className="text-red-600 text-sm">{error}</p>}
           <button type="submit"
             className="w-full py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-700 transition-colors">
             Continue with email
