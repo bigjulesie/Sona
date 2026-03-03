@@ -21,12 +21,19 @@ export async function POST(request: NextRequest) {
   // Get portrait system prompt
   const { data: portrait } = await supabase
     .from('portraits')
-    .select('system_prompt, display_name')
+    .select('system_prompt, display_name, brand, monthly_price_cents')
     .eq('id', portrait_id)
     .single()
 
   if (!portrait) {
     return new Response('Portrait not found', { status: 404 })
+  }
+
+  if (portrait.brand === 'sona' && portrait.monthly_price_cents) {
+    const { hasActiveSubscription } = await import('@/lib/subscriptions')
+    if (!(await hasActiveSubscription(supabase, user.id, portrait_id))) {
+      return new Response('Subscription required', { status: 403 })
+    }
   }
 
   // Retrieve relevant knowledge chunks (RLS filters by user tier)
