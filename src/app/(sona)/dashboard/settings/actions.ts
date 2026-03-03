@@ -3,11 +3,12 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 export async function updateSonaSettings(formData: FormData) {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  if (!user) redirect('/login')
 
   const { data: portrait } = await supabase
     .from('portraits')
@@ -15,7 +16,7 @@ export async function updateSonaSettings(formData: FormData) {
     .eq('creator_id', user.id)
     .single()
 
-  if (!portrait) return
+  if (!portrait) redirect('/dashboard/create')
 
   const { error } = await createAdminClient().from('portraits').update({
     tagline: formData.get('tagline') as string,

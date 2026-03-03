@@ -16,7 +16,11 @@ export function BillingPortalButton() {
         return
       }
       const { url } = await res.json()
-      if (url) window.location.href = url
+      if (url) {
+        window.location.href = url
+      } else {
+        setError('Unable to open billing portal. Please try again.')
+      }
     } catch {
       setError('Unable to open billing portal. Please try again.')
     } finally {

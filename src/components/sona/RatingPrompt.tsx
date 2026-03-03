@@ -17,6 +17,7 @@ export function RatingPrompt({ portraitId, messageCount, existingRating }: Props
   if (messageCount < 5) return null
 
   async function handleRate(score: number) {
+    const previous = selected
     setSelected(score)
     setError(null)
     try {
@@ -26,11 +27,13 @@ export function RatingPrompt({ portraitId, messageCount, existingRating }: Props
         body: JSON.stringify({ portrait_id: portraitId, score }),
       })
       if (!res.ok) {
+        setSelected(previous)
         setError('Failed to save rating.')
         return
       }
       setSubmitted(true)
     } catch {
+      setSelected(previous)
       setError('Failed to save rating.')
     }
   }
