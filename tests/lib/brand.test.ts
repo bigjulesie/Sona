@@ -9,17 +9,17 @@ import { headers } from 'next/headers'
 
 describe('getBrand', () => {
   it('returns nh when x-brand is nh', async () => {
-    vi.mocked(headers).mockReturnValue({ get: (k: string) => k === 'x-brand' ? 'nh' : null } as any)
+    vi.mocked(headers).mockResolvedValue({ get: (k: string) => k === 'x-brand' ? 'nh' : null } as any)
     expect(await getBrand()).toBe('nh')
   })
 
   it('returns sona when x-brand is sona', async () => {
-    vi.mocked(headers).mockReturnValue({ get: (k: string) => k === 'x-brand' ? 'sona' : null } as any)
+    vi.mocked(headers).mockResolvedValue({ get: (k: string) => k === 'x-brand' ? 'sona' : null } as any)
     expect(await getBrand()).toBe('sona')
   })
 
   it('defaults to nh when header missing', async () => {
-    vi.mocked(headers).mockReturnValue({ get: () => null } as any)
+    vi.mocked(headers).mockResolvedValue({ get: () => null } as any)
     expect(await getBrand()).toBe('nh')
   })
 })
