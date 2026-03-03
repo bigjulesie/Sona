@@ -45,6 +45,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <span className="hidden md:inline">Chunks</span>
           <span className="md:hidden text-center block" title="Chunks">≡</span>
         </Link>
+        <Link href="/admin/interviews" className={navLink}>
+          <span className="hidden md:inline">Interviews</span>
+          <span className="md:hidden text-center block" title="Interviews">✉</span>
+        </Link>
       </nav>
       <div className="flex-1 p-4 md:p-6 overflow-y-auto">{children}</div>
     </div>
