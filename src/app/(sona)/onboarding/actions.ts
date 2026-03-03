@@ -9,10 +9,12 @@ export async function completeOnboarding(destination: 'create' | 'explore') {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  await createAdminClient()
+  const { error } = await createAdminClient()
     .from('profiles')
     .update({ onboarding_complete: true })
     .eq('id', user.id)
+
+  if (error) redirect('/onboarding?error=true')
 
   redirect(destination === 'create' ? '/dashboard/create' : '/explore')
 }
