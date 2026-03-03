@@ -1,7 +1,14 @@
+import type { Metadata } from 'next'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { logout } from '@/app/login/actions'
+import { logout } from '@/app/(shared)/login/actions'
 import Image from 'next/image'
+
+export const metadata: Metadata = {
+  title: { default: 'Neural Heirloom', template: '%s | Neural Heirloom' },
+  description: 'A private archive of memory and voice',
+  icons: { icon: '/brand_assets/favicon.svg' },
+}
 
 export default async function AuthenticatedLayout({
   children,

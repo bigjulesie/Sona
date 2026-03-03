@@ -17,11 +17,8 @@ const lora = Lora({
 })
 
 export const metadata: Metadata = {
-  title: 'Neural Heirloom',
-  description: 'A private archive of memory and voice',
-  icons: {
-    icon: '/brand_assets/favicon.svg',
-  },
+  title: { default: 'Sona', template: '%s | Sona' },
+  description: 'Meet the people who shaped your world',
 }
 
 export default function RootLayout({
