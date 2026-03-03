@@ -48,7 +48,7 @@ export default async function SonaPage({ params }: PageProps) {
             className="w-24 h-24 rounded-full object-cover shrink-0" />
         ) : (
           <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-            <span className="text-3xl font-semibold text-gray-400">{portrait.display_name[0] ?? '?'}</span>
+            <span className="text-3xl font-semibold text-gray-400">{(portrait.display_name?.[0]) ?? '?'}</span>
           </div>
         )}
         <div>
@@ -56,12 +56,12 @@ export default async function SonaPage({ params }: PageProps) {
           {portrait.tagline && <p className="text-gray-500 mt-1">{portrait.tagline}</p>}
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
             <span>{(stats?.subscriber_count ?? 0).toLocaleString()} subscribers</span>
-            {stats?.avg_rating && (stats?.rating_count ?? 0) >= 5 && (
+            {stats?.avg_rating != null && (stats?.rating_count ?? 0) >= 5 && (
               <span>★ {stats.avg_rating}</span>
             )}
             <span className={portrait.monthly_price_cents ? 'text-indigo-600' : 'text-green-600'}>
               {portrait.monthly_price_cents
-                ? `$${(portrait.monthly_price_cents / 100).toFixed(0)}/month`
+                ? `$${(portrait.monthly_price_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}/month`
                 : 'Free'}
             </span>
           </div>
@@ -76,7 +76,7 @@ export default async function SonaPage({ params }: PageProps) {
         <div className="mb-8 p-6 bg-gray-50 rounded-2xl">
           <p className="text-gray-600 text-sm mb-4">
             {portrait.monthly_price_cents
-              ? `Subscribe for $${(portrait.monthly_price_cents / 100).toFixed(0)}/month to have a full conversation.`
+              ? `Subscribe for $${(portrait.monthly_price_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}/month to have a full conversation.`
               : 'Follow for free to unlock full conversations.'}
           </p>
           <SubscribeButton
