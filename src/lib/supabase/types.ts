@@ -77,6 +77,13 @@ export type Database = {
             foreignKeyName: "conversations_portrait_id_fkey"
             columns: ["portrait_id"]
             isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
             referencedRelation: "portraits"
             referencedColumns: ["id"]
           },
@@ -85,6 +92,61 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_requests: {
+        Row: {
+          created_at: string | null
+          creator_id: string
+          id: string
+          notes: string | null
+          portrait_id: string
+          scheduled_at: string | null
+          status: string
+          whatsapp_number: string
+        }
+        Insert: {
+          created_at?: string | null
+          creator_id: string
+          id?: string
+          notes?: string | null
+          portrait_id: string
+          scheduled_at?: string | null
+          status?: string
+          whatsapp_number: string
+        }
+        Update: {
+          created_at?: string | null
+          creator_id?: string
+          id?: string
+          notes?: string | null
+          portrait_id?: string
+          scheduled_at?: string | null
+          status?: string
+          whatsapp_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_requests_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interview_requests_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interview_requests_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
             referencedColumns: ["id"]
           },
         ]
@@ -130,6 +192,13 @@ export type Database = {
           source_type?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "knowledge_chunks_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "knowledge_chunks_portrait_id_fkey"
             columns: ["portrait_id"]
@@ -300,7 +369,60 @@ export type Database = {
             foreignKeyName: "profiles_portrait_id_fkey"
             columns: ["portrait_id"]
             isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
             referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ratings: {
+        Row: {
+          created_at: string | null
+          id: string
+          portrait_id: string
+          score: number
+          subscriber_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          portrait_id: string
+          score: number
+          subscriber_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          portrait_id?: string
+          score?: number
+          subscriber_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -341,6 +463,13 @@ export type Database = {
             foreignKeyName: "subscriptions_portrait_id_fkey"
             columns: ["portrait_id"]
             isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
             referencedRelation: "portraits"
             referencedColumns: ["id"]
           },
@@ -355,7 +484,24 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      portrait_discovery: {
+        Row: {
+          avatar_url: string | null
+          avg_rating: number | null
+          brand: string | null
+          category: string | null
+          display_name: string | null
+          id: string | null
+          monthly_price_cents: number | null
+          new_subscribers_30d: number | null
+          rating_count: number | null
+          slug: string | null
+          subscriber_count: number | null
+          tagline: string | null
+          tags: string[] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       match_knowledge_chunks: {
