@@ -35,6 +35,9 @@ export async function POST(request: NextRequest) {
     success_url: `${origin}/sona/${portrait.slug}?subscribed=true`,
     cancel_url: `${origin}/sona/${portrait.slug}`,
     metadata: { portrait_id, user_id: user.id },
+    subscription_data: {
+      metadata: { portrait_id, user_id: user.id },
+    },
   })
 
   return NextResponse.json({ url: session.url })

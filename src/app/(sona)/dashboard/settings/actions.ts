@@ -14,7 +14,7 @@ export async function updateSonaSettings(formData: FormData) {
     .from('portraits')
     .select('id')
     .eq('creator_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!portrait) redirect('/dashboard/create')
 

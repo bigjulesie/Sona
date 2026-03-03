@@ -48,7 +48,16 @@ export async function POST(request: NextRequest) {
 
   // Get or create conversation
   let convId = conversation_id
-  if (!convId) {
+  if (conversation_id) {
+    const { data: conv } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('id', conversation_id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+    if (!conv) return new Response('Forbidden', { status: 403 })
+    convId = conversation_id
+  } else {
     const { data: conv } = await supabase
       .from('conversations')
       .insert({ user_id: user.id, portrait_id, title: message.slice(0, 100) })
