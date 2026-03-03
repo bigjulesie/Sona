@@ -257,7 +257,9 @@ export type Database = {
           id: string
           invited_by: string | null
           is_admin: boolean
+          onboarding_complete: boolean
           portrait_id: string | null
+          stripe_customer_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -268,7 +270,9 @@ export type Database = {
           id: string
           invited_by?: string | null
           is_admin?: boolean
+          onboarding_complete?: boolean
           portrait_id?: string | null
+          stripe_customer_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -279,7 +283,9 @@ export type Database = {
           id?: string
           invited_by?: string | null
           is_admin?: boolean
+          onboarding_complete?: boolean
           portrait_id?: string | null
+          stripe_customer_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -295,6 +301,54 @@ export type Database = {
             columns: ["portrait_id"]
             isOneToOne: false
             referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          id: string
+          portrait_id: string
+          status: string
+          stripe_subscription_id: string | null
+          subscriber_id: string
+          tier: Database["public"]["Enums"]["access_tier"]
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          id?: string
+          portrait_id: string
+          status: string
+          stripe_subscription_id?: string | null
+          subscriber_id: string
+          tier?: Database["public"]["Enums"]["access_tier"]
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          id?: string
+          portrait_id?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          subscriber_id?: string
+          tier?: Database["public"]["Enums"]["access_tier"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
