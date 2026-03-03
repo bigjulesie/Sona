@@ -16,12 +16,23 @@ export async function createSonaIdentity(formData: FormData) {
   const tags = (formData.get('tags') as string)
     .split(',').map(t => t.trim()).filter(Boolean)
 
-  const slug = display_name
+  let slug = display_name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
 
-  const { data: portrait } = await createAdminClient()
+  // Ensure slug uniqueness by checking for existing portraits
+  const { data: existing } = await createAdminClient()
+    .from('portraits')
+    .select('id')
+    .eq('slug', slug)
+    .maybeSingle()
+
+  if (existing) {
+    slug = `${slug}-${Date.now().toString(36)}`
+  }
+
+  const { data: portrait, error: insertError } = await createAdminClient()
     .from('portraits')
     .insert({
       creator_id: user.id,
@@ -38,7 +49,9 @@ export async function createSonaIdentity(formData: FormData) {
     .select('id')
     .single()
 
-  if (!portrait) return
+  if (insertError || !portrait) {
+    throw new Error('Failed to create Sona. Please try again.')
+  }
 
   redirect(`/dashboard/create?step=2&portrait_id=${portrait.id}`)
 }

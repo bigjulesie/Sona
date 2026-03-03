@@ -29,6 +29,20 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
 
   if (existing && step === '1') redirect('/dashboard')
 
+  // Verify portrait_id ownership for steps > 1
+  let verifiedPortraitId: string | undefined
+  if (portrait_id && step !== '1') {
+    const { data: ownedPortrait } = await supabase
+      .from('portraits')
+      .select('id')
+      .eq('id', portrait_id)
+      .eq('creator_id', user.id)
+      .maybeSingle()
+    verifiedPortraitId = ownedPortrait?.id
+  } else {
+    verifiedPortraitId = portrait_id
+  }
+
   return (
     <div className="max-w-lg mx-auto">
       {/* Step indicator */}
@@ -82,18 +96,18 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
         </form>
       )}
 
-      {step === '2' && portrait_id && <InterviewStep portraitId={portrait_id} />}
+      {step === '2' && verifiedPortraitId && <InterviewStep portraitId={verifiedPortraitId} />}
 
-      {step === '3' && portrait_id && (
+      {step === '3' && verifiedPortraitId && (
         <div className="text-center">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Add content (optional)</h2>
           <p className="text-gray-500 text-sm mb-6">Upload documents or writings to enrich your Sona. You can always do this later.</p>
           <div className="flex gap-3 justify-center">
-            <a href={`/dashboard/content?portrait_id=${portrait_id}`}
+            <a href={`/dashboard/content?portrait_id=${verifiedPortraitId}`}
               className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm hover:border-gray-400 transition-colors">
               Add content
             </a>
-            <a href={`/dashboard/create?step=4&portrait_id=${encodeURIComponent(portrait_id)}`}
+            <a href={`/dashboard/create?step=4&portrait_id=${encodeURIComponent(verifiedPortraitId)}`}
               className="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-sm hover:bg-gray-700 transition-colors">
               Skip for now
             </a>
@@ -101,7 +115,7 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
         </div>
       )}
 
-      {step === '4' && portrait_id && <PricingStep portraitId={portrait_id} />}
+      {step === '4' && verifiedPortraitId && <PricingStep portraitId={verifiedPortraitId} />}
     </div>
   )
 }
