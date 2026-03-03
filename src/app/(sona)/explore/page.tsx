@@ -36,7 +36,7 @@ export default async function ExplorePage({ searchParams }: PageProps) {
       <div className="flex flex-wrap gap-2 mb-6">
         {CATEGORIES.map(cat => (
           <a key={cat}
-            href={`/explore?category=${cat}&sort=${sort}${q ? `&q=${q}` : ''}`}
+            href={`/explore?category=${encodeURIComponent(cat)}&sort=${encodeURIComponent(sort)}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
               (category ?? 'All') === cat
                 ? 'bg-gray-900 text-white'
@@ -48,7 +48,9 @@ export default async function ExplorePage({ searchParams }: PageProps) {
       </div>
 
       <div className="flex items-center gap-4 mb-8">
-        <form className="flex-1 max-w-xs">
+        <form action="/explore" className="flex-1 max-w-xs">
+          <input type="hidden" name="sort" value={sort} />
+          {category && <input type="hidden" name="category" value={category} />}
           <input name="q" defaultValue={q} placeholder="Search by name…"
             className="w-full px-4 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
         </form>
@@ -59,7 +61,7 @@ export default async function ExplorePage({ searchParams }: PageProps) {
             { value: 'trending', label: 'Trending' },
           ].map(opt => (
             <a key={opt.value}
-              href={`/explore?sort=${opt.value}${category ? `&category=${category}` : ''}${q ? `&q=${q}` : ''}`}
+              href={`/explore?sort=${encodeURIComponent(opt.value)}${category ? `&category=${encodeURIComponent(category)}` : ''}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
               className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 sort === opt.value ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-900'
               }`}>

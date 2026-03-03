@@ -17,6 +17,7 @@ export function SonaCard({
   slug, display_name, tagline, avatar_url, category,
   subscriber_count, avg_rating, rating_count, monthly_price_cents,
 }: SonaCardProps) {
+  const isPaid = monthly_price_cents != null && monthly_price_cents > 0
   return (
     <Link href={`/sona/${slug}`} className="block group">
       <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all">
@@ -26,7 +27,7 @@ export function SonaCard({
               className="w-14 h-14 rounded-full object-cover flex-shrink-0" />
           ) : (
             <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-xl font-semibold text-gray-400">{display_name[0]}</span>
+              <span className="text-xl font-semibold text-gray-400">{display_name[0] ?? '?'}</span>
             </div>
           )}
           <div className="min-w-0 flex-1">
@@ -45,12 +46,12 @@ export function SonaCard({
             {avg_rating && rating_count >= 5 && <span>★ {avg_rating}</span>}
           </div>
           <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${
-            monthly_price_cents
+            isPaid
               ? 'bg-indigo-50 text-indigo-600'
               : 'bg-green-50 text-green-600'
           }`}>
-            {monthly_price_cents
-              ? `$${(monthly_price_cents / 100).toFixed(0)}/mo`
+            {isPaid
+              ? `$${(monthly_price_cents! / 100).toFixed(0)}/mo`
               : 'Free'}
           </span>
         </div>
