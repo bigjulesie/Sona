@@ -12,7 +12,13 @@ const inputClass = 'w-full bg-transparent border-b border-brass/30 py-1.5 text-i
 const selectClass = 'w-full bg-parchment border border-brass/20 rounded px-3 py-2 text-sm text-ink focus:outline-none focus:border-brass transition-colors'
 const labelClass = 'block text-xs tracking-widest uppercase text-mist mb-2'
 
-export function IngestForm({ portraits }: { portraits: Portrait[] }) {
+interface IngestFormProps {
+  portraits?: Portrait[]
+  lockedPortraitId?: string
+  lockedPortraitName?: string
+}
+
+export function IngestForm({ portraits, lockedPortraitId, lockedPortraitName }: IngestFormProps) {
   const [result, setResult] = useState<{ success?: boolean; chunksCreated?: number; error?: string } | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -28,11 +34,18 @@ export function IngestForm({ portraits }: { portraits: Portrait[] }) {
     <form action={handleSubmit} className="bg-vellum border border-brass/20 rounded p-6 space-y-5 max-w-2xl">
       <div>
         <label className={labelClass}>Sona</label>
-        <select name="portrait_id" required className={selectClass}>
-          {portraits.map(p => (
-            <option key={p.id} value={p.id}>{p.display_name}</option>
-          ))}
-        </select>
+        {lockedPortraitId ? (
+          <>
+            <input type="hidden" name="portrait_id" value={lockedPortraitId} />
+            <p className="text-sm text-gray-600">Adding content to: <strong>{lockedPortraitName}</strong></p>
+          </>
+        ) : (
+          <select name="portrait_id" required className={selectClass}>
+            {portraits?.map(p => (
+              <option key={p.id} value={p.id}>{p.display_name}</option>
+            ))}
+          </select>
+        )}
       </div>
       <div>
         <label className={labelClass}>Source Title</label>
