@@ -180,38 +180,73 @@ export type Database = {
       portraits: {
         Row: {
           avatar_url: string | null
+          bio: string | null
+          brand: string
+          category: string | null
           created_at: string | null
+          creator_id: string | null
           display_name: string
           id: string
+          is_public: boolean
+          monthly_price_cents: number | null
           slug: string
+          stripe_price_id: string | null
           system_prompt: string
+          tagline: string | null
+          tags: string[] | null
           updated_at: string | null
           voice_enabled: boolean
           voice_provider_id: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
+          brand?: string
+          category?: string | null
           created_at?: string | null
+          creator_id?: string | null
           display_name: string
           id?: string
+          is_public?: boolean
+          monthly_price_cents?: number | null
           slug: string
+          stripe_price_id?: string | null
           system_prompt: string
+          tagline?: string | null
+          tags?: string[] | null
           updated_at?: string | null
           voice_enabled?: boolean
           voice_provider_id?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
+          brand?: string
+          category?: string | null
           created_at?: string | null
+          creator_id?: string | null
           display_name?: string
           id?: string
+          is_public?: boolean
+          monthly_price_cents?: number | null
           slug?: string
+          stripe_price_id?: string | null
           system_prompt?: string
+          tagline?: string | null
+          tags?: string[] | null
           updated_at?: string | null
           voice_enabled?: boolean
           voice_provider_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "portraits_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
