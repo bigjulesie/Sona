@@ -11,6 +11,7 @@ export function detectBrand(host: string): Brand {
 export function isSonaPublicRoute(pathname: string): boolean {
   return (
     pathname === '/explore' ||
+    pathname === '/sona' ||
     pathname.startsWith('/sona/') ||
     pathname === '/signup'
   )

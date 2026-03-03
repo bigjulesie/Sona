@@ -12,8 +12,11 @@ describe('detectBrand', () => {
 
   it('returns BRAND env var for localhost', () => {
     process.env.BRAND = 'sona'
-    expect(detectBrand('localhost:3000')).toBe('sona')
-    delete process.env.BRAND
+    try {
+      expect(detectBrand('localhost:3000')).toBe('sona')
+    } finally {
+      delete process.env.BRAND
+    }
   })
 
   it('defaults to nh when BRAND unset', () => {
