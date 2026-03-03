@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { retrieveRelevantChunks } from '@/lib/rag/retrieve'
+import { hasActiveSubscription } from '@/lib/subscriptions'
 import Anthropic from '@anthropic-ai/sdk'
 
 export async function POST(request: NextRequest) {
@@ -30,7 +31,6 @@ export async function POST(request: NextRequest) {
   }
 
   if (portrait.brand === 'sona' && portrait.monthly_price_cents) {
-    const { hasActiveSubscription } = await import('@/lib/subscriptions')
     if (!(await hasActiveSubscription(supabase, user.id, portrait_id))) {
       return new Response('Subscription required', { status: 403 })
     }

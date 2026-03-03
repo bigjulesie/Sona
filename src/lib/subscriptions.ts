@@ -3,12 +3,13 @@ export async function hasActiveSubscription(
   userId: string,
   portraitId: string
 ): Promise<boolean> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('subscriptions')
     .select('id')
     .eq('subscriber_id', userId)
     .eq('portrait_id', portraitId)
     .eq('status', 'active')
     .maybeSingle()
+  if (error) throw error
   return !!data
 }
