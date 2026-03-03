@@ -1,12 +1,23 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+
+async function assertAdmin() {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthenticated')
+  const { data: profile } = await supabase
+    .from('profiles').select('is_admin').eq('id', user.id).single()
+  if (!profile?.is_admin) throw new Error('Forbidden')
+}
 
 export async function updateInterviewStatus(
   requestId: string,
   status: 'scheduled' | 'completed',
 ) {
+  await assertAdmin()
   const { error } = await createAdminClient()
     .from('interview_requests')
     .update({ status })
@@ -16,6 +27,7 @@ export async function updateInterviewStatus(
 }
 
 export async function publishSona(portraitId: string) {
+  await assertAdmin()
   const { error } = await createAdminClient()
     .from('portraits')
     .update({ is_public: true })
