@@ -10,9 +10,23 @@ export async function POST(request: NextRequest) {
 
   const { portrait_id, monthly_price_cents } = await request.json()
 
+  if (!portrait_id) {
+    return NextResponse.json({ error: 'portrait_id required' }, { status: 400 })
+  }
+
+  // Validate price: must be null/undefined/0 (free) or integer >= 50 cents
+  if (monthly_price_cents != null && monthly_price_cents !== 0) {
+    if (!Number.isInteger(monthly_price_cents) || monthly_price_cents < 50) {
+      return NextResponse.json(
+        { error: 'monthly_price_cents must be null (free) or an integer >= 50' },
+        { status: 400 },
+      )
+    }
+  }
+
   const { data: portrait } = await supabase
     .from('portraits')
-    .select('id, display_name, creator_id')
+    .select('id, display_name, creator_id, stripe_price_id')
     .eq('id', portrait_id)
     .single()
 
@@ -24,24 +38,50 @@ export async function POST(request: NextRequest) {
 
   if (monthly_price_cents) {
     const stripe = getStripe()
-    const product = await stripe.products.create({
-      name: `${portrait.display_name} — Sona`,
-      metadata: { portrait_id },
-    })
-    const price = await stripe.prices.create({
-      product: product.id,
-      unit_amount: monthly_price_cents,
-      currency: 'usd',
-      recurring: { interval: 'month' },
-      metadata: { portrait_id },
-    })
-    stripe_price_id = price.id
+
+    // Archive the old price if one exists (idempotency — creators can reprice)
+    if (portrait.stripe_price_id) {
+      try {
+        await stripe.prices.update(portrait.stripe_price_id, { active: false })
+      } catch {
+        // Best-effort: old price archival failure is non-blocking
+      }
+    }
+
+    try {
+      const product = await stripe.products.create({
+        name: `${portrait.display_name} — Sona`,
+        metadata: { portrait_id },
+      })
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: monthly_price_cents,
+        currency: 'usd',
+        recurring: { interval: 'month' },
+        metadata: { portrait_id },
+      })
+      stripe_price_id = price.id
+    } catch {
+      return NextResponse.json({ error: 'Stripe error' }, { status: 502 })
+    }
   }
 
-  await createAdminClient()
+  const { error: dbError } = await createAdminClient()
     .from('portraits')
     .update({ monthly_price_cents: monthly_price_cents ?? null, stripe_price_id })
     .eq('id', portrait_id)
+
+  if (dbError) {
+    // Stripe objects were created but DB write failed — archive the orphaned price
+    if (stripe_price_id) {
+      try {
+        await getStripe().prices.update(stripe_price_id, { active: false })
+      } catch {
+        // Best-effort cleanup
+      }
+    }
+    return NextResponse.json({ error: 'Database error' }, { status: 500 })
+  }
 
   return NextResponse.json({ ok: true })
 }
