@@ -8,12 +8,14 @@ export async function signUpWithMagicLink(formData: FormData) {
   const supabase = await createServerSupabaseClient()
 
   const domain = process.env.NEXT_PUBLIC_SONA_DOMAIN
-  if (!domain) throw new Error('NEXT_PUBLIC_SONA_DOMAIN is not set')
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+  if (!domain && !appUrl) throw new Error('NEXT_PUBLIC_SONA_DOMAIN is not set')
+  const baseUrl = domain ? `https://${domain}` : appUrl!
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `https://${domain}/auth/callback?next=/onboarding`,
+      emailRedirectTo: `${baseUrl}/auth/callback?next=/onboarding`,
     },
   })
 
