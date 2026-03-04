@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-export function InterviewStep({ portraitId }: { portraitId: string }) {
+export function InterviewStep({ portraitId, returnHref }: { portraitId: string; returnHref?: string }) {
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -34,15 +34,17 @@ export function InterviewStep({ portraitId }: { portraitId: string }) {
     }
   }
 
+  const continueHref = returnHref ?? `/dashboard/create?step=3&portrait_id=${portraitId}`
+
   if (done) {
     return (
       <div className="text-center">
         <div className="text-4xl mb-4">&#10003;</div>
         <h2 className="text-lg font-semibold text-gray-900 mb-2">Interview requested</h2>
         <p className="text-gray-500 text-sm mb-6">We&apos;ll be in touch via WhatsApp to schedule.</p>
-        <a href={`/dashboard/create?step=3&portrait_id=${portraitId}`}
+        <a href={continueHref}
           className="px-5 py-2.5 bg-gray-900 text-white rounded-xl text-sm hover:bg-gray-700 transition-colors">
-          Continue
+          {returnHref ? 'Back to dashboard' : 'Continue'}
         </a>
       </div>
     )
@@ -68,8 +70,10 @@ export function InterviewStep({ portraitId }: { portraitId: string }) {
         className="w-full py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-700 disabled:opacity-50 transition-colors">
         {loading ? 'Submitting\u2026' : 'Request interview'}
       </button>
-      <a href={`/dashboard/create?step=3&portrait_id=${portraitId}`}
-        className="block text-center text-sm text-gray-400 hover:text-gray-600">Skip for now</a>
+      {!returnHref && (
+        <a href={`/dashboard/create?step=3&portrait_id=${portraitId}`}
+          className="block text-center text-sm text-gray-400 hover:text-gray-600">Skip for now</a>
+      )}
     </form>
   )
 }

@@ -23,6 +23,7 @@ export default async function SonaPage({ params }: PageProps) {
   if (!portrait) notFound()
 
   let isSubscribed = false
+  let existingRating: number | null = null
   if (user) {
     const { data: sub } = await supabase
       .from('subscriptions')
@@ -32,6 +33,16 @@ export default async function SonaPage({ params }: PageProps) {
       .eq('status', 'active')
       .maybeSingle()
     isSubscribed = !!sub
+
+    if (isSubscribed) {
+      const { data: rating } = await supabase
+        .from('ratings')
+        .select('score')
+        .eq('subscriber_id', user.id)
+        .eq('portrait_id', portrait.id)
+        .maybeSingle()
+      existingRating = rating?.score ?? null
+    }
   }
 
   const { data: stats } = await supabase
@@ -89,7 +100,11 @@ export default async function SonaPage({ params }: PageProps) {
       )}
 
       {isSubscribed && (
-        <ChatInterface portraitId={portrait.id} portraitName={portrait.display_name} />
+        <ChatInterface
+          portraitId={portrait.id}
+          portraitName={portrait.display_name}
+          existingRating={existingRating}
+        />
       )}
     </main>
   )

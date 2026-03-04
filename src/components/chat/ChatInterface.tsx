@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useChat } from '@/lib/hooks/useChat'
 import { MessageBubble } from './MessageBubble'
 import { ChatInput } from './ChatInput'
+import { RatingPrompt } from '@/components/sona/RatingPrompt'
 
 interface ChatInterfaceProps {
   portraitId: string
@@ -12,6 +13,7 @@ interface ChatInterfaceProps {
   voiceEnabled?: boolean
   initialConversationId?: string
   onConversationChange?: (id: string) => void
+  existingRating?: number | null
 }
 
 export function ChatInterface({
@@ -20,6 +22,7 @@ export function ChatInterface({
   voiceEnabled = false,
   initialConversationId,
   onConversationChange,
+  existingRating,
 }: ChatInterfaceProps) {
   const { messages, isStreaming, conversationId, sendMessage, loadConversation } =
     useChat(portraitId)
@@ -116,6 +119,8 @@ export function ChatInterface({
     }
   }, [portraitId])
 
+  const userMessageCount = messages.filter(m => m.role === 'user').length
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-4 md:px-6 py-8">
@@ -158,6 +163,11 @@ export function ChatInterface({
         )}
         <div ref={messagesEndRef} />
       </div>
+      {existingRating !== undefined && (
+        <div className="px-4 md:px-6">
+          <RatingPrompt portraitId={portraitId} messageCount={userMessageCount} existingRating={existingRating} />
+        </div>
+      )}
       <ChatInput
         onSend={sendMessage}
         disabled={isStreaming}
