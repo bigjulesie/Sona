@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { SonaCard } from '@/components/sona/SonaCard'
 
 const CATEGORIES = [
@@ -12,7 +12,7 @@ interface PageProps {
 
 export default async function ExplorePage({ searchParams }: PageProps) {
   const { category, sort = 'popular', q } = await searchParams
-  const supabase = createAdminClient()
+  const supabase = await createServerSupabaseClient()
 
   let query = supabase.from('portrait_discovery').select('*')
 

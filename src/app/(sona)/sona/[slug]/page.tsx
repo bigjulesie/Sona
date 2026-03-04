@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { SubscribeButton } from '@/components/sona/SubscribeButton'
 import { ChatInterface } from '@/components/chat/ChatInterface'
 
@@ -13,10 +12,7 @@ export default async function SonaPage({ params }: PageProps) {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Use admin client for public data (bypasses RLS — safe, server-side only)
-  const admin = createAdminClient()
-
-  const { data: portrait } = await admin
+  const { data: portrait } = await supabase
     .from('portraits')
     .select('id, display_name, tagline, bio, avatar_url, monthly_price_cents, slug')
     .eq('slug', slug)
@@ -49,7 +45,7 @@ export default async function SonaPage({ params }: PageProps) {
     }
   }
 
-  const { data: stats } = await admin
+  const { data: stats } = await supabase
     .from('portrait_discovery')
     .select('subscriber_count, avg_rating, rating_count')
     .eq('id', portrait.id)
