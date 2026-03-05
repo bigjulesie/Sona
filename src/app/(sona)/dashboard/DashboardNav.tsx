@@ -9,7 +9,8 @@ const GEIST = 'var(--font-geist-sans)'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Overview', exact: true },
-  { href: '/dashboard/content', label: 'Content', exact: false },
+  { href: '/dashboard/content',   label: 'Content',   exact: false },
+  { href: '/dashboard/pricing',   label: 'Pricing',   exact: false },
   { href: '/dashboard/interview', label: 'Interview', exact: false },
   { href: '/dashboard/settings', label: 'Settings', exact: false },
 ]
