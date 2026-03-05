@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 
 export type Brand = 'nh' | 'sona'
 
@@ -17,7 +18,7 @@ export function isSonaPublicRoute(pathname: string): boolean {
   )
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const host = request.headers.get('host') ?? ''
   const brand = detectBrand(host)
@@ -32,22 +33,30 @@ export function middleware(request: NextRequest) {
     isSharedPublicRoute ||
     (brand === 'sona' && isSonaPublicRoute(pathname))
 
-  let response: ReturnType<typeof NextResponse.next>
+  let response = NextResponse.next()
 
-  if (isPublic) {
-    response = NextResponse.next()
-  } else {
-    const hasSession = request.cookies
-      .getAll()
-      .some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'))
+  if (!isPublic) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options)
+            )
+          },
+        },
+      },
+    )
 
-    if (!hasSession) {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
       return NextResponse.redirect(url)
     }
-
-    response = NextResponse.next()
   }
 
   response.headers.set('x-brand', brand)

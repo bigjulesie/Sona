@@ -10,7 +10,12 @@ const CATEGORIES = [
   'Sport', 'Politics', 'Education', 'Health', 'Other',
 ]
 
-export default async function DashboardSettingsPage() {
+interface PageProps {
+  searchParams: Promise<{ saved?: string }>
+}
+
+export default async function DashboardSettingsPage({ searchParams }: PageProps) {
+  const { saved } = await searchParams
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -41,6 +46,23 @@ export default async function DashboardSettingsPage() {
       }}>
         Settings
       </h1>
+
+      {/* ── Save success banner ─────────────────────────────────── */}
+      {saved && (
+        <div style={{
+          fontFamily: GEIST,
+          fontSize: '0.8125rem',
+          fontWeight: 400,
+          color: '#1a7a5a',
+          backgroundColor: 'rgba(26,122,90,0.07)',
+          border: '1px solid rgba(26,122,90,0.15)',
+          borderRadius: 10,
+          padding: '10px 16px',
+          marginBottom: 32,
+        }}>
+          Changes saved.
+        </div>
+      )}
 
       {/* ── Profile form ────────────────────────────────────────── */}
       <form action={updateSonaSettings}>

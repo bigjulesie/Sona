@@ -9,6 +9,17 @@ export async function createSonaIdentity(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // Concurrency guard — one portrait per creator
+  const { data: existing_portrait } = await createAdminClient()
+    .from('portraits')
+    .select('id')
+    .eq('creator_id', user.id)
+    .maybeSingle()
+
+  if (existing_portrait) {
+    redirect(`/dashboard/create?step=2&portrait_id=${existing_portrait.id}`)
+  }
+
   const display_name = formData.get('display_name') as string
   const tagline = formData.get('tagline') as string
   const bio = formData.get('bio') as string

@@ -27,4 +27,5 @@ export async function updateSonaSettings(formData: FormData) {
   if (error) throw new Error('Failed to save settings')
 
   revalidatePath('/dashboard/settings')
+  redirect('/dashboard/settings?saved=1')
 }
