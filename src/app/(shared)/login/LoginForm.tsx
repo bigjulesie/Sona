@@ -4,6 +4,9 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { createClient } from '@supabase/supabase-js'
 
+const GEIST = 'var(--font-geist-sans)'
+const CORMORANT = 'var(--font-cormorant)'
+
 interface Props {
   brand: string
 }
@@ -41,6 +44,117 @@ export function LoginForm({ brand }: Props) {
 
   const isSona = brand === 'sona'
 
+  if (isSona) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#fff',
+        padding: '0 24px',
+      }}>
+        <div style={{ width: '100%', maxWidth: 320 }}>
+          {/* Logo */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 48 }}>
+            <Image
+              src="/brand_assets/sona/Sona brand - on white bg.svg"
+              alt="Sona"
+              width={110}
+              height={41}
+              priority
+            />
+          </div>
+
+          {sent ? (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{
+                fontFamily: CORMORANT,
+                fontSize: '1.75rem',
+                fontWeight: 400,
+                fontStyle: 'italic',
+                color: '#1a1a1a',
+                margin: '0 0 10px',
+              }}>
+                Check your email
+              </p>
+              <p style={{ fontFamily: GEIST, fontSize: '0.9375rem', color: '#6b6b6b', margin: 0 }}>
+                A sign-in link has been sent to {email}
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: 24 }}>
+                <label style={{
+                  display: 'block',
+                  fontFamily: GEIST,
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: '#6b6b6b',
+                  marginBottom: 8,
+                }}>
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  style={{
+                    width: '100%',
+                    fontFamily: GEIST,
+                    fontSize: '0.9375rem',
+                    color: '#1a1a1a',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid rgba(0,0,0,0.15)',
+                    padding: '8px 0',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              {error && (
+                <p style={{ fontFamily: GEIST, fontSize: '0.875rem', color: '#c0392b', marginBottom: 16 }}>
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  fontFamily: GEIST,
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  letterSpacing: '-0.01em',
+                  color: '#fff',
+                  backgroundColor: '#1a1a1a',
+                  border: 'none',
+                  borderRadius: '980px',
+                  padding: '14px 0',
+                  cursor: loading ? 'default' : 'pointer',
+                  opacity: loading ? 0.5 : 1,
+                  transition: 'opacity 0.15s',
+                  marginTop: 8,
+                }}
+              >
+                {loading ? 'Sending…' : 'Continue'}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // ── Neural Heirloom ──────────────────────────────────────────────────────
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-6"
@@ -53,17 +167,13 @@ export function LoginForm({ brand }: Props) {
       <div className="w-full max-w-xs">
         {/* Logo */}
         <div className="flex justify-center mb-12">
-          {isSona ? (
-            <span className="font-display text-4xl tracking-wide" style={{ color: '#2C2416' }}>sona</span>
-          ) : (
-            <Image
-              src="/brand_assets/nh/logo.svg"
-              alt="Neural Heirloom"
-              width={210}
-              height={63}
-              priority
-            />
-          )}
+          <Image
+            src="/brand_assets/nh/logo.svg"
+            alt="Neural Heirloom"
+            width={210}
+            height={63}
+            priority
+          />
         </div>
 
         {/* Divider with icon */}
