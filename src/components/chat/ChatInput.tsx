@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useVoice } from '@/lib/hooks/useVoice'
 import { VoiceWaveform } from './VoiceWaveform'
 
+const GEIST = 'var(--font-geist-sans)'
+
 interface ChatInputProps {
   onSend: (message: string) => void
   disabled?: boolean
@@ -68,32 +70,92 @@ export function ChatInput({
   const isTranscribing = status === 'transcribing'
 
   return (
-    <div className="border-t border-brass/20 bg-parchment">
+    <div style={{
+      borderTop: '1px solid rgba(0,0,0,0.06)',
+      backgroundColor: '#fff',
+    }}>
       {/* Privacy banner — visible only while recording */}
       {isRecording && (
-        <div className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600/90 text-white text-xs font-medium tracking-wide">
-          <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-          Microphone active — tap the mic button to stop
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          padding: '8px 16px',
+          backgroundColor: '#DC2626',
+          color: '#fff',
+        }}>
+          <span style={{
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            backgroundColor: '#fff',
+            display: 'inline-block',
+            animation: 'pulse 1.5s ease-in-out infinite',
+          }} />
+          <span style={{
+            fontFamily: GEIST,
+            fontSize: '0.75rem',
+            fontWeight: 500,
+            letterSpacing: '0.03em',
+          }}>
+            Microphone active — tap the mic button to stop
+          </span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex items-end gap-3 px-4 md:px-6 py-4">
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 10,
+          padding: '14px clamp(16px, 4vw, 24px)',
+        }}
+      >
         {voiceMode ? (
           /* Voice mode controls */
-          <div className="flex-1 flex items-center justify-center gap-4 min-h-[44px]">
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 16,
+            minHeight: 44,
+          }}>
             {isRecording && (
-              <span className="text-red-600">
-                <VoiceWaveform analyser={analyser} />
-              </span>
+              <VoiceWaveform analyser={analyser} />
             )}
             {isTranscribing && (
-              <span className="text-xs text-mist tracking-wide">Transcribing…</span>
+              <span style={{
+                fontFamily: GEIST,
+                fontSize: '0.75rem',
+                fontWeight: 300,
+                color: '#9b9b9b',
+                letterSpacing: '0.04em',
+              }}>
+                Transcribing…
+              </span>
             )}
             {status === 'idle' && !error && (
-              <span className="text-xs text-mist tracking-wide">Tap mic to speak</span>
+              <span style={{
+                fontFamily: GEIST,
+                fontSize: '0.75rem',
+                fontWeight: 300,
+                color: '#9b9b9b',
+                letterSpacing: '0.04em',
+              }}>
+                Tap mic to speak
+              </span>
             )}
             {error && (
-              <span className="text-xs text-red-600">{error}</span>
+              <span style={{
+                fontFamily: GEIST,
+                fontSize: '0.75rem',
+                color: '#DE3E7B',
+              }}>
+                {error}
+              </span>
             )}
           </div>
         ) : (
@@ -106,10 +168,23 @@ export function ChatInput({
             placeholder="Ask a question…"
             rows={1}
             disabled={disabled}
-            className="flex-1 resize-none bg-vellum border border-brass/20 rounded-xl px-4 py-3
-                       text-sm text-ink placeholder:text-mist/60
-                       focus:outline-none focus:border-brass
-                       disabled:opacity-50 max-h-32 transition-colors"
+            style={{
+              flex: 1,
+              resize: 'none',
+              backgroundColor: '#f7f7f7',
+              border: '1px solid rgba(0,0,0,0.08)',
+              borderRadius: 14,
+              padding: '12px 16px',
+              fontFamily: GEIST,
+              fontSize: '0.9375rem',
+              fontWeight: 300,
+              color: '#1a1a1a',
+              outline: 'none',
+              maxHeight: 128,
+              boxSizing: 'border-box',
+              lineHeight: 1.5,
+              opacity: disabled ? 0.5 : 1,
+            }}
           />
         )}
 
@@ -121,18 +196,33 @@ export function ChatInput({
             disabled={disabled || isTranscribing}
             title={isRecording ? 'Stop recording' : 'Start recording'}
             aria-label={isRecording ? 'Stop recording' : 'Start voice input'}
-            className={`p-3 rounded-xl transition-colors shrink-0 relative disabled:opacity-40 ${
-              isRecording
-                ? 'bg-red-600 text-white'
-                : 'bg-vellum border border-brass/20 text-mist hover:text-ink hover:border-brass'
-            }`}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 14,
+              border: isRecording ? 'none' : '1px solid rgba(0,0,0,0.08)',
+              backgroundColor: isRecording ? '#DC2626' : '#f7f7f7',
+              color: isRecording ? '#fff' : '#9b9b9b',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: disabled || isTranscribing ? 'default' : 'pointer',
+              opacity: disabled || isTranscribing ? 0.4 : 1,
+              position: 'relative',
+              flexShrink: 0,
+              transition: 'background-color 0.15s ease, color 0.15s ease',
+            }}
           >
-            {/* Pulsing ring while recording */}
-            {isRecording && (
-              <span className="absolute inset-0 rounded-xl border-2 border-red-400 animate-ping opacity-75" />
-            )}
             {isTranscribing ? (
-              <span className="w-4 h-4 border border-brass/60 border-t-transparent rounded-full animate-spin block" />
+              <span style={{
+                width: 16,
+                height: 16,
+                border: '1.5px solid rgba(0,0,0,0.2)',
+                borderTopColor: 'transparent',
+                borderRadius: '50%',
+                display: 'block',
+                animation: 'spin 0.8s linear infinite',
+              }} />
             ) : (
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <rect x="5" y="1" width="6" height="9" rx="3" />
@@ -150,11 +240,20 @@ export function ChatInput({
             type="button"
             onClick={onToggleVoice}
             title={voiceMode ? 'Switch to text mode' : 'Switch to voice mode'}
-            className={`p-3 rounded-xl transition-colors shrink-0 border ${
-              voiceMode
-                ? 'bg-brass/10 border-brass/40 text-brass'
-                : 'bg-vellum border-brass/20 text-mist hover:text-ink hover:border-brass'
-            }`}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 14,
+              border: voiceMode ? '1px solid rgba(222,62,123,0.3)' : '1px solid rgba(0,0,0,0.08)',
+              backgroundColor: voiceMode ? 'rgba(222,62,123,0.06)' : '#f7f7f7',
+              color: voiceMode ? '#DE3E7B' : '#9b9b9b',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+              transition: 'all 0.15s ease',
+            }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
               {voiceMode ? (
@@ -181,8 +280,22 @@ export function ChatInput({
           <button
             type="submit"
             disabled={disabled || !value.trim()}
-            className="px-5 py-3 bg-ink text-parchment rounded-xl text-xs tracking-widest uppercase
-                       hover:bg-ink/90 disabled:opacity-40 transition-colors shrink-0"
+            style={{
+              height: 44,
+              padding: '0 20px',
+              backgroundColor: '#1a1a1a',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '980px',
+              fontFamily: GEIST,
+              fontSize: '0.8125rem',
+              fontWeight: 500,
+              letterSpacing: '-0.01em',
+              cursor: disabled || !value.trim() ? 'default' : 'pointer',
+              opacity: disabled || !value.trim() ? 0.35 : 1,
+              transition: 'opacity 0.15s ease',
+              flexShrink: 0,
+            }}
           >
             Send
           </button>

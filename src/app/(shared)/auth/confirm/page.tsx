@@ -47,8 +47,22 @@ function AuthConfirm() {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <p className="text-gray-400 text-sm">Signing you in…</p>
+    <main style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#fff',
+    }}>
+      <p style={{
+        fontFamily: 'var(--font-cormorant)',
+        fontSize: '1.25rem',
+        fontWeight: 400,
+        fontStyle: 'italic',
+        color: '#b0b0b0',
+      }}>
+        Signing you in…
+      </p>
     </main>
   )
 }

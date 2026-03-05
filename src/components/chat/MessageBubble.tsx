@@ -1,3 +1,5 @@
+const GEIST = 'var(--font-geist-sans)'
+
 interface MessageBubbleProps {
   role: 'user' | 'assistant'
   content: string
@@ -10,25 +12,61 @@ export function MessageBubble({ role, content, portraitName, onPlayTTS, isPlayin
   const isUser = role === 'user'
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-5`}>
-      <div
-        className={`max-w-[72%] px-5 py-4 ${
-          isUser
-            ? 'bg-ink text-parchment rounded-2xl rounded-br-sm'
-            : 'bg-vellum text-ink border border-brass/20 rounded-2xl rounded-bl-sm'
-        }`}
-      >
-        {!isUser && (
-          <p className="text-xs tracking-widest uppercase text-brass mb-2">{portraitName}</p>
+    <div style={{
+      display: 'flex',
+      justifyContent: isUser ? 'flex-end' : 'flex-start',
+      marginBottom: 20,
+    }}>
+      <div style={{
+        maxWidth: '72%',
+        padding: '14px 18px',
+        borderRadius: isUser ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+        backgroundColor: isUser ? '#1a1a1a' : '#f5f5f5',
+        border: isUser ? 'none' : '1px solid rgba(0,0,0,0.06)',
+      }}>
+        {!isUser && portraitName && (
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.625rem',
+            fontWeight: 500,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: '#b0b0b0',
+            margin: '0 0 8px',
+          }}>
+            {portraitName}
+          </p>
         )}
-        <p className="text-sm leading-relaxed whitespace-pre-wrap font-body">{content}</p>
+        <p style={{
+          fontFamily: GEIST,
+          fontSize: '0.9375rem',
+          fontWeight: 300,
+          lineHeight: 1.65,
+          color: isUser ? '#fff' : '#1a1a1a',
+          margin: 0,
+          whiteSpace: 'pre-wrap',
+        }}>
+          {content}
+        </p>
         {onPlayTTS && (
           <button
             onClick={onPlayTTS}
-            className={`mt-2 flex items-center gap-1.5 text-xs transition-colors ${
-              isPlayingTTS ? 'text-brass' : 'text-mist hover:text-ink'
-            }`}
             title={isPlayingTTS ? 'Playing…' : 'Listen'}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              marginTop: 10,
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              fontFamily: GEIST,
+              fontSize: '0.75rem',
+              fontWeight: 400,
+              color: isPlayingTTS ? '#DE3E7B' : '#b0b0b0',
+              transition: 'color 0.15s ease',
+            }}
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
               {isPlayingTTS ? (

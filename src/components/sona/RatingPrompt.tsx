@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+const GEIST = 'var(--font-geist-sans)'
+
 interface Props {
   portraitId: string
   messageCount: number
@@ -40,33 +42,94 @@ export function RatingPrompt({ portraitId, messageCount, existingRating }: Props
 
   if (submitted && selected) {
     return (
-      <div className="flex items-center gap-2 py-2 text-sm text-gray-500">
-        <span>Your rating:</span>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        paddingTop: 8,
+        paddingBottom: 8,
+      }}>
+        <span style={{
+          fontFamily: GEIST,
+          fontSize: '0.8125rem',
+          fontWeight: 300,
+          color: '#9b9b9b',
+        }}>
+          Your rating:
+        </span>
         {[1, 2, 3, 4, 5].map(n => (
-          <button key={n} onClick={() => { setSubmitted(false) }}
-            className={`text-lg ${n <= selected ? 'text-yellow-400' : 'text-gray-200'}`}>
+          <button
+            key={n}
+            onClick={() => setSubmitted(false)}
+            style={{
+              fontSize: '1.125rem',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              color: n <= selected ? '#DE3E7B' : 'rgba(0,0,0,0.12)',
+              lineHeight: 1,
+            }}
+          >
             &#9733;
           </button>
         ))}
-        <span className="text-xs text-gray-400">(tap to change)</span>
+        <span style={{
+          fontFamily: GEIST,
+          fontSize: '0.75rem',
+          fontWeight: 300,
+          color: '#b0b0b0',
+        }}>
+          (tap to change)
+        </span>
       </div>
     )
   }
 
   return (
-    <div className="py-3 border-t border-gray-100">
-      <p className="text-sm text-gray-500 mb-2">How would you rate this Sona?</p>
-      <div className="flex gap-1">
+    <div style={{
+      paddingTop: 16,
+      borderTop: '1px solid rgba(0,0,0,0.06)',
+    }}>
+      <p style={{
+        fontFamily: GEIST,
+        fontSize: '0.8125rem',
+        fontWeight: 300,
+        color: '#9b9b9b',
+        margin: '0 0 10px',
+      }}>
+        How would you rate this Sona?
+      </p>
+      <div style={{ display: 'flex', gap: 4 }}>
         {[1, 2, 3, 4, 5].map(n => (
-          <button key={n} onClick={() => handleRate(n)}
-            className={`text-2xl transition-colors hover:text-yellow-400 ${
-              selected && n <= selected ? 'text-yellow-400' : 'text-gray-200'
-            }`}>
+          <button
+            key={n}
+            onClick={() => handleRate(n)}
+            style={{
+              fontSize: '1.5rem',
+              background: 'none',
+              border: 'none',
+              padding: '0 2px',
+              cursor: 'pointer',
+              color: selected && n <= selected ? '#DE3E7B' : 'rgba(0,0,0,0.12)',
+              lineHeight: 1,
+              transition: 'color 0.1s ease',
+            }}
+          >
             &#9733;
           </button>
         ))}
       </div>
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && (
+        <p style={{
+          fontFamily: GEIST,
+          fontSize: '0.75rem',
+          color: '#DE3E7B',
+          margin: '8px 0 0',
+        }}>
+          {error}
+        </p>
+      )}
     </div>
   )
 }
