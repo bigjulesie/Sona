@@ -1,7 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+const GEIST = 'var(--font-geist-sans)'
+const CORMORANT = 'var(--font-cormorant)'
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('')
@@ -34,44 +38,181 @@ export default function SignUpPage() {
     setLoading(false)
   }
 
-  if (sent) {
-    return (
-      <main className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-sm w-full text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h1>
-          <p className="text-gray-500">We sent you a magic link. Click it to continue.</p>
-        </div>
-      </main>
-    )
-  }
-
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-sm w-full">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Create your account</h1>
-        <p className="text-gray-500 mb-8">Join Sona — create your digital presence or explore others.</p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            required
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+    <main style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#fff',
+      padding: '0 24px',
+    }}>
+      <div style={{ width: '100%', maxWidth: 320 }}>
+
+        {/* Logo */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 40 }}>
+          <Image
+            src="/brand_assets/sona/Sona brand on white bg 1.svg"
+            alt="Sona"
+            width={100}
+            height={38}
+            priority
           />
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-700 disabled:opacity-50 transition-colors"
-          >
-            {loading ? 'Sending…' : 'Continue with email'}
-          </button>
-        </form>
-        <p className="text-center text-sm text-gray-400 mt-6">
-          Already have an account?{' '}
-          <a href="/login" className="text-gray-700 underline">Sign in</a>
-        </p>
+        </div>
+
+        {sent ? (
+          <div style={{ textAlign: 'center' }}>
+            {/* Coral check */}
+            <div style={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              backgroundColor: '#DE3E7B',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px',
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <p style={{
+              fontFamily: CORMORANT,
+              fontSize: '1.75rem',
+              fontWeight: 400,
+              fontStyle: 'italic',
+              color: '#1a1a1a',
+              margin: '0 0 8px',
+              lineHeight: 1.2,
+            }}>
+              Check your email
+            </p>
+            <p style={{
+              fontFamily: GEIST,
+              fontSize: '0.875rem',
+              fontWeight: 300,
+              color: '#6b6b6b',
+              margin: 0,
+              lineHeight: 1.6,
+            }}>
+              We sent a magic link to {email}. Click it to continue.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Heading */}
+            <p style={{
+              fontFamily: CORMORANT,
+              fontSize: '1.625rem',
+              fontWeight: 400,
+              fontStyle: 'italic',
+              color: '#1a1a1a',
+              textAlign: 'center',
+              margin: '0 0 32px',
+              lineHeight: 1.2,
+            }}>
+              Get started
+            </p>
+
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: 24 }}>
+                <label style={{
+                  display: 'block',
+                  fontFamily: GEIST,
+                  fontSize: '0.6875rem',
+                  fontWeight: 500,
+                  letterSpacing: '0.09em',
+                  textTransform: 'uppercase',
+                  color: '#b0b0b0',
+                  marginBottom: 10,
+                }}>
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  className="sona-input"
+                  style={{
+                    width: '100%',
+                    fontFamily: GEIST,
+                    fontSize: '0.9375rem',
+                    fontWeight: 300,
+                    color: '#1a1a1a',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid rgba(0,0,0,0.15)',
+                    padding: '8px 0',
+                    outline: 'none',
+                    boxSizing: 'border-box' as const,
+                  }}
+                />
+              </div>
+
+              {error && (
+                <p style={{
+                  fontFamily: GEIST,
+                  fontSize: '0.8125rem',
+                  color: '#DE3E7B',
+                  margin: '-8px 0 16px',
+                }}>
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="sona-btn-dark"
+                style={{
+                  width: '100%',
+                  fontFamily: GEIST,
+                  fontSize: '0.9375rem',
+                  fontWeight: 500,
+                  letterSpacing: '-0.01em',
+                  color: '#fff',
+                  backgroundColor: '#1a1a1a',
+                  border: 'none',
+                  borderRadius: '980px',
+                  padding: '14px 0',
+                  cursor: loading ? 'default' : 'pointer',
+                  opacity: loading ? 0.5 : 1,
+                  marginTop: 8,
+                }}
+              >
+                {loading ? 'Sending…' : 'Continue with email'}
+              </button>
+            </form>
+
+            {/* Sign in link */}
+            <p style={{
+              fontFamily: GEIST,
+              fontSize: '0.8125rem',
+              fontWeight: 300,
+              color: '#b0b0b0',
+              textAlign: 'center',
+              margin: '24px 0 0',
+            }}>
+              Already have an account?{' '}
+              <a
+                href="/login"
+                className="sona-link"
+                style={{
+                  color: '#6b6b6b',
+                  textDecoration: 'none',
+                  fontWeight: 400,
+                }}
+              >
+                Sign in
+              </a>
+            </p>
+          </>
+        )}
+
       </div>
     </main>
   )
