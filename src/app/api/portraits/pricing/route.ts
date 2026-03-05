@@ -14,11 +14,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'portrait_id required' }, { status: 400 })
   }
 
-  // Validate price: must be null/undefined/0 (free) or integer >= 50 cents
+  // Validate price: must be null/undefined/0 (free) or integer >= 100 cents
   if (monthly_price_cents != null && monthly_price_cents !== 0) {
-    if (!Number.isInteger(monthly_price_cents) || monthly_price_cents < 50) {
+    if (!Number.isInteger(monthly_price_cents) || monthly_price_cents < 100) {
       return NextResponse.json(
-        { error: 'monthly_price_cents must be null (free) or an integer >= 50' },
+        { error: 'monthly_price_cents must be null (free) or an integer >= 100' },
         { status: 400 },
       )
     }
@@ -50,8 +50,9 @@ export async function POST(request: NextRequest) {
 
     try {
       // Idempotency keys prevent duplicate products/prices on double-submit
-      const idemProduct = `product_${portrait_id}_${monthly_price_cents}`
-      const idemPrice   = `price_${portrait_id}_${monthly_price_cents}`
+      // Timestamp suffix avoids 24h collision window when repricing to the same amount
+      const idemProduct = `product_${portrait_id}_${monthly_price_cents}_${Date.now()}`
+      const idemPrice   = `price_${portrait_id}_${monthly_price_cents}_${Date.now()}`
 
       const product = await stripe.products.create(
         { name: `${portrait.display_name} — Sona`, metadata: { portrait_id } },
