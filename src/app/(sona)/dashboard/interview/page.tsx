@@ -1,6 +1,28 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { InterviewStep } from '../create/InterviewStep'
+
+const GEIST = 'var(--font-geist-sans)'
+const CORMORANT = 'var(--font-cormorant)'
+
+const WHILE_YOU_WAIT = [
+  {
+    href: '/dashboard/content',
+    label: 'Add content',
+    description: 'Upload writings, talks, or documents to enrich your Sona',
+  },
+  {
+    href: '/dashboard/settings',
+    label: 'Review your profile',
+    description: 'Polish your bio, tagline, and pricing before you go live',
+  },
+  {
+    href: '/explore',
+    label: 'Explore other Sonas',
+    description: 'See how others have built their presence',
+  },
+]
 
 export default async function DashboardInterviewPage() {
   const supabase = await createServerSupabaseClient()
@@ -24,58 +46,152 @@ export default async function DashboardInterviewPage() {
     .maybeSingle()
 
   return (
-    <div className="max-w-lg">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">WhatsApp Interview</h1>
-      <p className="text-gray-500 text-sm mb-8">
-        We conduct a WhatsApp interview to capture your voice and values — the foundation of your Sona.
+    <div style={{ maxWidth: 520 }}>
+
+      {/* ── Page header ─────────────────────────────────────────── */}
+      <h1 style={{
+        fontFamily: CORMORANT,
+        fontSize: 'clamp(1.75rem, 3vw, 2.25rem)',
+        fontWeight: 400,
+        fontStyle: 'italic',
+        lineHeight: 1.1,
+        letterSpacing: '-0.02em',
+        color: '#1a1a1a',
+        margin: '0 0 8px',
+      }}>
+        Interview
+      </h1>
+      <p style={{
+        fontFamily: GEIST,
+        fontSize: '0.875rem',
+        fontWeight: 300,
+        color: '#6b6b6b',
+        margin: '0 0 40px',
+        lineHeight: 1.6,
+      }}>
+        We conduct a WhatsApp conversation to capture your voice, beliefs, and values — the foundation of your Sona.
       </p>
 
       {existing ? (
-        <div className="space-y-6">
-          <div className="p-5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
-            <p className="font-medium mb-1">Interview request received</p>
-            <p>
-              Status: <span className="capitalize">{existing.status}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+
+          {/* Status card */}
+          <div style={{
+            border: '1px solid rgba(0,0,0,0.08)',
+            borderRadius: 16,
+            padding: '24px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span style={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                backgroundColor: '#DE3E7B',
+                flexShrink: 0,
+                display: 'inline-block',
+              }} />
+              <p style={{
+                fontFamily: GEIST,
+                fontSize: '0.6875rem',
+                fontWeight: 500,
+                letterSpacing: '0.09em',
+                textTransform: 'uppercase',
+                color: '#b0b0b0',
+                margin: 0,
+              }}>
+                Interview request received
+              </p>
+            </div>
+            <p style={{
+              fontFamily: CORMORANT,
+              fontSize: '1.375rem',
+              fontWeight: 400,
+              fontStyle: 'italic',
+              color: '#1a1a1a',
+              margin: '0 0 6px',
+              lineHeight: 1.3,
+              textTransform: 'capitalize',
+            }}>
+              {existing.status}
               {existing.scheduled_at && (
-                <> · Scheduled for {new Date(existing.scheduled_at).toLocaleDateString('en-US', { dateStyle: 'long' })}</>
+                <span style={{ fontStyle: 'normal', fontWeight: 300, color: '#6b6b6b' }}>
+                  {' '}· {new Date(existing.scheduled_at).toLocaleDateString('en-US', { dateStyle: 'long' })}
+                </span>
               )}
             </p>
-            <p className="mt-2 text-amber-600">We&apos;ll be in touch via WhatsApp to confirm a time.</p>
+            <p style={{
+              fontFamily: GEIST,
+              fontSize: '0.8125rem',
+              fontWeight: 300,
+              color: '#b0b0b0',
+              margin: 0,
+            }}>
+              We'll be in touch via WhatsApp to confirm a time.
+            </p>
           </div>
 
+          {/* While you wait */}
           <div>
-            <h2 className="text-sm font-semibold text-gray-900 mb-3">While you wait</h2>
-            <div className="space-y-2">
-              <a href="/dashboard/content"
-                className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:border-gray-300 transition-colors group">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Add content</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Upload writings, talks, or documents to enrich your Sona</p>
-                </div>
-                <span className="text-gray-300 group-hover:text-gray-500 transition-colors text-lg">&#8594;</span>
-              </a>
-              <a href="/dashboard/settings"
-                className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:border-gray-300 transition-colors group">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Review your profile</p>
-                  <p className="text-xs text-gray-500 mt-0.5">Polish your bio, tagline, and pricing before you go live</p>
-                </div>
-                <span className="text-gray-300 group-hover:text-gray-500 transition-colors text-lg">&#8594;</span>
-              </a>
-              <a href="/explore"
-                className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:border-gray-300 transition-colors group">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Explore other Sonas</p>
-                  <p className="text-xs text-gray-500 mt-0.5">See how others have built their digital presence</p>
-                </div>
-                <span className="text-gray-300 group-hover:text-gray-500 transition-colors text-lg">&#8594;</span>
-              </a>
+            <p style={{
+              fontFamily: GEIST,
+              fontSize: '0.6875rem',
+              fontWeight: 500,
+              letterSpacing: '0.09em',
+              textTransform: 'uppercase',
+              color: '#b0b0b0',
+              margin: '0 0 12px',
+            }}>
+              While you wait
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {WHILE_YOU_WAIT.map(item => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="sona-card"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 16,
+                    padding: '16px 20px',
+                    backgroundColor: '#fff',
+                    border: '1px solid rgba(0,0,0,0.07)',
+                    borderRadius: 14,
+                    textDecoration: 'none',
+                  }}
+                >
+                  <div>
+                    <p style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.875rem',
+                      fontWeight: 400,
+                      color: '#1a1a1a',
+                      margin: '0 0 2px',
+                    }}>
+                      {item.label}
+                    </p>
+                    <p style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.75rem',
+                      fontWeight: 300,
+                      color: '#b0b0b0',
+                      margin: 0,
+                    }}>
+                      {item.description}
+                    </p>
+                  </div>
+                  <span style={{ color: 'rgba(0,0,0,0.2)', flexShrink: 0 }}>→</span>
+                </Link>
+              ))}
             </div>
           </div>
+
         </div>
       ) : (
         <InterviewStep portraitId={portrait.id} returnHref="/dashboard" />
       )}
+
     </div>
   )
 }
