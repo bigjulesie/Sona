@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getStripe } from '@/lib/stripe/client'
 import { createAdminClient } from '@/lib/supabase/admin'
+import {
+  sendSubscriptionConfirmedEmail,
+  sendSubscriptionCancelledEmail,
+} from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -43,6 +47,22 @@ export async function POST(request: NextRequest) {
           ? { current_period_end: new Date(periodEnd * 1000).toISOString() }
           : {}),
       }, { onConflict: 'subscriber_id,portrait_id' })
+
+      // Send confirmation email on first activation
+      if (status === 'active' && event.type === 'customer.subscription.created') {
+        const [{ data: { user } }, { data: portrait }] = await Promise.all([
+          supabase.auth.admin.getUserById(user_id),
+          supabase.from('portraits').select('display_name, slug, monthly_price_cents').eq('id', portrait_id).single(),
+        ])
+        if (user?.email && portrait) {
+          sendSubscriptionConfirmedEmail(
+            user.email,
+            portrait.display_name,
+            portrait.slug,
+            portrait.monthly_price_cents,
+          ).catch(() => {})
+        }
+      }
       break
     }
 
@@ -52,6 +72,18 @@ export async function POST(request: NextRequest) {
         .from('subscriptions')
         .update({ status: 'cancelled' })
         .eq('stripe_subscription_id', sub.id)
+
+      // Send cancellation email
+      const { portrait_id, user_id } = sub.metadata
+      if (portrait_id && user_id) {
+        const [{ data: { user } }, { data: portrait }] = await Promise.all([
+          supabase.auth.admin.getUserById(user_id),
+          supabase.from('portraits').select('display_name').eq('id', portrait_id).single(),
+        ])
+        if (user?.email && portrait) {
+          sendSubscriptionCancelledEmail(user.email, portrait.display_name).catch(() => {})
+        }
+      }
       break
     }
 

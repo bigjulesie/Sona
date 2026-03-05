@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { BillingPortalButton } from './BillingPortalButton'
+import { AccountSync } from './AccountSync'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
@@ -32,6 +33,7 @@ export default async function AccountPage() {
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
+      <AccountSync />
       <div style={{
         maxWidth: 720,
         margin: '0 auto',

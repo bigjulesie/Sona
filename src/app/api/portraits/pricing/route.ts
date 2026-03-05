@@ -49,17 +49,24 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const product = await stripe.products.create({
-        name: `${portrait.display_name} — Sona`,
-        metadata: { portrait_id },
-      })
-      const price = await stripe.prices.create({
-        product: product.id,
-        unit_amount: monthly_price_cents,
-        currency: 'usd',
-        recurring: { interval: 'month' },
-        metadata: { portrait_id },
-      })
+      // Idempotency keys prevent duplicate products/prices on double-submit
+      const idemProduct = `product_${portrait_id}_${monthly_price_cents}`
+      const idemPrice   = `price_${portrait_id}_${monthly_price_cents}`
+
+      const product = await stripe.products.create(
+        { name: `${portrait.display_name} — Sona`, metadata: { portrait_id } },
+        { idempotencyKey: idemProduct },
+      )
+      const price = await stripe.prices.create(
+        {
+          product: product.id,
+          unit_amount: monthly_price_cents,
+          currency: 'usd',
+          recurring: { interval: 'month' },
+          metadata: { portrait_id },
+        },
+        { idempotencyKey: idemPrice },
+      )
       stripe_price_id = price.id
     } catch {
       return NextResponse.json({ error: 'Stripe error' }, { status: 502 })
