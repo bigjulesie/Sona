@@ -105,12 +105,11 @@ export default async function ExplorePage({ searchParams }: PageProps) {
                     fontFamily: GEIST,
                     fontSize: '0.8125rem',
                     fontWeight: isActive ? 500 : 400,
-                    ...(isActive
-                      ? { color: '#1a1a1a', borderBottom: '2px solid #DE3E7B' }
-                      : {}),
+                    color: isActive ? '#1a1a1a' : '#6b6b6b',
                     textDecoration: 'none',
                     padding: '15px 14px',
                     display: 'inline-block',
+                    borderBottom: isActive ? '2px solid #DE3E7B' : '2px solid transparent',
                     whiteSpace: 'nowrap',
                   }}
                 >

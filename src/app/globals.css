@@ -62,15 +62,13 @@ body {
   opacity: 0.6;
 }
 
-/* Filter bar tabs — base state + hover managed entirely in CSS */
+/* Filter bar tabs */
 .sona-filter-tab {
-  color: #6b6b6b;
-  border-bottom: 2px solid transparent;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
 .sona-filter-tab:hover {
-  color: #1a1a1a;
-  border-bottom-color: rgba(0,0,0,0.12);
+  color: #1a1a1a !important;
+  border-bottom: 2px solid rgba(0,0,0,0.12) !important;
 }
 
 /* Portrait cards */
