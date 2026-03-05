@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { TIER_LABELS } from '@/lib/tiers'
 
 const GEIST = 'var(--font-geist-sans)'
@@ -13,6 +14,7 @@ interface Props {
 
 export function PricingManager({ portraitId, currentPriceCents }: Props) {
   const isPaid = currentPriceCents != null && currentPriceCents > 0
+  const router = useRouter()
   const [editing, setEditing] = useState(false)
   const [type, setType] = useState<'free' | 'paid'>(isPaid ? 'paid' : 'free')
   const [price, setPrice] = useState(isPaid ? (currentPriceCents! / 100).toFixed(0) : '')
@@ -44,6 +46,7 @@ export function PricingManager({ portraitId, currentPriceCents }: Props) {
       }
       setSaved(true)
       setEditing(false)
+      router.refresh()
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {

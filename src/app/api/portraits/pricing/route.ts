@@ -36,18 +36,18 @@ export async function POST(request: NextRequest) {
 
   let stripe_price_id: string | null = null
 
-  if (monthly_price_cents) {
-    const stripe = getStripe()
+  const stripe = getStripe()
 
-    // Archive the old price if one exists (idempotency — creators can reprice)
-    if (portrait.stripe_price_id) {
-      try {
-        await stripe.prices.update(portrait.stripe_price_id, { active: false })
-      } catch {
-        // Best-effort: old price archival failure is non-blocking
-      }
+  // Archive the old price whenever one exists — covers both reprice and going free
+  if (portrait.stripe_price_id) {
+    try {
+      await stripe.prices.update(portrait.stripe_price_id, { active: false })
+    } catch {
+      // Best-effort: old price archival failure is non-blocking
     }
+  }
 
+  if (monthly_price_cents) {
     try {
       // Idempotency keys prevent duplicate products/prices on double-submit
       // Timestamp suffix avoids 24h collision window when repricing to the same amount
