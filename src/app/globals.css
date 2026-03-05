@@ -28,3 +28,36 @@ body {
   background: #DE3E7B;
   color: #ffffff;
 }
+
+/* ── Hover states ─────────────────────────────────────────────────────── */
+/* Muted text links darken to ink on hover */
+.sona-link {
+  transition: color 0.15s ease;
+}
+.sona-link:hover {
+  color: #1a1a1a !important;
+}
+
+/* Dark pill buttons reduce opacity on hover */
+.sona-btn-dark {
+  transition: opacity 0.15s ease;
+}
+.sona-btn-dark:hover {
+  opacity: 0.78;
+}
+
+/* Outline pill buttons gain a subtle fill on hover */
+.sona-btn-outline {
+  transition: background-color 0.15s ease;
+}
+.sona-btn-outline:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+/* Dark text links (already ink) gain a soft underline on hover */
+.sona-arrow-link {
+  transition: opacity 0.15s ease;
+}
+.sona-arrow-link:hover {
+  opacity: 0.6;
+}

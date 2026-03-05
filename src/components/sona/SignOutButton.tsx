@@ -21,6 +21,7 @@ export function SignOutButton() {
   return (
     <button
       onClick={signOut}
+      className="sona-link"
       style={{
         fontFamily: GEIST,
         fontSize: '0.875rem',

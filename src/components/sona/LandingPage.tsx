@@ -38,7 +38,7 @@ export function LandingPage() {
           priority
         />
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.75rem' }}>
-          <Link href="/login" style={{
+          <Link href="/login" className="sona-link" style={{
             fontFamily: GEIST,
             fontSize: '0.875rem',
             color: '#6b6b6b',
@@ -47,7 +47,7 @@ export function LandingPage() {
           }}>
             Sign in
           </Link>
-          <Link href="/signup" style={{
+          <Link href="/signup" className="sona-btn-dark" style={{
             fontFamily: GEIST,
             fontSize: '0.875rem',
             fontWeight: 500,
@@ -132,7 +132,7 @@ export function LandingPage() {
 
         {/* CTAs */}
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/explore" style={{
+          <Link href="/explore" className="sona-btn-dark" style={{
             fontFamily: GEIST,
             display: 'inline-block',
             padding: '16px 36px',
@@ -146,7 +146,7 @@ export function LandingPage() {
           }}>
             Explore Sonas
           </Link>
-          <Link href="/signup" style={{
+          <Link href="/signup" className="sona-btn-outline" style={{
             fontFamily: GEIST,
             display: 'inline-block',
             padding: '16px 36px',
@@ -212,7 +212,7 @@ export function LandingPage() {
             your meetings, your decisions, your conversations with others.
             A Sona isn't just available — they're with you.
           </p>
-          <Link href="/explore" style={{
+          <Link href="/explore" className="sona-arrow-link" style={{
             fontFamily: GEIST,
             fontSize: '0.9375rem',
             fontWeight: 500,
@@ -263,7 +263,7 @@ export function LandingPage() {
             everything that makes you <em>you</em>, available to the people
             who value your perspective exactly when they need it most.
           </p>
-          <Link href="/signup" style={{
+          <Link href="/signup" className="sona-arrow-link" style={{
             fontFamily: GEIST,
             fontSize: '0.9375rem',
             fontWeight: 500,
@@ -414,7 +414,7 @@ export function LandingPage() {
           or explore the remarkable people already here.
         </p>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/signup" style={{
+          <Link href="/signup" className="sona-btn-dark" style={{
             fontFamily: GEIST,
             display: 'inline-block',
             padding: '16px 36px',
@@ -428,7 +428,7 @@ export function LandingPage() {
           }}>
             Create your Sona
           </Link>
-          <Link href="/explore" style={{
+          <Link href="/explore" className="sona-btn-outline" style={{
             fontFamily: GEIST,
             display: 'inline-block',
             padding: '16px 36px',

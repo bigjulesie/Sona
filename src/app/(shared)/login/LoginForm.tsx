@@ -128,6 +128,7 @@ export function LoginForm({ brand }: Props) {
               <button
                 type="submit"
                 disabled={loading}
+                className="sona-btn-dark"
                 style={{
                   width: '100%',
                   fontFamily: GEIST,
@@ -141,7 +142,6 @@ export function LoginForm({ brand }: Props) {
                   padding: '14px 0',
                   cursor: loading ? 'default' : 'pointer',
                   opacity: loading ? 0.5 : 1,
-                  transition: 'opacity 0.15s',
                   marginTop: 8,
                 }}
               >

@@ -57,6 +57,7 @@ export function DashboardNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                className={active ? undefined : 'sona-link'}
                 style={{
                   fontFamily: GEIST,
                   fontSize: '0.875rem',
@@ -66,7 +67,7 @@ export function DashboardNav() {
                   padding: '6px 12px',
                   borderRadius: '6px',
                   backgroundColor: active ? 'rgba(0,0,0,0.05)' : 'transparent',
-                  transition: 'all 0.15s',
+                  transition: 'background-color 0.15s',
                 }}
               >
                 {item.label}
@@ -86,7 +87,7 @@ export function DashboardNav() {
 
         {/* Right: Explore + Account + Sign out */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <Link href="/explore" style={{
+          <Link href="/explore" className="sona-link" style={{
             fontFamily: GEIST,
             fontSize: '0.875rem',
             color: '#6b6b6b',
@@ -94,7 +95,7 @@ export function DashboardNav() {
           }}>
             Explore
           </Link>
-          <Link href="/account" style={{
+          <Link href="/account" className="sona-link" style={{
             fontFamily: GEIST,
             fontSize: '0.875rem',
             color: '#6b6b6b',

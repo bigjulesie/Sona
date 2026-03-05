@@ -53,20 +53,20 @@ export async function SonaNav() {
       </Link>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.75rem' }}>
-        <Link href="/explore" style={linkStyle}>Explore</Link>
+        <Link href="/explore" className="sona-link" style={linkStyle}>Explore</Link>
 
         {user ? (
           <>
             {hasPortrait && (
-              <Link href="/dashboard" style={linkStyle}>Dashboard</Link>
+              <Link href="/dashboard" className="sona-link" style={linkStyle}>Dashboard</Link>
             )}
-            <Link href="/account" style={linkStyle}>Account</Link>
+            <Link href="/account" className="sona-link" style={linkStyle}>Account</Link>
             <SignOutButton />
           </>
         ) : (
           <>
-            <Link href="/login" style={linkStyle}>Sign in</Link>
-            <Link href="/signup" style={{
+            <Link href="/login" className="sona-link" style={linkStyle}>Sign in</Link>
+            <Link href="/signup" className="sona-btn-dark" style={{
               fontFamily: GEIST,
               fontSize: '0.875rem',
               fontWeight: 500,
