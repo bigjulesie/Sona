@@ -61,3 +61,12 @@ body {
 .sona-arrow-link:hover {
   opacity: 0.6;
 }
+
+/* Portrait cards */
+.sona-card {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.sona-card:hover {
+  border-color: rgba(0,0,0,0.14) !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
