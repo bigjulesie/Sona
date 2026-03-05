@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 
+const GEIST = 'var(--font-geist-sans)'
+
 export function BillingPortalButton() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -30,11 +32,37 @@ export function BillingPortalButton() {
 
   return (
     <div>
-      <button onClick={openPortal} disabled={loading}
-        className="px-5 py-2.5 border border-gray-200 rounded-xl text-sm hover:border-gray-400 disabled:opacity-50 transition-colors">
-        {loading ? 'Loading\u2026' : 'Manage billing \u2192'}
+      <button
+        onClick={openPortal}
+        disabled={loading}
+        className="sona-btn-outline"
+        style={{
+          fontFamily: GEIST,
+          fontSize: '0.875rem',
+          fontWeight: 400,
+          letterSpacing: '-0.01em',
+          color: '#1a1a1a',
+          padding: '10px 24px',
+          borderRadius: '980px',
+          border: '1px solid rgba(0,0,0,0.18)',
+          background: 'transparent',
+          cursor: loading ? 'default' : 'pointer',
+          opacity: loading ? 0.5 : 1,
+          transition: 'background-color 0.15s ease',
+        }}
+      >
+        {loading ? 'Loading…' : 'Manage billing →'}
       </button>
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      {error && (
+        <p style={{
+          fontFamily: GEIST,
+          fontSize: '0.8125rem',
+          color: '#DE3E7B',
+          marginTop: 12,
+        }}>
+          {error}
+        </p>
+      )}
     </div>
   )
 }

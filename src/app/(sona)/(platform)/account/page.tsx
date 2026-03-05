@@ -1,6 +1,17 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { BillingPortalButton } from './BillingPortalButton'
+
+const GEIST = 'var(--font-geist-sans)'
+const CORMORANT = 'var(--font-cormorant)'
+
+const STATUS_LABEL: Record<string, string> = {
+  active: 'Active',
+  past_due: 'Past due',
+  cancelled: 'Cancelled',
+  canceled: 'Cancelled',
+}
 
 export default async function AccountPage() {
   const supabase = await createServerSupabaseClient()
@@ -20,58 +31,197 @@ export default async function AccountPage() {
     .single()
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Your account</h1>
+    <main style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
+      <div style={{
+        maxWidth: 720,
+        margin: '0 auto',
+        padding: '56px clamp(24px, 4vw, 48px) 96px',
+      }}>
 
-      <section className="mb-10">
-        <h2 className="font-semibold text-gray-700 mb-4">Subscriptions</h2>
-        {subscriptions && subscriptions.length > 0 ? (
-          <div className="space-y-3">
-            {subscriptions.map(sub => {
-              const portrait = sub.portraits as any
-              return (
-                <a key={sub.id} href={`/sona/${portrait.slug}`}
-                  className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-300 transition-colors">
-                  {portrait.avatar_url ? (
-                    <img src={portrait.avatar_url} alt={portrait.display_name}
-                      className="w-10 h-10 rounded-full object-cover shrink-0" />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                      <span className="text-sm font-semibold text-gray-400">{portrait.display_name?.[0] ?? '?'}</span>
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{portrait.display_name}</p>
-                    <p className="text-xs text-gray-400">
-                      {portrait.monthly_price_cents
-                        ? `$${(portrait.monthly_price_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}/month`
-                        : 'Free'}
-                    </p>
-                  </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${
-                    sub.status === 'active' ? 'bg-green-50 text-green-600' :
-                    sub.status === 'past_due' ? 'bg-red-50 text-red-600' :
-                    'bg-gray-100 text-gray-400'
-                  }`}>
-                    {sub.status.replace('_', ' ')}
-                  </span>
-                </a>
-              )
-            })}
-          </div>
-        ) : (
-          <p className="text-gray-400 text-sm">
-            No subscriptions yet. <a href="/explore" className="underline">Explore Sonas</a>
+        {/* ── Page header ─────────────────────────────────────────── */}
+        <div style={{ marginBottom: 48 }}>
+          <h1 style={{
+            fontFamily: CORMORANT,
+            fontSize: 'clamp(2rem, 4vw, 2.75rem)',
+            fontWeight: 400,
+            fontStyle: 'italic',
+            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+            color: '#1a1a1a',
+            margin: '0 0 8px',
+          }}>
+            Account
+          </h1>
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.875rem',
+            fontWeight: 300,
+            color: '#b0b0b0',
+            margin: 0,
+          }}>
+            {user.email}
           </p>
-        )}
-      </section>
+        </div>
 
-      {profile?.stripe_customer_id && (
-        <section>
-          <h2 className="font-semibold text-gray-700 mb-4">Billing</h2>
-          <BillingPortalButton />
+        {/* ── Divider ─────────────────────────────────────────────── */}
+        <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.06)', marginBottom: 40 }} />
+
+        {/* ── Subscriptions ───────────────────────────────────────── */}
+        <section style={{ marginBottom: 48 }}>
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.6875rem',
+            fontWeight: 500,
+            letterSpacing: '0.09em',
+            textTransform: 'uppercase',
+            color: '#b0b0b0',
+            margin: '0 0 16px',
+          }}>
+            Sonas
+          </p>
+
+          {subscriptions && subscriptions.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {subscriptions.map(sub => {
+                const portrait = sub.portraits as any
+                const isPaid = portrait.monthly_price_cents != null && portrait.monthly_price_cents > 0
+                const initial = portrait.display_name?.[0] ?? '?'
+                const statusLabel = STATUS_LABEL[sub.status] ?? sub.status.replace('_', ' ')
+                const isActive = sub.status === 'active'
+                const isPastDue = sub.status === 'past_due'
+
+                return (
+                  <Link
+                    key={sub.id}
+                    href={`/sona/${portrait.slug}`}
+                    className="sona-card"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 16,
+                      padding: '16px 20px',
+                      backgroundColor: '#fff',
+                      border: '1px solid rgba(0,0,0,0.07)',
+                      borderRadius: 14,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    {/* Avatar */}
+                    {portrait.avatar_url ? (
+                      <img
+                        src={portrait.avatar_url}
+                        alt={portrait.display_name}
+                        style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(0,0,0,0.04)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}>
+                        <span style={{
+                          fontFamily: CORMORANT,
+                          fontSize: '1.25rem',
+                          fontStyle: 'italic',
+                          fontWeight: 400,
+                          color: '#1a1a1a',
+                          lineHeight: 1,
+                          userSelect: 'none',
+                        }}>
+                          {initial}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Name + price */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{
+                        fontFamily: CORMORANT,
+                        fontSize: '1.125rem',
+                        fontWeight: 400,
+                        fontStyle: 'italic',
+                        color: '#1a1a1a',
+                        margin: 0,
+                        lineHeight: 1.2,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {portrait.display_name}
+                      </p>
+                      <p style={{
+                        fontFamily: GEIST,
+                        fontSize: '0.75rem',
+                        fontWeight: 300,
+                        color: '#b0b0b0',
+                        margin: '2px 0 0',
+                      }}>
+                        {isPaid
+                          ? `$${(portrait.monthly_price_cents / 100).toFixed(0)}/mo`
+                          : 'Free'}
+                      </p>
+                    </div>
+
+                    {/* Status */}
+                    <span style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.6875rem',
+                      fontWeight: 500,
+                      letterSpacing: '0.04em',
+                      color: isPastDue ? '#DE3E7B' : isActive ? '#9b9b9b' : '#c0c0c0',
+                      flexShrink: 0,
+                    }}>
+                      {statusLabel}
+                    </span>
+                  </Link>
+                )
+              })}
+            </div>
+          ) : (
+            <p style={{
+              fontFamily: GEIST,
+              fontSize: '0.875rem',
+              fontWeight: 300,
+              color: '#b0b0b0',
+              margin: 0,
+            }}>
+              No Sonas yet.{' '}
+              <Link href="/explore" style={{
+                fontFamily: GEIST,
+                color: '#6b6b6b',
+                textDecoration: 'underline',
+                textUnderlineOffset: 3,
+              }}>
+                Explore
+              </Link>
+            </p>
+          )}
         </section>
-      )}
+
+        {/* ── Billing ─────────────────────────────────────────────── */}
+        {profile?.stripe_customer_id && (
+          <section>
+            <p style={{
+              fontFamily: GEIST,
+              fontSize: '0.6875rem',
+              fontWeight: 500,
+              letterSpacing: '0.09em',
+              textTransform: 'uppercase',
+              color: '#b0b0b0',
+              margin: '0 0 16px',
+            }}>
+              Billing
+            </p>
+            <BillingPortalButton />
+          </section>
+        )}
+
+      </div>
     </main>
   )
 }
