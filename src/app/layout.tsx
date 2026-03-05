@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, Lora } from 'next/font/google'
+import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -32,8 +33,8 @@ export default function RootLayout({
         <meta name="color-scheme" content="light" />
       </head>
       <body
-        className={`${cormorant.variable} ${lora.variable} antialiased`}
-        style={{ backgroundColor: '#F5F0E8', color: '#2C2416' }}
+        className={`${cormorant.variable} ${lora.variable} ${GeistSans.variable} antialiased`}
+        style={{ backgroundColor: '#ffffff', color: '#1a1a1a' }}
       >
         {children}
       </body>

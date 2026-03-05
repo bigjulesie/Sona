@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-ink: #2C2416;
+  --color-ink: #1a1a1a;
+  --color-white: #ffffff;
+  --color-coral: #DE3E7B;
+  --color-muted: #6b6b6b;
+  --color-border: rgba(0,0,0,0.08);
+  /* Legacy NH tokens kept for backward compat */
   --color-parchment: #F5F0E8;
   --color-vellum: #EDE8DC;
   --color-brass: #8B7355;
@@ -9,16 +14,17 @@
   --color-mist: #9B9086;
   --font-display: var(--font-cormorant);
   --font-body: var(--font-lora);
+  --font-sans: var(--font-geist-sans);
 }
 
 body {
-  background: #F5F0E8;
-  color: #2C2416;
-  font-family: var(--font-lora), Georgia, serif;
+  background: #ffffff;
+  color: #1a1a1a;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: #2C2416;
-  color: #F5F0E8;
+  background: #DE3E7B;
+  color: #ffffff;
 }

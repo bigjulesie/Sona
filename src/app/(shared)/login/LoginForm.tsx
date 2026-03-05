@@ -57,7 +57,7 @@ export function LoginForm({ brand }: Props) {
             <span className="font-display text-4xl tracking-wide" style={{ color: '#2C2416' }}>sona</span>
           ) : (
             <Image
-              src="/brand_assets/logo.svg"
+              src="/brand_assets/nh/logo.svg"
               alt="Neural Heirloom"
               width={210}
               height={63}
@@ -69,7 +69,7 @@ export function LoginForm({ brand }: Props) {
         {/* Divider with icon */}
         <div className="flex items-center gap-3 mb-10">
           <div className="flex-1 h-px" style={{ backgroundColor: '#8B7355', opacity: 0.3 }} />
-          <Image src="/brand_assets/icon.svg" alt="" width={14} height={14} className="opacity-30" />
+          <Image src="/brand_assets/nh/icon.svg" alt="" width={14} height={14} className="opacity-30" />
           <div className="flex-1 h-px" style={{ backgroundColor: '#8B7355', opacity: 0.3 }} />
         </div>
 

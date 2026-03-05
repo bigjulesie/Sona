@@ -12,6 +12,7 @@
     "@anthropic-ai/sdk": "^0.78.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
+    "geist": "^1.7.0",
     "next": "16.1.6",
     "openai": "^6.22.0",
     "react": "19.2.3",
