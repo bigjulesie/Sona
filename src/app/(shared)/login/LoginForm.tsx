@@ -59,7 +59,7 @@ export function LoginForm({ brand }: Props) {
           {/* Logo */}
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 48 }}>
             <Image
-              src="/brand_assets/sona/Sona brand - on white bg.svg"
+              src="/brand_assets/sona/Sona brand on white bg 1.svg"
               alt="Sona"
               width={110}
               height={41}

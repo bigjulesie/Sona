@@ -31,7 +31,7 @@ export function LandingPage() {
         justifyContent: 'space-between',
       }}>
         <Image
-          src="/brand_assets/sona/Sona brand - on white bg.svg"
+          src="/brand_assets/sona/Sona brand on white bg 1.svg"
           alt="Sona"
           width={88}
           height={33}
@@ -453,7 +453,7 @@ export function LandingPage() {
         justifyContent: 'space-between',
       }}>
         <Image
-          src="/brand_assets/sona/Sona brand - on white bg.svg"
+          src="/brand_assets/sona/Sona brand on white bg 1.svg"
           alt="Sona"
           width={66}
           height={25}

@@ -44,7 +44,7 @@ export async function SonaNav() {
     }}>
       <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
         <Image
-          src="/brand_assets/sona/Sona brand - on white bg.svg"
+          src="/brand_assets/sona/Sona brand on white bg 1.svg"
           alt="Sona"
           width={88}
           height={33}

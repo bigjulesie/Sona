@@ -41,7 +41,7 @@ export function DashboardNav() {
         {/* Logo */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
           <Image
-            src="/brand_assets/sona/Sona brand - on white bg.svg"
+            src="/brand_assets/sona/Sona brand on white bg 1.svg"
             alt="Sona"
             width={72}
             height={27}
