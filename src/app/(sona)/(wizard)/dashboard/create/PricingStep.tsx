@@ -21,8 +21,8 @@ export function PricingStep({ portraitId }: { portraitId: string }) {
       ? Math.round(parseFloat(price) * 100)
       : null
 
-    if (type === 'paid' && (isNaN(monthly_price_cents!) || monthly_price_cents! < 50)) {
-      setError('Minimum price is $0.50')
+    if (type === 'paid' && (isNaN(monthly_price_cents!) || monthly_price_cents! < 100)) {
+      setError('Minimum price is $1.00')
       setLoading(false)
       return
     }
@@ -88,6 +88,18 @@ export function PricingStep({ portraitId }: { portraitId: string }) {
         ))}
       </div>
 
+      <p style={{
+        fontFamily: GEIST,
+        fontSize: '0.8125rem',
+        fontWeight: 300,
+        color: '#9b9b9b',
+        margin: '-12px 0 0',
+        lineHeight: 1.6,
+      }}>
+        Subscribers receive <strong style={{ fontWeight: 500 }}>Perspective</strong>-level access.
+        Wisdom and Legacy tier controls are coming soon.
+      </p>
+
       {/* Price input */}
       {type === 'paid' && (
         <div>
@@ -119,8 +131,8 @@ export function PricingStep({ portraitId }: { portraitId: string }) {
             </span>
             <input
               type="number"
-              min="0.50"
-              step="0.01"
+              min="1"
+              step="1"
               value={price}
               onChange={e => setPrice(e.target.value)}
               required
