@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+const GEIST = 'var(--font-geist-sans)'
+
 interface Props {
   portraitId: string
   isFree: boolean
@@ -56,11 +58,37 @@ export function SubscribeButton({ portraitId, isFree, isLoggedIn, slug }: Props)
 
   return (
     <div>
-      <button onClick={handleClick} disabled={loading}
-        className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-700 disabled:opacity-50 transition-colors">
+      <button
+        onClick={handleClick}
+        disabled={loading}
+        className="sona-btn-dark"
+        style={{
+          fontFamily: GEIST,
+          fontSize: '0.9375rem',
+          fontWeight: 500,
+          letterSpacing: '-0.01em',
+          padding: '14px 40px',
+          borderRadius: '980px',
+          background: '#1a1a1a',
+          color: '#fff',
+          border: 'none',
+          cursor: loading ? 'default' : 'pointer',
+          opacity: loading ? 0.5 : 1,
+          transition: 'opacity 0.15s ease',
+        }}
+      >
         {loading ? 'Loading…' : isFree ? 'Follow for free' : 'Subscribe'}
       </button>
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      {error && (
+        <p style={{
+          fontFamily: GEIST,
+          fontSize: '0.8125rem',
+          color: '#DE3E7B',
+          marginTop: 12,
+        }}>
+          {error}
+        </p>
+      )}
     </div>
   )
 }
