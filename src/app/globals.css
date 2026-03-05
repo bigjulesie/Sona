@@ -71,6 +71,14 @@ body {
   border-bottom: 2px solid rgba(0,0,0,0.12) !important;
 }
 
+/* Dashboard checklist rows */
+.sona-row-hover {
+  transition: background-color 0.15s ease;
+}
+.sona-row-hover:hover {
+  background-color: rgba(0,0,0,0.03);
+}
+
 /* Portrait cards */
 .sona-card {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;

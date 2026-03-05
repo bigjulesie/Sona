@@ -2,14 +2,17 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
+const GEIST = 'var(--font-geist-sans)'
+const CORMORANT = 'var(--font-cormorant)'
+
 const UNLOCKS = [
-  { count: 25, label: 'Inner circle interviews' },
+  { count: 25,  label: 'Inner circle interviews' },
   { count: 100, label: 'Analytics dashboard' },
   { count: 250, label: 'Custom domain' },
 ]
 
 const INTERVIEW_STATUS_LABEL: Record<string, string> = {
-  pending: 'Pending — we\'ll be in touch via WhatsApp',
+  pending:   'Pending — we\'ll be in touch via WhatsApp',
   scheduled: 'Scheduled',
   completed: 'Completed',
 }
@@ -53,7 +56,6 @@ export default async function DashboardPage() {
 
   const hasContent = (chunkCount ?? 0) > 0
 
-  // Determine the single most relevant next action for this creator
   const nextAction = !portrait.is_public
     ? !interviewRequest
       ? { label: 'Schedule your interview', description: 'Book your WhatsApp interview to get your Sona live.', href: '/dashboard/interview', cta: 'Schedule now' }
@@ -87,7 +89,7 @@ export default async function DashboardPage() {
     {
       label: 'Set your pricing',
       description: portrait.monthly_price_cents
-        ? `$${(portrait.monthly_price_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}/month`
+        ? `$${(portrait.monthly_price_cents / 100).toFixed(0)}/month`
         : 'Free',
       done: true,
       href: '/dashboard/settings',
@@ -97,99 +99,347 @@ export default async function DashboardPage() {
   const allRequiredDone = !!interviewRequest
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{portrait.display_name}</h1>
+    <div style={{ maxWidth: 680 }}>
+
+      {/* ── Page header ─────────────────────────────────────────── */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 40, gap: 16 }}>
+        <div>
+          <h1 style={{
+            fontFamily: CORMORANT,
+            fontSize: 'clamp(1.75rem, 3vw, 2.5rem)',
+            fontWeight: 400,
+            fontStyle: 'italic',
+            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+            color: '#1a1a1a',
+            margin: '0 0 6px',
+          }}>
+            {portrait.display_name}
+          </h1>
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.8125rem',
+            fontWeight: 300,
+            color: portrait.is_public ? '#9b9b9b' : '#b0b0b0',
+            margin: 0,
+          }}>
+            {portrait.is_public ? 'Live' : allRequiredDone ? 'In review' : 'Not yet live'}
+          </p>
+        </div>
         {portrait.is_public && (
-          <a href={`/sona/${portrait.slug}`} target="_blank"
-            className="text-sm text-indigo-600 hover:underline">View public page &#8599;</a>
+          <Link
+            href={`/sona/${portrait.slug}`}
+            target="_blank"
+            className="sona-link"
+            style={{
+              fontFamily: GEIST,
+              fontSize: '0.8125rem',
+              color: '#6b6b6b',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              paddingTop: 6,
+              flexShrink: 0,
+            }}
+          >
+            View public page <span aria-hidden>↗</span>
+          </Link>
         )}
       </div>
 
+      {/* ── Next action banner ───────────────────────────────────── */}
       {nextAction && (
-        <Link href={nextAction.href}
-          className="flex items-center justify-between mb-6 p-5 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-colors group">
+        <Link
+          href={nextAction.href}
+          className="sona-btn-dark"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            padding: '24px 28px',
+            borderRadius: 18,
+            background: '#1a1a1a',
+            textDecoration: 'none',
+            marginBottom: 32,
+          }}
+        >
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-0.5 uppercase tracking-wide">Recommended next step</p>
-            <p className="font-semibold">{nextAction.label}</p>
-            <p className="text-sm text-gray-400 mt-0.5">{nextAction.description}</p>
+            <p style={{
+              fontFamily: GEIST,
+              fontSize: '0.6875rem',
+              fontWeight: 500,
+              letterSpacing: '0.09em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.4)',
+              margin: '0 0 6px',
+            }}>
+              Recommended next step
+            </p>
+            <p style={{
+              fontFamily: CORMORANT,
+              fontSize: '1.375rem',
+              fontWeight: 400,
+              fontStyle: 'italic',
+              color: '#fff',
+              margin: '0 0 4px',
+              lineHeight: 1.2,
+            }}>
+              {nextAction.label}
+            </p>
+            <p style={{
+              fontFamily: GEIST,
+              fontSize: '0.8125rem',
+              fontWeight: 300,
+              color: 'rgba(255,255,255,0.5)',
+              margin: 0,
+            }}>
+              {nextAction.description}
+            </p>
           </div>
-          <span className="text-gray-400 group-hover:text-white transition-colors text-xl shrink-0 ml-4">&#8594;</span>
+          <span style={{
+            color: 'rgba(255,255,255,0.4)',
+            fontSize: '1.25rem',
+            flexShrink: 0,
+          }}>
+            →
+          </span>
         </Link>
       )}
 
+      {/* ── Setup checklist ─────────────────────────────────────── */}
       {!portrait.is_public && (
-        <div className="mb-8 bg-white rounded-2xl border border-gray-100 p-6">
-          <div className="flex items-start justify-between mb-5">
+        <div style={{
+          border: '1px solid rgba(0,0,0,0.07)',
+          borderRadius: 18,
+          padding: '28px 24px',
+          marginBottom: 32,
+          backgroundColor: '#fff',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, gap: 12 }}>
             <div>
-              <h2 className="font-semibold text-gray-900">Getting your Sona live</h2>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p style={{
+                fontFamily: GEIST,
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: '#1a1a1a',
+                margin: '0 0 4px',
+              }}>
+                Getting your Sona live
+              </p>
+              <p style={{
+                fontFamily: GEIST,
+                fontSize: '0.8125rem',
+                fontWeight: 300,
+                color: '#b0b0b0',
+                margin: 0,
+              }}>
                 {allRequiredDone
                   ? 'Interview requested — we\'ll notify you when you\'re live.'
-                  : 'Complete the steps below to launch your Sona.'}
+                  : 'Complete the steps below to launch.'}
               </p>
             </div>
             {allRequiredDone && (
-              <span className="text-xs font-medium px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full">In review</span>
+              <span style={{
+                fontFamily: GEIST,
+                fontSize: '0.6875rem',
+                fontWeight: 500,
+                letterSpacing: '0.05em',
+                color: '#b08850',
+                backgroundColor: '#fef9ef',
+                padding: '4px 10px',
+                borderRadius: '980px',
+                flexShrink: 0,
+              }}>
+                In review
+              </span>
             )}
           </div>
 
-          <div className="space-y-1">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {setupSteps.map((step) => (
-              <Link key={step.label} href={step.href}
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                  step.done ? 'bg-gray-900' : 'border-2 border-gray-200'
-                }`}>
+              <Link
+                key={step.label}
+                href={step.href}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  padding: '10px 12px',
+                  borderRadius: 10,
+                  textDecoration: 'none',
+                  transition: 'background-color 0.15s ease',
+                }}
+                className="sona-row-hover"
+              >
+                {/* Step indicator */}
+                <div style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: step.done ? '#DE3E7B' : 'transparent',
+                  border: step.done ? 'none' : '1.5px solid rgba(0,0,0,0.15)',
+                }}>
                   {step.done && (
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 13l4 4L19 7" />
                     </svg>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className={`text-sm font-medium ${step.done ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
+
+                {/* Text */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.875rem',
+                      fontWeight: step.done ? 300 : 400,
+                      color: step.done ? '#b0b0b0' : '#1a1a1a',
+                      textDecoration: step.done ? 'line-through' : 'none',
+                      textDecorationColor: 'rgba(0,0,0,0.2)',
+                    }}>
                       {step.label}
                     </span>
                     {step.optional && (
-                      <span className="text-xs text-gray-400">(optional)</span>
+                      <span style={{
+                        fontFamily: GEIST,
+                        fontSize: '0.6875rem',
+                        color: '#c0c0c0',
+                      }}>
+                        optional
+                      </span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-400 mt-0.5 truncate">{step.description}</p>
+                  <p style={{
+                    fontFamily: GEIST,
+                    fontSize: '0.75rem',
+                    fontWeight: 300,
+                    color: '#c0c0c0',
+                    margin: '1px 0 0',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {step.description}
+                  </p>
                 </div>
-                <span className="text-gray-200 group-hover:text-gray-400 transition-colors text-sm">&#8594;</span>
+
+                <span style={{ color: 'rgba(0,0,0,0.18)', fontSize: '0.875rem', flexShrink: 0 }}>→</span>
               </Link>
             ))}
           </div>
         </div>
       )}
 
+      {/* ── Stats ────────────────────────────────────────────────── */}
       {portrait.is_public && (
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-white rounded-2xl p-6 border border-gray-100">
-            <p className="text-sm text-gray-500 mb-1">Subscribers</p>
-            <p className="text-3xl font-bold text-gray-900">{subscriberCount.toLocaleString()}</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 border border-gray-100">
-            <p className="text-sm text-gray-500 mb-1">Monthly revenue</p>
-            <p className="text-3xl font-bold text-gray-900">{mrr > 0 ? `$${mrr.toFixed(0)}` : '\u2014'}</p>
-          </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 12,
+          marginBottom: 32,
+        }}>
+          {[
+            { label: 'Subscribers', value: subscriberCount.toLocaleString() },
+            { label: 'Monthly revenue', value: mrr > 0 ? `$${mrr.toFixed(0)}` : '—' },
+          ].map(({ label, value }) => (
+            <div key={label} style={{
+              backgroundColor: '#fff',
+              border: '1px solid rgba(0,0,0,0.07)',
+              borderRadius: 16,
+              padding: '24px',
+            }}>
+              <p style={{
+                fontFamily: GEIST,
+                fontSize: '0.75rem',
+                fontWeight: 400,
+                color: '#b0b0b0',
+                margin: '0 0 8px',
+                letterSpacing: '0.02em',
+              }}>
+                {label}
+              </p>
+              <p style={{
+                fontFamily: CORMORANT,
+                fontSize: '2.5rem',
+                fontWeight: 400,
+                fontStyle: 'italic',
+                color: '#1a1a1a',
+                margin: 0,
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+              }}>
+                {value}
+              </p>
+            </div>
+          ))}
         </div>
       )}
 
+      {/* ── Unlocks ──────────────────────────────────────────────── */}
       {portrait.is_public && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">Unlock more features</h2>
-          <div className="space-y-3">
-            {UNLOCKS.map(({ count, label }) => {
+        <div style={{
+          backgroundColor: '#fff',
+          border: '1px solid rgba(0,0,0,0.07)',
+          borderRadius: 16,
+          padding: '24px',
+        }}>
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.6875rem',
+            fontWeight: 500,
+            letterSpacing: '0.09em',
+            textTransform: 'uppercase',
+            color: '#b0b0b0',
+            margin: '0 0 16px',
+          }}>
+            Unlock more
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {UNLOCKS.map(({ count, label }, i) => {
               const unlocked = subscriberCount >= count
               return (
-                <div key={count} className={`flex items-center justify-between py-2 ${unlocked ? '' : 'opacity-40'}`}>
-                  <span className="text-sm text-gray-700">{label}</span>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                    unlocked ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'
-                  }`}>
+                <div
+                  key={count}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 0',
+                    borderTop: i > 0 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+                    opacity: unlocked ? 1 : 0.4,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      backgroundColor: unlocked ? '#DE3E7B' : 'rgba(0,0,0,0.2)',
+                      flexShrink: 0,
+                      display: 'inline-block',
+                    }} />
+                    <span style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.875rem',
+                      fontWeight: 300,
+                      color: '#1a1a1a',
+                    }}>
+                      {label}
+                    </span>
+                  </div>
+                  <span style={{
+                    fontFamily: GEIST,
+                    fontSize: '0.6875rem',
+                    fontWeight: 500,
+                    color: unlocked ? '#DE3E7B' : '#c0c0c0',
+                    letterSpacing: '0.03em',
+                  }}>
                     {unlocked ? 'Unlocked' : `${count} subscribers`}
                   </span>
                 </div>
@@ -198,6 +448,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
     </div>
   )
 }
