@@ -100,7 +100,7 @@ export default async function ExplorePage({ searchParams }: PageProps) {
                 <a
                   key={cat}
                   href={href}
-                  className={isActive ? undefined : 'sona-link'}
+                  className={isActive ? undefined : 'sona-filter-tab'}
                   style={{
                     fontFamily: GEIST,
                     fontSize: '0.8125rem',

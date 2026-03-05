@@ -62,6 +62,15 @@ body {
   opacity: 0.6;
 }
 
+/* Filter bar tabs — pale grey underline on hover */
+.sona-filter-tab {
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.sona-filter-tab:hover {
+  color: #1a1a1a !important;
+  border-bottom-color: rgba(0,0,0,0.12) !important;
+}
+
 /* Portrait cards */
 .sona-card {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
