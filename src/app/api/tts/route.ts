@@ -1,10 +1,16 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return new Response('Unauthorized', { status: 401 })
+
+  if (!(await checkRateLimit(user.id, 'tts'))) {
+    return new Response('Rate limit exceeded.', { status: 429 })
+  }
 
   const { text, portrait_id } = await req.json()
   if (!text || !portrait_id) {
@@ -56,6 +62,14 @@ export async function POST(req: NextRequest) {
       const error = await elRes.text()
       return new Response(`ElevenLabs error: ${error}`, { status: 500 })
     }
+
+    await createAdminClient().from('audit_log').insert({
+      user_id: user.id,
+      action: 'tts',
+      resource_type: 'portrait',
+      resource_id: portrait_id,
+      metadata: { text_length: text.length },
+    })
 
     return new Response(elRes.body, {
       headers: {

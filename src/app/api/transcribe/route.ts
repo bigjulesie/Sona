@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  if (!(await checkRateLimit(user.id, 'transcribe'))) {
+    return NextResponse.json({ error: 'Rate limit exceeded.' }, { status: 429 })
+  }
 
   const formData = await req.formData()
   const audio = formData.get('audio') as Blob | null
@@ -39,6 +45,14 @@ export async function POST(req: NextRequest) {
     const data = await dgRes.json()
     const transcript =
       data.results?.channels?.[0]?.alternatives?.[0]?.transcript ?? ''
+
+    await createAdminClient().from('audit_log').insert({
+      user_id: user.id,
+      action: 'transcribe',
+      resource_type: 'audio',
+      resource_id: null,
+      metadata: { size_bytes: buffer.byteLength },
+    })
 
     return NextResponse.json({ transcript })
   } catch (err) {

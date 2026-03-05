@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { retrieveRelevantChunks } from '@/lib/rag/retrieve'
 import { hasActiveSubscription } from '@/lib/subscriptions'
+import { checkRateLimit } from '@/lib/rate-limit'
 import Anthropic from '@anthropic-ai/sdk'
 
 export async function POST(request: NextRequest) {
@@ -11,6 +12,10 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     return new Response('Unauthorized', { status: 401 })
+  }
+
+  if (!(await checkRateLimit(user.id, 'chat'))) {
+    return new Response('Rate limit exceeded. Please wait before sending more messages.', { status: 429 })
   }
 
   const { message, conversation_id, portrait_id } = await request.json()

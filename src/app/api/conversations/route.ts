@@ -12,6 +12,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from('conversations')
     .select('id, title, portrait_id, created_at, updated_at')
+    .eq('user_id', user.id)
     .order('updated_at', { ascending: false })
 
   if (error) {

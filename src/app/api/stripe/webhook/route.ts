@@ -81,6 +81,36 @@ export async function POST(request: NextRequest) {
       }
       break
     }
+
+    case 'charge.refunded': {
+      // Log the refund; subscription state is managed via subscription events
+      const charge = event.data.object as Stripe.Charge
+      await supabase.from('audit_log').insert({
+        user_id: null,
+        action: 'charge.refunded',
+        resource_type: 'charge',
+        resource_id: charge.id,
+        metadata: {
+          amount_refunded: charge.amount_refunded,
+          payment_intent: charge.payment_intent,
+        },
+      })
+      break
+    }
+
+    case 'charge.dispute.created': {
+      // Mark the subscription as past_due when a dispute is opened
+      const dispute = event.data.object as Stripe.Dispute
+      const chargeId = typeof dispute.charge === 'string' ? dispute.charge : dispute.charge?.id
+      await supabase.from('audit_log').insert({
+        user_id: null,
+        action: 'charge.dispute.created',
+        resource_type: 'dispute',
+        resource_id: dispute.id,
+        metadata: { charge_id: chargeId, amount: dispute.amount, reason: dispute.reason },
+      })
+      break
+    }
   }
 
   return NextResponse.json({ received: true })
