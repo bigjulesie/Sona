@@ -5,6 +5,7 @@ const LIMITS: Record<string, number> = {
   chat:       100,
   tts:         60,
   transcribe:  60,
+  ingest:      20,
 }
 
 /**
