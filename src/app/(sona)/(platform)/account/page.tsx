@@ -183,23 +183,50 @@ export default async function AccountPage() {
               })}
             </div>
           ) : (
-            <p style={{
-              fontFamily: GEIST,
-              fontSize: '0.875rem',
-              fontWeight: 300,
-              color: '#b0b0b0',
-              margin: 0,
+            <div style={{
+              border: '1px solid rgba(0,0,0,0.07)',
+              borderRadius: 14,
+              padding: '28px 24px',
+              textAlign: 'center',
             }}>
-              No Sonas yet.{' '}
-              <Link href="/explore" style={{
-                fontFamily: GEIST,
-                color: '#6b6b6b',
-                textDecoration: 'underline',
-                textUnderlineOffset: 3,
+              <p style={{
+                fontFamily: CORMORANT,
+                fontSize: '1.25rem',
+                fontWeight: 400,
+                fontStyle: 'italic',
+                color: '#1a1a1a',
+                margin: '0 0 6px',
+                lineHeight: 1.3,
               }}>
-                Explore
+                No Sonas yet.
+              </p>
+              <p style={{
+                fontFamily: GEIST,
+                fontSize: '0.8125rem',
+                fontWeight: 300,
+                color: '#9b9b9b',
+                margin: '0 0 20px',
+              }}>
+                Follow a Sona to start a conversation.
+              </p>
+              <Link
+                href="/explore"
+                style={{
+                  fontFamily: GEIST,
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  letterSpacing: '-0.01em',
+                  color: '#fff',
+                  backgroundColor: '#1a1a1a',
+                  borderRadius: '980px',
+                  padding: '10px 24px',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                }}
+              >
+                Explore Sonas
               </Link>
-            </p>
+            </div>
           )}
         </section>
 

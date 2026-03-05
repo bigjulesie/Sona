@@ -95,3 +95,9 @@ body {
   border-color: rgba(0,0,0,0.14) !important;
   box-shadow: 0 4px 24px rgba(0,0,0,0.06);
 }
+
+/* Chat streaming dots */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-4px); opacity: 1; }
+}

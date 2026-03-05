@@ -347,7 +347,7 @@ export function LandingPage() {
                 <h3 style={{
                   fontFamily: GEIST,
                   fontSize: '1rem',
-                  fontWeight: 600,
+                  fontWeight: 500,
                   margin: '0 0 12px',
                   letterSpacing: '-0.01em',
                 }}>

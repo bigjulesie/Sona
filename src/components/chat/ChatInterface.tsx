@@ -7,6 +7,9 @@ import { MessageBubble } from './MessageBubble'
 import { ChatInput } from './ChatInput'
 import { RatingPrompt } from '@/components/sona/RatingPrompt'
 
+const GEIST = 'var(--font-geist-sans)'
+const CORMORANT = 'var(--font-cormorant)'
+
 interface ChatInterfaceProps {
   portraitId: string
   portraitName: string
@@ -69,7 +72,7 @@ export function ChatInterface({
         const blob = await res.blob()
         const url = URL.createObjectURL(blob)
         const audio = new Audio(url)
-        audio.dataset.blobUrl = url  // store for cleanup
+        audio.dataset.blobUrl = url
         audioRef.current = audio
         audio.onended = () => {
           setPlayingMessageId(null)
@@ -122,16 +125,47 @@ export function ChatInterface({
   const userMessageCount = messages.filter(m => m.role === 'user').length
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto px-4 md:px-6 py-8">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+
+      {/* ── Message list ───────────────────────────────────────────── */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '32px clamp(16px, 4vw, 24px)',
+      }}>
+
+        {/* Empty state */}
         {messages.length === 0 && !isRecording && (
-          <div className="flex flex-col items-center justify-center h-full gap-5 text-center">
-            <Image src="/brand_assets/icon.svg" alt="" width={40} height={40} className="opacity-25" />
-            <p className="font-display text-xl text-mist italic">
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            gap: 16,
+            textAlign: 'center',
+          }}>
+            <Image
+              src="/brand_assets/icon.svg"
+              alt=""
+              width={36}
+              height={36}
+              style={{ opacity: 0.2 }}
+            />
+            <p style={{
+              fontFamily: CORMORANT,
+              fontSize: '1.25rem',
+              fontWeight: 400,
+              fontStyle: 'italic',
+              color: '#b0b0b0',
+              margin: 0,
+            }}>
               Begin your conversation with {portraitName}
             </p>
           </div>
         )}
+
+        {/* Messages */}
         {messages.map((msg) => (
           <MessageBubble
             key={msg.id}
@@ -149,25 +183,60 @@ export function ChatInterface({
             isPlayingTTS={playingMessageId === msg.id}
           />
         ))}
+
+        {/* Streaming indicator */}
         {isStreaming && (
-          <div className="flex justify-start mb-5">
-            <div className="bg-vellum border border-brass/20 rounded-2xl rounded-bl-sm px-5 py-4">
-              <p className="text-xs tracking-widest uppercase text-brass mb-2">{portraitName}</p>
-              <div className="flex gap-1.5 items-center h-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-brass/60 animate-bounce [animation-delay:0ms]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-brass/60 animate-bounce [animation-delay:150ms]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-brass/60 animate-bounce [animation-delay:300ms]" />
+          <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 20 }}>
+            <div style={{
+              backgroundColor: '#f5f5f5',
+              border: '1px solid rgba(0,0,0,0.06)',
+              borderRadius: '20px 20px 20px 4px',
+              padding: '14px 18px',
+            }}>
+              <p style={{
+                fontFamily: GEIST,
+                fontSize: '0.625rem',
+                fontWeight: 500,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#b0b0b0',
+                margin: '0 0 8px',
+              }}>
+                {portraitName}
+              </p>
+              <div style={{ display: 'flex', gap: 5, alignItems: 'center', height: 16 }}>
+                {[0, 150, 300].map((delay) => (
+                  <span
+                    key={delay}
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(0,0,0,0.2)',
+                      display: 'inline-block',
+                      animation: `bounce 1s ease-in-out ${delay}ms infinite`,
+                    }}
+                  />
+                ))}
               </div>
             </div>
           </div>
         )}
+
         <div ref={messagesEndRef} />
       </div>
+
+      {/* ── Rating prompt ───────────────────────────────────────────── */}
       {existingRating !== undefined && (
-        <div className="px-4 md:px-6">
-          <RatingPrompt portraitId={portraitId} messageCount={userMessageCount} existingRating={existingRating} />
+        <div style={{ padding: '0 clamp(16px, 4vw, 24px)' }}>
+          <RatingPrompt
+            portraitId={portraitId}
+            messageCount={userMessageCount}
+            existingRating={existingRating}
+          />
         </div>
       )}
+
       <ChatInput
         onSend={sendMessage}
         disabled={isStreaming}

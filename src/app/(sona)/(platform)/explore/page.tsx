@@ -186,13 +186,27 @@ export default async function ExplorePage({ searchParams }: PageProps) {
           </div>
         ) : (
           <div style={{ textAlign: 'center', padding: '96px 0' }}>
+            {/* Coral mark */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+              <svg width="36" height="36" viewBox="0 0 72 72" fill="none" aria-hidden>
+                <circle cx="36" cy="36" r="36" fill="url(#emptyGrad)" opacity="0.25" />
+                <defs>
+                  <radialGradient id="emptyGrad" cx="0" cy="0" r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="translate(36 36) rotate(90) scale(36)">
+                    <stop stopColor="#DE3E7B" />
+                    <stop offset="1" stopColor="#DE3E7B" stopOpacity="0" />
+                  </radialGradient>
+                </defs>
+              </svg>
+            </div>
             <p style={{
               fontFamily: CORMORANT,
               fontSize: '1.5rem',
               fontStyle: 'italic',
               fontWeight: 400,
               color: '#6b6b6b',
-              margin: '0 0 12px',
+              margin: '0 0 10px',
             }}>
               No Sonas found.
             </p>
