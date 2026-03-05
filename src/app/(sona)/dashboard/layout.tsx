@@ -8,7 +8,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!user) redirect('/login')
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#fafafa' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
       <DashboardNav />
       <div style={{ maxWidth: 1080, margin: '0 auto', padding: '40px clamp(24px, 4vw, 48px)' }}>
         {children}

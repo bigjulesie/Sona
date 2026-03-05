@@ -1,0 +1,605 @@
+[     240ms] [WARNING] Image with src "http://localhost:3000/brand_assets/sona/Sona%20brand%20on%20white%20bg%201.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 6075102ms] [WARNING] GoTrueClient@sb-mytlsjaxaasslhbnrjvl-auth-token:1 (2.97.0) 2026-03-05T18:53:21.074Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 6170069ms] [WARNING] Image with src "http://localhost:3000/brand_assets/sona/Sona%20brand%20on%20white%20bg%201.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7021895ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/login?_rsc=dstol:0
+[ 7022690ms] [WARNING] Image with src "http://localhost:3000/brand_assets/sona/Sona%20brand%20on%20white%20bg%201.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7274676ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login?_rsc=dstol:0
+[ 7275046ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login?_rsc=dstol:0
+[ 7275245ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login:0
+[ 7275676ms] Error: ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard.
+
+    at Object.getCompilationErrors (file:///Users/julian/Documents/sona/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:997:55)
+    at DevBundlerService.getCompilationError (file:///Users/julian/Documents/sona/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/julian/Documents/sona/node_modules/next/dist/server/dev/next-dev-server.js:706:42)
+    at DevServer.findPageComponents (file:///Users/julian/Documents/sona/node_modules/next/dist/server/dev/next-dev-server.js:676:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/julian/Documents/sona/node_modules/next/dist/server/base-server.js:1733:26)
+[ 7275809ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275859ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275860ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275860ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275860ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275860ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275860ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275860ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275860ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275860ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275860ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275861ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275861ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275861ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275861ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275861ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275861ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7275944ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7276068ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7276229ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7280205ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7282777ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7286077ms] [ERROR] ./src/app/(sona)/dashboard
+You cannot have two parallel pages that resolve to the same path. Please check /(sona)/(wizard)/dashboard/create and /(sona)/dashboard. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7288903ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7289185ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7289912ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7290549ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7290588ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7290638ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7290707ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7290779ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7290846ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7290922ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7290961ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7291014ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7291072ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7291132ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7291319ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7291982ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292088ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292130ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292191ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292297ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292623ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292674ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292740ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292798ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292893ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292931ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7292977ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293027ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293080ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293129ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293182ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293250ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293300ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293349ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293407ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293459ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293512ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293562ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293620ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293678ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293728ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293789ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293848ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7293900ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b3fb3b5f._.js:1920
+[ 7294084ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[ 7294122ms] [WARNING] Image with src "http://localhost:3000/brand_assets/sona/Sona%20brand%20on%20white%20bg%201.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[ 7294124ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[ 7335606ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[ 7337821ms] [ERROR] ./src/app/(sona)/dashboard/interview/page.tsx:4:1
+Module not found: Can't resolve '../create/InterviewStep'
+  2 | import { redirect } from 'next/navigation'
+  3 | import Link from 'next/link'
+> 4 | import { InterviewStep } from '../create/InterviewStep'
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  5 |
+  6 | const GEIST = 'var(--font-geist-sans)'
+  7 | const CORMORANT = 'var(--font-cormorant)'
+
+https://nextjs.org/docs/messages/module-not-found @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:3127
+[ 7395046ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed:  @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7396075ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7397079ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7398082ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7399087ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7400090ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7405096ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7410103ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7415122ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7420133ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7425179ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7430290ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7435420ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=JTjUBXq0ILgcekKqbI-2G' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[ 7533129ms] [WARNING] Image with src "http://localhost:3000/brand_assets/sona/Sona%20brand%20on%20white%20bg%201.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297

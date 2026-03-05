@@ -326,7 +326,7 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
               />
             </div>
 
-            <div>
+            <div style={{ display: 'flex' }}>
               <button
                 type="submit"
                 className="sona-btn-dark"

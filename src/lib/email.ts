@@ -1,6 +1,9 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY!)
+}
+
 const FROM = process.env.EMAIL_FROM ?? 'Sona <noreply@sona.ai>'
 const BASE_URL = process.env.NEXT_PUBLIC_SONA_URL ?? 'https://sona.ai'
 
@@ -50,7 +53,7 @@ function wrap(content: string): string {
 export async function sendWelcomeEmail(to: string): Promise<void> {
   if (!process.env.RESEND_API_KEY) return
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: 'Welcome to Sona',
@@ -95,7 +98,7 @@ export async function sendSubscriptionConfirmedEmail(
     ? 'Free'
     : `$${(monthlyPriceCents! / 100).toFixed(0)}/month`
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `You're now following ${portraitName}`,
@@ -125,7 +128,7 @@ export async function sendSubscriptionCancelledEmail(
 ): Promise<void> {
   if (!process.env.RESEND_API_KEY) return
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `Your subscription to ${portraitName} has ended`,
