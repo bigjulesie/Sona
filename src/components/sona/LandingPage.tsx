@@ -458,14 +458,38 @@ export function LandingPage() {
           width={66}
           height={25}
         />
-        <p style={{
-          fontFamily: GEIST,
-          fontSize: '0.8125rem',
-          color: '#b0b0b0',
-          margin: 0,
-        }}>
-          © 2026 Sona
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <a
+            href="/privacy"
+            style={{
+              fontFamily: GEIST,
+              fontSize: '0.8125rem',
+              color: '#b0b0b0',
+              textDecoration: 'none',
+            }}
+          >
+            Privacy
+          </a>
+          <a
+            href="/terms"
+            style={{
+              fontFamily: GEIST,
+              fontSize: '0.8125rem',
+              color: '#b0b0b0',
+              textDecoration: 'none',
+            }}
+          >
+            Terms
+          </a>
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.8125rem',
+            color: '#b0b0b0',
+            margin: 0,
+          }}>
+            © 2026 Sona
+          </p>
+        </div>
       </footer>
 
     </div>

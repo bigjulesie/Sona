@@ -20,6 +20,18 @@ const lora = Lora({
 export const metadata: Metadata = {
   title: { default: 'Sona', template: '%s | Sona' },
   description: 'Meet the people who shaped your world',
+  openGraph: {
+    title: 'Sona',
+    description: 'Meet the people who shaped your world',
+    siteName: 'Sona',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sona',
+    description: 'Meet the people who shaped your world',
+  },
 }
 
 export default function RootLayout({

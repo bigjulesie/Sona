@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
@@ -9,6 +10,42 @@ const CORMORANT = 'var(--font-cormorant)'
 
 interface PageProps {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const supabase = await createServerSupabaseClient()
+  const { data: portrait } = await supabase
+    .from('portraits')
+    .select('display_name, tagline, bio, avatar_url')
+    .eq('slug', slug)
+    .eq('brand', 'sona')
+    .eq('is_public', true)
+    .maybeSingle()
+
+  if (!portrait) return { title: 'Not Found' }
+
+  const title = portrait.display_name
+  const description = portrait.tagline
+    ?? portrait.bio?.slice(0, 160)
+    ?? `Talk with ${portrait.display_name} on Sona.`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'profile',
+      ...(portrait.avatar_url ? { images: [{ url: portrait.avatar_url }] } : {}),
+    },
+    twitter: {
+      card: portrait.avatar_url ? 'summary_large_image' : 'summary',
+      title,
+      description,
+      ...(portrait.avatar_url ? { images: [portrait.avatar_url] } : {}),
+    },
+  }
 }
 
 export default async function SonaPage({ params }: PageProps) {
