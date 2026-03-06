@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         resource_id: charge.id,
         metadata: {
           amount_refunded: charge.amount_refunded,
-          payment_intent: charge.payment_intent,
+          payment_intent: typeof charge.payment_intent === 'string' ? charge.payment_intent : (charge.payment_intent?.id ?? null),
         },
       })
       break
