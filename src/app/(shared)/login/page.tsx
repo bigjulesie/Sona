@@ -1,10 +1,9 @@
-import { headers } from 'next/headers'
 import { Suspense } from 'react'
 import { LoginForm } from './LoginForm'
+import { getBrand } from '@/lib/brand'
 
 export default async function LoginPage() {
-  const hdrs = await headers()
-  const brand = hdrs.get('x-brand') ?? 'nh'
+  const brand = await getBrand()
   return (
     <Suspense>
       <LoginForm brand={brand} />

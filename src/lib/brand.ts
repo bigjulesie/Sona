@@ -1,8 +1,8 @@
 import { headers } from 'next/headers'
-import type { Brand } from '@/middleware'
+import { detectBrand } from '@/middleware'
 
-export async function getBrand(): Promise<Brand> {
+export async function getBrand() {
   const h = await headers()
-  const brand = h.get('x-brand')
-  return brand === 'sona' ? 'sona' : 'nh'
+  const host = h.get('host') ?? ''
+  return detectBrand(host)
 }
