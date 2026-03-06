@@ -120,7 +120,7 @@ export default async function SonaPage({ params }: PageProps) {
               gap: 6,
             }}
           >
-            <span aria-hidden style={{ fontSize: '1em' }}>←</span> Explore
+            <span aria-hidden style={{ fontSize: '1em' }}>←</span> Discover
           </Link>
         </div>
 
