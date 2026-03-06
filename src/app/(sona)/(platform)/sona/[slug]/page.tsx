@@ -277,12 +277,13 @@ export default async function SonaPage({ params }: PageProps) {
               margin: '0 0 24px',
             }}>
               {isPaid
-                ? `$${(portrait.monthly_price_cents! / 100).toFixed(0)}/mo — cancel any time.`
+                ? 'Cancel any time.'
                 : 'Free. Always available when you need them.'}
             </p>
             <SubscribeButton
               portraitId={portrait.id}
               isFree={!portrait.monthly_price_cents}
+              monthlyPriceCents={portrait.monthly_price_cents ?? undefined}
               isLoggedIn={!!user}
               slug={portrait.slug}
             />

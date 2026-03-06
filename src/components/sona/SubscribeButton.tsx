@@ -8,11 +8,12 @@ const GEIST = 'var(--font-geist-sans)'
 interface Props {
   portraitId: string
   isFree: boolean
+  monthlyPriceCents?: number
   isLoggedIn: boolean
   slug: string
 }
 
-export function SubscribeButton({ portraitId, isFree, isLoggedIn, slug }: Props) {
+export function SubscribeButton({ portraitId, isFree, monthlyPriceCents, isLoggedIn, slug }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -77,7 +78,7 @@ export function SubscribeButton({ portraitId, isFree, isLoggedIn, slug }: Props)
           transition: 'opacity 0.15s ease',
         }}
       >
-        {loading ? 'Loading…' : isFree ? 'Add to circle — free' : 'Add to circle'}
+        {loading ? 'Loading…' : isFree ? 'Add to circle — free' : `Add to circle — $${((monthlyPriceCents ?? 0) / 100).toFixed(0)}/mo`}
       </button>
       {error && (
         <p style={{
