@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useEffect, useState, useCallback } from 'react'
-import Image from 'next/image'
 import { useChat } from '@/lib/hooks/useChat'
 import { MessageBubble } from './MessageBubble'
 import { ChatInput } from './ChatInput'
@@ -145,13 +144,11 @@ export function ChatInterface({
             gap: 16,
             textAlign: 'center',
           }}>
-            <Image
-              src="/brand_assets/icon.svg"
-              alt=""
-              width={36}
-              height={36}
-              style={{ opacity: 0.2 }}
-            />
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden>
+              <circle cx="16" cy="16" r="16" fill="#DE3E7B" opacity="0.15" />
+              <circle cx="16" cy="16" r="9" fill="#DE3E7B" opacity="0.25" />
+              <circle cx="16" cy="16" r="4" fill="#DE3E7B" opacity="0.5" />
+            </svg>
             <p style={{
               fontFamily: CORMORANT,
               fontSize: '1.25rem',
