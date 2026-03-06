@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { detectBrand, isSonaPublicRoute } from '@/middleware'
+import { detectBrand, isSonaPublicRoute } from '@/proxy'
 
 describe('detectBrand', () => {
   it('returns nh for neuralheirloom.com', () => {

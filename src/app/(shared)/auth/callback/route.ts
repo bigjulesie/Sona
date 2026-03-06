@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { detectBrand } from '@/middleware'
+import { detectBrand } from '@/proxy'
 
 export async function GET(request: Request) {
   const { searchParams, origin, host } = new URL(request.url)
