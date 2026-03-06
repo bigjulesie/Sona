@@ -6,6 +6,9 @@ export type Brand = 'nh' | 'sona'
 export function detectBrand(host: string): Brand {
   if (host.includes('entersona.com')) return 'sona'
   if (host.includes('neuralheirloom.com')) return 'nh'
+  if (host.startsWith('localhost') || host.startsWith('127.0.0.1')) {
+    return (process.env.BRAND as Brand) ?? 'sona'
+  }
   return (process.env.BRAND as Brand) ?? 'nh'
 }
 
