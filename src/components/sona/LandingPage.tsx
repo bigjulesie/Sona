@@ -144,7 +144,7 @@ export function LandingPage() {
             fontWeight: 500,
             letterSpacing: '-0.01em',
           }}>
-            Explore Sonas
+            Discover Sonas
           </Link>
           <Link href="/signup" className="sona-btn-outline" style={{
             fontFamily: GEIST,
@@ -222,7 +222,7 @@ export function LandingPage() {
             alignItems: 'center',
             gap: 6,
           }}>
-            Explore Sonas <span aria-hidden style={{ fontSize: '1.1em' }}>→</span>
+            Discover Sonas <span aria-hidden style={{ fontSize: '1.1em' }}>→</span>
           </Link>
         </div>
 
@@ -439,7 +439,7 @@ export function LandingPage() {
             fontSize: '1rem',
             letterSpacing: '-0.01em',
           }}>
-            Explore Sonas
+            Discover Sonas
           </Link>
         </div>
       </section>
