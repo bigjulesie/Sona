@@ -33,11 +33,7 @@ export async function middleware(request: NextRequest) {
     isSharedPublicRoute ||
     (brand === 'sona' && isSonaPublicRoute(pathname))
 
-  // Forward x-brand as a request header so server components can read it via headers()
-  const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('x-brand', brand)
-
-  let response = NextResponse.next({ request: { headers: requestHeaders } })
+  let response = NextResponse.next()
 
   if (!isPublic) {
     const supabase = createServerClient(
