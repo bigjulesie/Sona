@@ -10,7 +10,9 @@ function AuthConfirm() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const next = searchParams.get('next') ?? '/chat'
+    const hostname = window.location.hostname
+    const isSona = hostname.includes('entersona.com') || hostname === 'localhost' || hostname === '127.0.0.1'
+    const next = searchParams.get('next') ?? (isSona ? '/explore' : '/chat')
 
     // Implicit-flow client reads #access_token from the URL hash.
     // createBrowserClient from @supabase/ssr hardcodes PKCE and ignores the hash.
