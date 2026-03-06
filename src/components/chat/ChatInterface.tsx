@@ -59,7 +59,6 @@ export function ChatInterface({
         audioRef.current = null
       }
       setPlayingMessageId(messageId)
-      setTtsError(null)
 
       try {
         const res = await fetch('/api/tts', {
