@@ -295,6 +295,7 @@ export default async function SonaPage({ params }: PageProps) {
             portraitId={portrait.id}
             portraitName={portrait.display_name}
             existingRating={existingRating}
+            voiceEnabled={true}
           />
         )}
 
