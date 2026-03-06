@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   }
 
   const voiceId =
-    portrait.voice_provider_id ?? process.env.ELEVENLABS_DEFAULT_VOICE_ID
+    portrait.voice_provider_id ?? process.env.ELEVENLABS_DEFAULT_VOICE_ID ?? process.env.ELEVENLABS_DEFAULT_VOICE
   if (!voiceId) {
     return new Response('No voice ID configured', { status: 500 })
   }
