@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
   if (!rawText || !portrait_id) {
     return new Response('text and portrait_id required', { status: 400 })
   }
-  // Cap at 1000 chars to keep credit usage predictable
-  const text = rawText.slice(0, 1000)
+  // Cap at 2000 chars to keep credit usage predictable
+  const text = rawText.slice(0, 2000)
 
   const apiKey = process.env.ELEVENLABS_API_KEY
   if (!apiKey) {
