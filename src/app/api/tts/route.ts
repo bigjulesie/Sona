@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     return new Response('ELEVENLABS_API_KEY not configured', { status: 500 })
   }
 
-  const { data: portrait } = await supabase
+  const { data: portrait } = await createAdminClient()
     .from('portraits')
     .select('voice_enabled, voice_provider_id')
     .eq('id', portrait_id)
