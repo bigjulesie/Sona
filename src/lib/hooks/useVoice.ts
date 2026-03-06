@@ -12,11 +12,21 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
   const [status, setStatus] = useState<VoiceStatus>('idle')
   const [error, setError] = useState<string | null>(null)
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null)
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([])
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>('')
   const recorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const mimeTypeRef = useRef<string>('audio/webm')
+
+  const refreshDevices = useCallback(async () => {
+    try {
+      const all = await navigator.mediaDevices.enumerateDevices()
+      const inputs = all.filter((d) => d.kind === 'audioinput' && d.deviceId)
+      setDevices(inputs)
+    } catch { /* permissions not yet granted — will retry after first recording */ }
+  }, [])
 
   const startRecording = useCallback(async () => {
     if (status !== 'idle') return  // guard against re-entrant calls
@@ -36,7 +46,12 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
     mimeTypeRef.current = mimeType
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const audioConstraint = selectedDeviceId
+        ? { deviceId: { exact: selectedDeviceId } }
+        : true
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraint })
+      // Populate device list now that we have permission
+      refreshDevices()
       streamRef.current = stream
 
       // AudioContext must be created (or resumed) on a user gesture — this IS the user gesture.
@@ -100,5 +115,5 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
     }
   }, [onTranscript, status])
 
-  return { status, error, analyser, startRecording, stopRecording }
+  return { status, error, analyser, devices, selectedDeviceId, setSelectedDeviceId, startRecording, stopRecording }
 }

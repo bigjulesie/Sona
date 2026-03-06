@@ -27,10 +27,17 @@ export function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleTranscript = useCallback(
-    (text: string) => { onSend(text) },
-    [onSend]
+    (text: string) => {
+      if (voiceMode) {
+        onSend(text)
+      } else {
+        setValue(text)
+        setTimeout(() => textareaRef.current?.focus(), 0)
+      }
+    },
+    [onSend, voiceMode]
   )
-  const { status, error, analyser, startRecording, stopRecording } = useVoice({
+  const { status, error, analyser, devices, selectedDeviceId, setSelectedDeviceId, startRecording, stopRecording } = useVoice({
     onTranscript: handleTranscript,
   })
 
@@ -74,6 +81,38 @@ export function ChatInput({
       borderTop: '1px solid rgba(0,0,0,0.06)',
       backgroundColor: '#fff',
     }}>
+      {/* Device picker — shown when multiple mics available and not recording */}
+      {voiceEnabled && !isRecording && devices.length > 1 && (
+        <div style={{ padding: '6px clamp(16px, 4vw, 24px) 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0, color: '#b0b0b0' }}>
+            <rect x="3.5" y="0.5" width="5" height="7" rx="2.5" stroke="currentColor" strokeWidth="1" />
+            <path d="M1 6a5 5 0 0 0 10 0" stroke="currentColor" strokeWidth="1" strokeLinecap="round" fill="none" />
+            <line x1="6" y1="11" x2="6" y2="12" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+          </svg>
+          <select
+            value={selectedDeviceId}
+            onChange={(e) => setSelectedDeviceId(e.target.value)}
+            style={{
+              fontFamily: GEIST,
+              fontSize: '0.75rem',
+              color: '#6b6b6b',
+              background: 'none',
+              border: 'none',
+              outline: 'none',
+              cursor: 'pointer',
+              maxWidth: 220,
+            }}
+          >
+            <option value="">Default microphone</option>
+            {devices.map((d) => (
+              <option key={d.deviceId} value={d.deviceId}>
+                {d.label || `Microphone ${d.deviceId.slice(0, 6)}`}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {/* Privacy banner — visible only while recording */}
       {isRecording && (
         <div style={{
