@@ -77,7 +77,7 @@ export function SubscribeButton({ portraitId, isFree, isLoggedIn, slug }: Props)
           transition: 'opacity 0.15s ease',
         }}
       >
-        {loading ? 'Loading…' : isFree ? 'Follow for free' : 'Subscribe'}
+        {loading ? 'Loading…' : isFree ? 'Add to circle — free' : 'Add to circle'}
       </button>
       {error && (
         <p style={{

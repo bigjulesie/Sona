@@ -79,7 +79,7 @@ export default async function AccountPage() {
             color: '#b0b0b0',
             margin: '0 0 16px',
           }}>
-            Sonas
+            Your circle
           </p>
 
           {subscriptions && subscriptions.length > 0 ? (
@@ -200,7 +200,7 @@ export default async function AccountPage() {
                 margin: '0 0 6px',
                 lineHeight: 1.3,
               }}>
-                No Sonas yet.
+                Your circle is empty.
               </p>
               <p style={{
                 fontFamily: GEIST,
@@ -209,7 +209,7 @@ export default async function AccountPage() {
                 color: '#9b9b9b',
                 margin: '0 0 20px',
               }}>
-                Follow a Sona to start a conversation.
+                Add someone to your circle to start a conversation.
               </p>
               <Link
                 href="/explore"
@@ -226,7 +226,7 @@ export default async function AccountPage() {
                   display: 'inline-block',
                 }}
               >
-                Explore Sonas
+                Discover Sonas
               </Link>
             </div>
           )}

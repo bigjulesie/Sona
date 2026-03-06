@@ -53,7 +53,7 @@ export async function SonaNav() {
       </Link>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(12px, 3vw, 28px)' }}>
-        <Link href="/explore" className="sona-link" style={linkStyle}>Explore</Link>
+        <Link href="/explore" className="sona-link" style={linkStyle}>Discover</Link>
 
         {user ? (
           <>

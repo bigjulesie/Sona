@@ -165,7 +165,7 @@ export default async function OnboardingPage() {
               margin: '0 0 6px',
               lineHeight: 1.2,
             }}>
-              Explore Sonas
+              Build your circle
             </h2>
             <p style={{
               fontFamily: GEIST,
@@ -175,7 +175,7 @@ export default async function OnboardingPage() {
               margin: 0,
               lineHeight: 1.55,
             }}>
-              Discover remarkable people available for conversation.
+              Add remarkable people to your circle — available whenever you need them.
             </p>
           </button>
         </form>

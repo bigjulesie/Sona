@@ -267,7 +267,7 @@ export default async function SonaPage({ params }: PageProps) {
               margin: '0 0 8px',
               lineHeight: 1.3,
             }}>
-              Begin your conversation with {portrait.display_name}.
+              Add {portrait.display_name} to your circle.
             </p>
             <p style={{
               fontFamily: GEIST,
@@ -277,8 +277,8 @@ export default async function SonaPage({ params }: PageProps) {
               margin: '0 0 24px',
             }}>
               {isPaid
-                ? `$${(portrait.monthly_price_cents! / 100).toFixed(0)} per month. Cancel any time.`
-                : 'Free to join. No credit card required.'}
+                ? `$${(portrait.monthly_price_cents! / 100).toFixed(0)}/mo — cancel any time.`
+                : 'Free. Always available when you need them.'}
             </p>
             <SubscribeButton
               portraitId={portrait.id}

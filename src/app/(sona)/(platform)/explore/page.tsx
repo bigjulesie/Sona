@@ -56,7 +56,7 @@ export default async function ExplorePage({ searchParams }: PageProps) {
           color: '#1a1a1a',
           margin: '0 0 10px',
         }}>
-          Explore
+          Discover
         </h1>
         <p style={{
           fontFamily: GEIST,
@@ -65,7 +65,7 @@ export default async function ExplorePage({ searchParams }: PageProps) {
           color: '#6b6b6b',
           margin: 0,
         }}>
-          Remarkable people. Available for conversation.
+          Remarkable people. Add them to your circle.
         </p>
       </div>
 
