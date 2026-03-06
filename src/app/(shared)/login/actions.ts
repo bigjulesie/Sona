@@ -2,15 +2,21 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 
 export async function loginWithMagicLink(formData: FormData) {
   const email = formData.get('email') as string
   const supabase = await createServerSupabaseClient()
 
+  const headersList = await headers()
+  const host = headersList.get('host') ?? ''
+  const proto = headersList.get('x-forwarded-proto') ?? 'https'
+  const origin = `${proto}://${host}`
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      emailRedirectTo: `${origin}/auth/callback`,
     },
   })
 

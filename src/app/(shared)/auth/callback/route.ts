@@ -1,13 +1,16 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { detectBrand } from '@/middleware'
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const { searchParams, origin, host } = new URL(request.url)
   const code = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type')
-  const next = searchParams.get('next') ?? '/chat'
+  const brand = detectBrand(host)
+  const defaultNext = brand === 'sona' ? '/explore' : '/chat'
+  const next = searchParams.get('next') ?? defaultNext
 
   const cookieStore = await cookies()
   const supabase = createServerClient(
