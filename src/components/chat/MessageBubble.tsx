@@ -1,4 +1,18 @@
+import { Fragment } from 'react'
+
 const GEIST = 'var(--font-geist-sans)'
+
+// Render basic markdown: **bold**, *italic*, `code`, newlines
+function renderMarkdown(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\n)/g)
+  return parts.map((part, i) => {
+    if (part === '\n') return <br key={i} />
+    if (part.startsWith('**') && part.endsWith('**')) return <strong key={i}>{part.slice(2, -2)}</strong>
+    if (part.startsWith('*') && part.endsWith('*')) return <em key={i}>{part.slice(1, -1)}</em>
+    if (part.startsWith('`') && part.endsWith('`')) return <code key={i} style={{ fontFamily: 'monospace', fontSize: '0.875em', backgroundColor: 'rgba(0,0,0,0.06)', padding: '1px 4px', borderRadius: 3 }}>{part.slice(1, -1)}</code>
+    return <Fragment key={i}>{part}</Fragment>
+  })
+}
 
 interface MessageBubbleProps {
   role: 'user' | 'assistant'
@@ -46,7 +60,7 @@ export function MessageBubble({ role, content, portraitName, onPlayTTS, isPlayin
           margin: 0,
           whiteSpace: 'pre-wrap',
         }}>
-          {content}
+          {renderMarkdown(content)}
         </p>
         {onPlayTTS && (
           <button
