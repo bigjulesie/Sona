@@ -1,14 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { detectBrand } from '@/proxy'
+import { getBrand } from '@/lib/brand'
 
 export async function GET(request: Request) {
-  const { searchParams, origin, host } = new URL(request.url)
+  const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type')
-  const brand = detectBrand(host)
+  const brand = await getBrand()
   const defaultNext = brand === 'sona' ? '/explore' : '/chat'
   const next = searchParams.get('next') ?? defaultNext
 
