@@ -74,10 +74,11 @@ export default async function OnboardingPage() {
         gap: 12,
         width: '100%',
         maxWidth: 480,
+        alignItems: 'stretch',
       }}>
 
         {/* Create */}
-        <form action={completeOnboarding.bind(null, 'create')} style={{ display: 'contents' }}>
+        <form action={completeOnboarding.bind(null, 'create')} style={{ display: 'flex' }}>
           <button
             type="submit"
             className="sona-card"
@@ -89,6 +90,8 @@ export default async function OnboardingPage() {
               backgroundColor: '#fff',
               textAlign: 'left',
               cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             {/* Icon mark */}
@@ -107,10 +110,9 @@ export default async function OnboardingPage() {
               </svg>
             </div>
             <h2 style={{
-              fontFamily: CORMORANT,
-              fontSize: '1.25rem',
-              fontWeight: 400,
-              fontStyle: 'italic',
+              fontFamily: GEIST,
+              fontSize: '0.9375rem',
+              fontWeight: 500,
               color: '#1a1a1a',
               margin: '0 0 6px',
               lineHeight: 1.2,
@@ -131,7 +133,7 @@ export default async function OnboardingPage() {
         </form>
 
         {/* Explore */}
-        <form action={completeOnboarding.bind(null, 'explore')} style={{ display: 'contents' }}>
+        <form action={completeOnboarding.bind(null, 'explore')} style={{ display: 'flex' }}>
           <button
             type="submit"
             className="sona-card"
@@ -143,21 +145,22 @@ export default async function OnboardingPage() {
               backgroundColor: '#fff',
               textAlign: 'left',
               cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             {/* Icon mark */}
             <div style={{ marginBottom: 20 }}>
               <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden>
-                <circle cx="14" cy="14" r="13" stroke="#1a1a1a" strokeWidth="1.5" opacity="0.15" />
-                <circle cx="14" cy="14" r="7" stroke="#1a1a1a" strokeWidth="1.5" opacity="0.2" />
-                <circle cx="14" cy="14" r="2.5" fill="#1a1a1a" opacity="0.3" />
+                <circle cx="14" cy="14" r="13" stroke="#DE3E7B" strokeWidth="1.5" opacity="0.35" />
+                <circle cx="14" cy="14" r="7" stroke="#DE3E7B" strokeWidth="1.5" opacity="0.6" />
+                <circle cx="14" cy="14" r="2.5" fill="#DE3E7B" opacity="1" />
               </svg>
             </div>
             <h2 style={{
-              fontFamily: CORMORANT,
-              fontSize: '1.25rem',
-              fontWeight: 400,
-              fontStyle: 'italic',
+              fontFamily: GEIST,
+              fontSize: '0.9375rem',
+              fontWeight: 500,
               color: '#1a1a1a',
               margin: '0 0 6px',
               lineHeight: 1.2,
