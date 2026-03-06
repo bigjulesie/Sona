@@ -184,8 +184,8 @@ export function ChatInterface({
           />
         ))}
 
-        {/* Streaming indicator */}
-        {isStreaming && (
+        {/* Streaming indicator — only while waiting for the first token */}
+        {isStreaming && messages[messages.length - 1]?.content === '' && (
           <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 20 }}>
             <div style={{
               backgroundColor: '#f5f5f5',
