@@ -165,8 +165,8 @@ export function ChatInterface({
           </div>
         )}
 
-        {/* Messages */}
-        {messages.map((msg) => (
+        {/* Messages — skip empty assistant placeholder while waiting for first token */}
+        {messages.filter(msg => !(isStreaming && msg.role === 'assistant' && msg.content === '')).map((msg) => (
           <MessageBubble
             key={msg.id}
             role={msg.role}
