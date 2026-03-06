@@ -383,22 +383,6 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
       {/* ── Step 3: Content ─────────────────────────────────────── */}
       {step === '3' && verifiedPortraitId && (
         <div style={{ textAlign: 'center' }}>
-          {/* Coral mark */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
-            <svg width="48" height="48" viewBox="0 0 72 72" fill="none" aria-hidden>
-              <circle cx="36" cy="36" r="36" fill="url(#createGrad)" />
-              <defs>
-                <radialGradient id="createGrad" cx="0" cy="0" r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform="translate(36 36) rotate(90) scale(36)">
-                  <stop stopColor="#DE3E7B" />
-                  <stop offset="0.495" stopColor="#DE3E7B" />
-                  <stop offset="1" stopColor="#DE3E7B" stopOpacity="0" />
-                </radialGradient>
-              </defs>
-            </svg>
-          </div>
-
           <h1 style={{
             fontFamily: CORMORANT,
             fontSize: 'clamp(1.75rem, 3vw, 2.25rem)',
