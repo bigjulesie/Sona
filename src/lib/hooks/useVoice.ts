@@ -22,11 +22,10 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
     if (status !== 'idle') return  // guard against re-entrant calls
     setError(null)
 
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : MediaRecorder.isTypeSupported('audio/webm')
-        ? 'audio/webm'
-        : null
+    const mimeType = (
+      ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg']
+        .find((t) => MediaRecorder.isTypeSupported(t))
+    ) ?? null
 
     if (!mimeType) {
       setError('Your browser does not support audio recording.')
