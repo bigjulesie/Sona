@@ -31,6 +31,12 @@ export default async function AccountPage() {
     .eq('id', user.id)
     .single()
 
+  const { data: ownPortrait } = await supabase
+    .from('portraits')
+    .select('id, slug, display_name, avatar_url')
+    .eq('profile_id', user.id)
+    .maybeSingle()
+
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
       <AccountSync />
@@ -65,7 +71,114 @@ export default async function AccountPage() {
           </p>
         </div>
 
-        {/* ── Divider ─────────────────────────────────────────────── */}
+        {/* ── Your Sona ───────────────────────────────────────────── */}
+        <section style={{ marginBottom: 48 }}>
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.6875rem',
+            fontWeight: 500,
+            letterSpacing: '0.09em',
+            textTransform: 'uppercase',
+            color: '#b0b0b0',
+            margin: '0 0 16px',
+          }}>
+            Your Sona
+          </p>
+
+          {ownPortrait ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              padding: '16px 20px',
+              border: '1px solid rgba(0,0,0,0.07)',
+              borderRadius: 14,
+            }}>
+              {/* Avatar */}
+              {ownPortrait.avatar_url ? (
+                <img
+                  src={ownPortrait.avatar_url}
+                  alt={ownPortrait.display_name}
+                  style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                />
+              ) : (
+                <div style={{
+                  width: 44, height: 44, borderRadius: '50%',
+                  backgroundColor: 'rgba(0,0,0,0.04)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <span style={{ fontFamily: CORMORANT, fontSize: '1.25rem', fontStyle: 'italic', color: '#1a1a1a' }}>
+                    {ownPortrait.display_name?.[0] ?? '?'}
+                  </span>
+                </div>
+              )}
+
+              {/* Name */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{
+                  fontFamily: CORMORANT, fontSize: '1.125rem', fontWeight: 400,
+                  fontStyle: 'italic', color: '#1a1a1a', margin: 0, lineHeight: 1.2,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {ownPortrait.display_name}
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                <Link
+                  href={`/sona/${ownPortrait.slug}`}
+                  style={{
+                    fontFamily: GEIST, fontSize: '0.8125rem', fontWeight: 400,
+                    color: '#6b6b6b', textDecoration: 'none',
+                    padding: '7px 16px', borderRadius: '980px',
+                    border: '1px solid rgba(0,0,0,0.08)',
+                  }}
+                >
+                  View
+                </Link>
+                <Link
+                  href="/dashboard"
+                  style={{
+                    fontFamily: GEIST, fontSize: '0.8125rem', fontWeight: 500,
+                    color: '#fff', textDecoration: 'none',
+                    padding: '7px 16px', borderRadius: '980px',
+                    backgroundColor: '#1a1a1a',
+                  }}
+                >
+                  Manage
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div style={{
+              border: '1px solid rgba(0,0,0,0.07)', borderRadius: 14,
+              padding: '28px 24px', textAlign: 'center',
+            }}>
+              <p style={{
+                fontFamily: CORMORANT, fontSize: '1.25rem', fontWeight: 400,
+                fontStyle: 'italic', color: '#1a1a1a', margin: '0 0 6px', lineHeight: 1.3,
+              }}>
+                You haven&apos;t created a Sona yet.
+              </p>
+              <p style={{
+                fontFamily: GEIST, fontSize: '0.8125rem', fontWeight: 300,
+                color: '#9b9b9b', margin: '0 0 20px',
+              }}>
+                Share your knowledge, story, or expertise.
+              </p>
+              <Link href="/dashboard/create" style={{
+                fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 500,
+                letterSpacing: '-0.01em', color: '#fff', backgroundColor: '#1a1a1a',
+                borderRadius: '980px', padding: '10px 24px',
+                textDecoration: 'none', display: 'inline-block',
+              }}>
+                Create your Sona
+              </Link>
+            </div>
+          )}
+        </section>
+
         <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.06)', marginBottom: 40 }} />
 
         {/* ── Subscriptions ───────────────────────────────────────── */}
