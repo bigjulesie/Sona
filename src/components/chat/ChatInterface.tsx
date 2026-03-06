@@ -59,6 +59,7 @@ export function ChatInterface({
         audioRef.current = null
       }
       setPlayingMessageId(messageId)
+      setTtsError(null)
 
       try {
         const res = await fetch('/api/tts', {
@@ -66,7 +67,10 @@ export function ChatInterface({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text, portrait_id: portraitId }),
         })
-        if (!res.ok) { setPlayingMessageId(null); return }
+        if (!res.ok) {
+          setPlayingMessageId(null)
+          return
+        }
 
         const blob = await res.blob()
         const url = URL.createObjectURL(blob)

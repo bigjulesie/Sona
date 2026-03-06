@@ -12,10 +12,13 @@ export async function POST(req: NextRequest) {
     return new Response('Rate limit exceeded.', { status: 429 })
   }
 
-  const { text, portrait_id } = await req.json()
-  if (!text || !portrait_id) {
+  const body = await req.json()
+  const { text: rawText, portrait_id } = body
+  if (!rawText || !portrait_id) {
     return new Response('text and portrait_id required', { status: 400 })
   }
+  // Cap at 1000 chars to keep credit usage predictable
+  const text = rawText.slice(0, 1000)
 
   const apiKey = process.env.ELEVENLABS_API_KEY
   if (!apiKey) {
@@ -24,19 +27,12 @@ export async function POST(req: NextRequest) {
 
   const { data: portrait } = await createAdminClient()
     .from('portraits')
-    .select('voice_enabled, voice_provider_id')
+    .select('voice_provider_id')
     .eq('id', portrait_id)
-    .single()
-
-  if (!portrait) {
-    return new Response('Portrait not found', { status: 404 })
-  }
-  if (!portrait.voice_enabled) {
-    return new Response('Voice not enabled for this portrait', { status: 403 })
-  }
+    .maybeSingle()
 
   const voiceId =
-    portrait.voice_provider_id ?? process.env.ELEVENLABS_DEFAULT_VOICE_ID ?? process.env.ELEVENLABS_DEFAULT_VOICE
+    portrait?.voice_provider_id ?? process.env.ELEVENLABS_DEFAULT_VOICE_ID ?? process.env.ELEVENLABS_DEFAULT_VOICE
   if (!voiceId) {
     return new Response('No voice ID configured', { status: 500 })
   }
