@@ -4,17 +4,14 @@ import { LandingPage } from '@/components/sona/LandingPage'
 import { getBrand } from '@/lib/brand'
 
 export default async function Home() {
-  const brand = await getBrand()
+  const [brand, supabase] = await Promise.all([getBrand(), createServerSupabaseClient()])
+  const { data: { user } } = await supabase.auth.getUser()
 
   if (brand === 'sona') {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
     if (user) redirect('/home')
     return <LandingPage />
   }
 
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
   if (user) redirect('/chat')
   redirect('/login')
 }
