@@ -29,9 +29,7 @@ export async function deleteAccount() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Sign out first to clear session cookies in the browser
-  await supabase.auth.signOut()
-
+  // deleteUser invalidates all sessions server-side; no need to sign out first
   const { error } = await createAdminClient().auth.admin.deleteUser(user.id)
   if (error) throw new Error('Failed to delete account')
 

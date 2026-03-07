@@ -29,14 +29,6 @@ export function DeleteAccountButton() {
       padding: '24px',
       backgroundColor: 'rgba(222,62,123,0.02)',
     }}>
-      <p style={{
-        fontFamily: GEIST, fontSize: '0.6875rem', fontWeight: 500,
-        letterSpacing: '0.09em', textTransform: 'uppercase',
-        color: '#DE3E7B', margin: '0 0 8px',
-      }}>
-        Danger zone
-      </p>
-
       {!confirming ? (
         <>
           <p style={{ fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 300, color: '#6b6b6b', margin: '0 0 16px' }}>
@@ -78,6 +70,7 @@ export function DeleteAccountButton() {
           />
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <button
+              type="button"
               onClick={handleDelete}
               disabled={confirmText !== 'DELETE' || isPending}
               style={{
