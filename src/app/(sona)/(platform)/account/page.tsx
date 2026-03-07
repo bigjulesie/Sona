@@ -1,75 +1,117 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { BillingPortalButton } from './BillingPortalButton'
-import { AccountSync } from './AccountSync'
+import { ProfileForm } from './ProfileForm'
+import { DeleteAccountButton } from './DeleteAccountButton'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
 
-export default async function AccountPage() {
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string }>
+}) {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('stripe_customer_id')
+    .select('full_name, stripe_customer_id')
     .eq('id', user.id)
     .single()
 
+  const params = await searchParams
+  const saved = params.saved === '1'
+
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#fff' }}>
-      <AccountSync />
       <div style={{
-        maxWidth: 720,
+        maxWidth: 560,
         margin: '0 auto',
         padding: '56px clamp(24px, 4vw, 48px) 96px',
       }}>
 
-        {/* ── Page header ─────────────────────────────────────────── */}
-        <div style={{ marginBottom: 40 }}>
-          <h1 style={{
-            fontFamily: CORMORANT,
-            fontSize: 'clamp(2rem, 4vw, 2.75rem)',
-            fontWeight: 400,
-            fontStyle: 'italic',
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-            color: '#1a1a1a',
-            margin: '0 0 8px',
-          }}>
-            Account
-          </h1>
-          <p style={{
+        {/* Page heading */}
+        <h1 style={{
+          fontFamily: CORMORANT,
+          fontSize: 'clamp(1.75rem, 3vw, 2.25rem)',
+          fontWeight: 400,
+          fontStyle: 'italic',
+          letterSpacing: '-0.02em',
+          color: '#1a1a1a',
+          margin: '0 0 48px',
+        }}>
+          Account
+        </h1>
+
+        {/* Profile section */}
+        <section>
+          <h2 style={{
             fontFamily: GEIST,
-            fontSize: '0.875rem',
-            fontWeight: 300,
+            fontSize: '0.6875rem',
+            fontWeight: 500,
+            letterSpacing: '0.09em',
+            textTransform: 'uppercase',
             color: '#b0b0b0',
-            margin: 0,
+            margin: '0 0 20px',
           }}>
-            {user.email}
-          </p>
-        </div>
+            Profile
+          </h2>
+          <ProfileForm
+            fullName={profile?.full_name ?? ''}
+            email={user.email ?? ''}
+            saved={saved}
+          />
+        </section>
 
-        <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.06)', marginBottom: 40 }} />
+        <hr style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.07)', margin: '40px 0' }} />
 
-        {/* ── Billing ─────────────────────────────────────────────── */}
-        {profile?.stripe_customer_id && (
-          <section>
+        {/* Billing section */}
+        <section>
+          <h2 style={{
+            fontFamily: GEIST,
+            fontSize: '0.6875rem',
+            fontWeight: 500,
+            letterSpacing: '0.09em',
+            textTransform: 'uppercase',
+            color: '#b0b0b0',
+            margin: '0 0 20px',
+          }}>
+            Billing
+          </h2>
+          {profile?.stripe_customer_id ? (
+            <BillingPortalButton />
+          ) : (
             <p style={{
               fontFamily: GEIST,
-              fontSize: '0.6875rem',
-              fontWeight: 500,
-              letterSpacing: '0.09em',
-              textTransform: 'uppercase',
-              color: '#b0b0b0',
-              margin: '0 0 16px',
+              fontSize: '0.875rem',
+              color: '#6b6b6b',
+              margin: 0,
             }}>
-              Billing
+              No active subscription.
             </p>
-            <BillingPortalButton />
-          </section>
-        )}
+          )}
+        </section>
+
+        <hr style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.07)', margin: '40px 0' }} />
+
+        {/* Danger zone section */}
+        <section>
+          <h2 style={{
+            fontFamily: GEIST,
+            fontSize: '0.6875rem',
+            fontWeight: 500,
+            letterSpacing: '0.09em',
+            textTransform: 'uppercase',
+            color: '#b0b0b0',
+            margin: '0 0 20px',
+          }}>
+            Danger Zone
+          </h2>
+          <DeleteAccountButton />
+        </section>
 
       </div>
     </main>
