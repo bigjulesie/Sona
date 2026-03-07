@@ -119,7 +119,10 @@ export function ProfileForm({ fullName, email, saved }: ProfileFormProps) {
             <input
               type="email"
               value={newEmail}
-              onChange={e => setNewEmail(e.target.value)}
+              onChange={e => {
+                setNewEmail(e.target.value)
+                if (emailStatus === 'error') setEmailStatus('idle')
+              }}
               placeholder="New email address"
               required
               className="sona-input"
@@ -154,10 +157,12 @@ export function ProfileForm({ fullName, email, saved }: ProfileFormProps) {
               <button
                 type="button"
                 onClick={() => { setShowEmailForm(false); setEmailStatus('idle'); setNewEmail('') }}
+                disabled={emailStatus === 'sending'}
                 style={{
                   fontFamily: GEIST, fontSize: '0.8125rem', fontWeight: 400,
                   color: '#b0b0b0', background: 'none', border: 'none',
-                  padding: 0, cursor: 'pointer',
+                  padding: 0, cursor: emailStatus === 'sending' ? 'default' : 'pointer',
+                  opacity: emailStatus === 'sending' ? 0.4 : 1,
                 }}
               >
                 Cancel
