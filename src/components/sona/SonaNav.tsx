@@ -61,7 +61,7 @@ export async function SonaNav() {
             {hasPortrait && (
               <Link href="/dashboard" className="sona-link" style={linkStyle}>Dashboard</Link>
             )}
-            <Link href="/account" className="sona-link" style={linkStyle}>Settings</Link>
+            <Link href="/account" className="sona-link" style={linkStyle}>Account</Link>
             <SignOutButton />
           </>
         ) : (

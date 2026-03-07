@@ -38,7 +38,7 @@ export default async function AccountPage() {
             color: '#1a1a1a',
             margin: '0 0 8px',
           }}>
-            Settings
+            Account
           </h1>
           <p style={{
             fontFamily: GEIST,
