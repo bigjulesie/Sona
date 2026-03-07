@@ -248,7 +248,7 @@ export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
             opacity: loading ? 0.5 : 1,
           }}
         >
-          {loading ? 'Processing…' : 'Add content'}
+          {loading ? 'Processing…' : 'Add context'}
         </button>
       </div>
 

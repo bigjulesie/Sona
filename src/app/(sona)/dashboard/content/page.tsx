@@ -42,10 +42,10 @@ export default async function DashboardContentPage() {
             color: '#1a1a1a',
             margin: '0 0 6px',
           }}>
-            Content
+            Context
           </h1>
           <p style={{ fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 300, color: '#6b6b6b', margin: 0, lineHeight: 1.6 }}>
-            Writings, talks, and documents that enrich your Sona's knowledge.
+            Writings, talks, and documents that add depth to your Sona.
           </p>
         </div>
       </div>

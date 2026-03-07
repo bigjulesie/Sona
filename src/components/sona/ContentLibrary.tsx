@@ -76,7 +76,7 @@ export function ContentLibrary({ sources, portraitId, portraitName }: Props) {
               cursor: 'pointer',
             }}
           >
-            + Add content
+            + Add context
           </button>
         </div>
       )}
@@ -92,7 +92,7 @@ export function ContentLibrary({ sources, portraitId, portraitName }: Props) {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             <p style={{ fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 500, color: '#1a1a1a', margin: 0 }}>
-              Add content
+              Add context
             </p>
             <button
               onClick={() => setShowForm(false)}
@@ -118,7 +118,7 @@ export function ContentLibrary({ sources, portraitId, portraitName }: Props) {
           textAlign: 'center',
         }}>
           <p style={{ fontFamily: CORMORANT, fontSize: '1.375rem', fontWeight: 400, fontStyle: 'italic', color: '#1a1a1a', margin: '0 0 8px', lineHeight: 1.3 }}>
-            No content yet.
+            No context yet.
           </p>
           <p style={{ fontFamily: GEIST, fontSize: '0.8125rem', fontWeight: 300, color: '#9b9b9b', margin: 0, lineHeight: 1.6 }}>
             Your WhatsApp interview is the primary source. Add documents to enrich your Sona further.
