@@ -22,7 +22,7 @@ export async function SonaNav() {
     const { data } = await supabase
       .from('portraits')
       .select('id')
-      .eq('profile_id', user.id)
+      .eq('creator_id', user.id)
       .maybeSingle()
     hasPortrait = !!data
   }
@@ -57,10 +57,11 @@ export async function SonaNav() {
 
         {user ? (
           <>
+            <Link href="/home" className="sona-link" style={linkStyle}>My Circle</Link>
             {hasPortrait && (
               <Link href="/dashboard" className="sona-link" style={linkStyle}>Dashboard</Link>
             )}
-            <Link href="/account" className="sona-link" style={linkStyle}>Account</Link>
+            <Link href="/account" className="sona-link" style={linkStyle}>Settings</Link>
             <SignOutButton />
           </>
         ) : (

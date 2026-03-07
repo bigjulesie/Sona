@@ -17,7 +17,7 @@ export default async function HomePage() {
   const { data: ownPortrait } = await supabase
     .from('portraits')
     .select('id, slug, display_name, avatar_url')
-    .eq('profile_id', user.id)
+    .eq('creator_id', user.id)
     .maybeSingle()
 
   // Subscribed Sonas
@@ -28,12 +28,16 @@ export default async function HomePage() {
     .eq('status', 'active')
     .order('created_at', { ascending: false })
 
-  // Last conversation per portrait
-  const { data: conversations } = await supabase
-    .from('conversations')
-    .select('portrait_id, updated_at')
-    .eq('user_id', user.id)
-    .order('updated_at', { ascending: false })
+  // Last conversation per portrait — scoped to subscribed portrait IDs only
+  const portraitIds = (subscriptions ?? []).map((s) => s.portrait_id).filter(Boolean)
+  const { data: conversations } = portraitIds.length > 0
+    ? await supabase
+        .from('conversations')
+        .select('portrait_id, updated_at')
+        .eq('user_id', user.id)
+        .in('portrait_id', portraitIds)
+        .order('updated_at', { ascending: false })
+    : { data: [] }
 
   // Build a map: portrait_id → most recent updated_at
   const lastActive: Record<string, string> = {}
