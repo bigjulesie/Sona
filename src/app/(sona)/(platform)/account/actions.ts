@@ -10,7 +10,8 @@ export async function updateProfile(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const fullName = (formData.get('full_name') as string ?? '').trim()
+  const raw = formData.get('full_name')
+  const fullName = typeof raw === 'string' ? raw.trim() : ''
 
   const { error } = await supabase
     .from('profiles')
@@ -27,6 +28,9 @@ export async function deleteAccount() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  // Sign out first to clear session cookies in the browser
+  await supabase.auth.signOut()
 
   const { error } = await createAdminClient().auth.admin.deleteUser(user.id)
   if (error) throw new Error('Failed to delete account')
