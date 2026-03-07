@@ -7,12 +7,14 @@ export default async function Home() {
   const brand = await getBrand()
 
   if (brand === 'sona') {
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) redirect('/home')
     return <LandingPage />
   }
 
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
-
   if (user) redirect('/chat')
   redirect('/login')
 }
