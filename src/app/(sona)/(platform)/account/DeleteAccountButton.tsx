@@ -9,10 +9,16 @@ export function DeleteAccountButton() {
   const [confirming, setConfirming] = useState(false)
   const [confirmText, setConfirmText] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   function handleDelete() {
+    setErrorMessage(null)
     startTransition(async () => {
-      await deleteAccount()
+      try {
+        await deleteAccount()
+      } catch {
+        setErrorMessage('Could not delete account. Please try again.')
+      }
     })
   }
 
@@ -37,8 +43,8 @@ export function DeleteAccountButton() {
             Permanently delete your account and all associated data. This cannot be undone.
           </p>
           <button
+            type="button"
             onClick={() => setConfirming(true)}
-            className="sona-btn-outline"
             style={{
               fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 400,
               color: '#DE3E7B', border: '1px solid rgba(222,62,123,0.3)',
@@ -98,6 +104,11 @@ export function DeleteAccountButton() {
               Cancel
             </button>
           </div>
+          {errorMessage && (
+            <p style={{ fontFamily: GEIST, fontSize: '0.8125rem', color: '#DE3E7B', margin: '4px 0 0' }}>
+              {errorMessage}
+            </p>
+          )}
         </div>
       )}
     </div>
