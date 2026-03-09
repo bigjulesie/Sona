@@ -101,3 +101,12 @@ body {
   0%, 100% { transform: translateY(0); opacity: 0.4; }
   50% { transform: translateY(-4px); opacity: 1; }
 }
+
+@keyframes presence-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.45; transform: scale(0.88); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presence-dot { animation: none !important; }
+}

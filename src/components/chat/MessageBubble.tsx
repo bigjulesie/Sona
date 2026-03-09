@@ -20,11 +20,66 @@ interface MessageBubbleProps {
   portraitName?: string
   onPlayTTS?: () => void
   isPlayingTTS?: boolean
+  variant?: 'aside'  // proactive listening aside — coral left border treatment
 }
 
-export function MessageBubble({ role, content, portraitName, onPlayTTS, isPlayingTTS }: MessageBubbleProps) {
+export function MessageBubble({
+  role,
+  content,
+  portraitName,
+  onPlayTTS,
+  isPlayingTTS,
+  variant,
+}: MessageBubbleProps) {
   const isUser = role === 'user'
+  const isAside = variant === 'aside'
 
+  // Aside variant: coral left border, flat left radius, fafafa background
+  if (isAside) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'flex-start',
+        marginBottom: 20,
+      }}>
+        <div style={{
+          maxWidth: '80%',
+          padding: '14px 18px',
+          backgroundColor: '#fafafa',
+          border: '1px solid rgba(0,0,0,0.06)',
+          borderLeft: '2px solid #DE3E7B',   // inline — Tailwind v4 safe
+          borderRadius: '0 20px 20px 0',      // flat left edge is load-bearing
+        }}>
+          {portraitName && (
+            <p style={{
+              fontFamily: GEIST,
+              fontSize: '0.625rem',
+              fontWeight: 500,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#DE3E7B',               // coral for aside name label
+              margin: '0 0 8px',
+            }}>
+              {portraitName}
+            </p>
+          )}
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.9375rem',
+            fontWeight: 300,
+            lineHeight: 1.65,
+            color: '#1a1a1a',
+            margin: 0,
+            whiteSpace: 'pre-wrap',
+          }}>
+            {renderMarkdown(content)}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Standard variant (unchanged)
   return (
     <div style={{
       display: 'flex',
