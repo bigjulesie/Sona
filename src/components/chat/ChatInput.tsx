@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useVoice } from '@/lib/hooks/useVoice'
 import { VoiceWaveform } from './VoiceWaveform'
 
@@ -13,6 +13,10 @@ interface ChatInputProps {
   voiceMode?: boolean
   onToggleVoice?: () => void
   onRecordingChange?: (recording: boolean) => void
+  portraitName?: string
+  inRoomMode?: boolean
+  inRoomMicActive?: boolean
+  textareaRef?: React.RefObject<HTMLTextAreaElement | null>
 }
 
 export function ChatInput({
@@ -22,9 +26,14 @@ export function ChatInput({
   voiceMode = false,
   onToggleVoice,
   onRecordingChange,
+  portraitName,
+  inRoomMode = false,
+  inRoomMicActive = false,
+  textareaRef: textareaRefProp,
 }: ChatInputProps) {
   const [value, setValue] = useState('')
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const localTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const textareaRef = textareaRefProp ?? localTextareaRef
 
   const handleTranscript = useCallback(
     (text: string) => {
@@ -113,8 +122,8 @@ export function ChatInput({
         </div>
       )}
 
-      {/* Privacy banner — visible only while recording */}
-      {isRecording && (
+      {/* Privacy banner — visible only while recording and NOT in in-room mode */}
+      {isRecording && !inRoomMode && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -139,6 +148,39 @@ export function ChatInput({
             letterSpacing: '0.03em',
           }}>
             Microphone active — tap the mic button to stop
+          </span>
+        </div>
+      )}
+
+      {/* In-room mic status indicator — calm coral/grey dot */}
+      {inRoomMode && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '6px clamp(16px, 4vw, 24px) 0',
+        }}>
+          <span
+            className="presence-dot"
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              backgroundColor: inRoomMicActive ? '#DE3E7B' : '#b0b0b0',
+              display: 'inline-block',
+              animation: inRoomMicActive ? 'presence-pulse 2.8s ease-in-out infinite' : 'none',
+              transition: 'background-color 0.2s ease',
+            }}
+            aria-label={inRoomMicActive ? 'Microphone active, listening to room' : 'Microphone paused'}
+          />
+          <span style={{
+            fontFamily: GEIST,
+            fontSize: '0.6875rem',
+            fontWeight: 400,
+            color: '#b0b0b0',
+            letterSpacing: '0.04em',
+          }}>
+            {inRoomMicActive ? 'Listening' : 'Paused'}
           </span>
         </div>
       )}
@@ -204,7 +246,7 @@ export function ChatInput({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask a question…"
+            placeholder={inRoomMode ? `Say something to ${portraitName ?? 'them'}…` : 'Ask a question…'}
             rows={1}
             disabled={disabled}
             style={{

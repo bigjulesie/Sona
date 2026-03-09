@@ -345,6 +345,10 @@ export function ChatInterface({
         voiceMode={voiceMode}
         onToggleVoice={() => setVoiceMode((v) => !v)}
         onRecordingChange={setIsRecording}
+        portraitName={portraitName}
+        inRoomMode={sessionStatus === 'active' || sessionStatus === 'paused'}
+        inRoomMicActive={sessionStatus === 'active'}
+        textareaRef={textareaRef}
       />
     </div>
   )
