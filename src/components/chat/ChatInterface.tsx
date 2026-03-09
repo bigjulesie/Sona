@@ -43,7 +43,6 @@ export function ChatInterface({
   const autoPlayedRef = useRef<Set<string>>(new Set())
 
   // Group session state
-  const [groupSessionConvId, setGroupSessionConvId] = useState<string | null>(null)
   const [groupError, setGroupError] = useState<string | null>(null)
   const [asideMessages, setAsideMessages] = useState<Array<{
     id: string; content: string; trigger: 'proactive' | 'direct'; timestamp: number
@@ -57,7 +56,6 @@ export function ChatInterface({
     leave,
   } = useGroupSession({
     portraitId,
-    conversationId: groupSessionConvId,
     onAside: (msg) => setAsideMessages(prev => [...prev, msg]),
     onError: (msg) => setGroupError(msg),
   })
@@ -69,11 +67,6 @@ export function ChatInterface({
   useEffect(() => {
     if (conversationId) onConversationChange?.(conversationId)
   }, [conversationId, onConversationChange])
-
-  // Sync groupSessionConvId when a conversation is established
-  useEffect(() => {
-    if (conversationId) setGroupSessionConvId(conversationId)
-  }, [conversationId])
 
   useEffect(() => {
     // Suppress auto-scroll when subscriber has focus in the textarea or has unsent text

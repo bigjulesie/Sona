@@ -13,7 +13,6 @@ interface GroupSessionMessage {
 
 interface UseGroupSessionOptions {
   portraitId: string
-  conversationId: string | null
   onAside: (message: GroupSessionMessage) => void
   onError: (message: string) => void
 }
@@ -27,7 +26,6 @@ function measureWpm(transcript: string, windowMs = 60000): number {
 
 export function useGroupSession({
   portraitId,
-  conversationId,
   onAside,
   onError,
 }: UseGroupSessionOptions) {
