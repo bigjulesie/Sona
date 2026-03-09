@@ -34,7 +34,8 @@ export function MessageBubble({
   const isUser = role === 'user'
   const isAside = variant === 'aside'
 
-  // Aside variant: coral left border, flat left radius, fafafa background
+  // Aside variant: coral left border, flat left radius, fafafa background.
+  // TTS not rendered for aside variant — asides are read, not listened to.
   if (isAside) {
     return (
       <div style={{
