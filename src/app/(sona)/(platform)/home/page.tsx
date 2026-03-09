@@ -195,29 +195,156 @@ export default async function HomePage() {
             </div>
           ) : (
             <div style={{
-              border: '1px solid rgba(0,0,0,0.07)', borderRadius: 14,
-              padding: '40px 24px', textAlign: 'center',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: 16,
             }}>
-              <p style={{
-                fontFamily: CORMORANT, fontSize: '1.5rem', fontWeight: 400,
-                fontStyle: 'italic', color: '#1a1a1a', margin: '0 0 8px',
+
+              {/* Card 1 — context-aware */}
+              {ownPortrait ? (
+                <div style={{
+                  border: '1px solid rgba(0,0,0,0.07)',
+                  borderRadius: 16,
+                  padding: '32px 28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 16,
+                }}>
+                  <p style={{
+                    fontFamily: CORMORANT,
+                    fontSize: '1.375rem',
+                    fontWeight: 400,
+                    fontStyle: 'italic',
+                    letterSpacing: '-0.01em',
+                    color: '#1a1a1a',
+                    margin: 0,
+                    lineHeight: 1.25,
+                  }}>
+                    Be present. Even when you can&apos;t be.
+                  </p>
+                  <p style={{
+                    fontFamily: GEIST,
+                    fontSize: '0.875rem',
+                    fontWeight: 300,
+                    color: '#6b6b6b',
+                    margin: 0,
+                    lineHeight: 1.65,
+                  }}>
+                    Your Sona carries your perspective into every conversation. Add context, expand your circle, and track who&apos;s listening from your dashboard.
+                  </p>
+                  <div>
+                    <Link href="/dashboard" style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      color: '#fff',
+                      backgroundColor: '#1a1a1a',
+                      borderRadius: '980px',
+                      padding: '10px 24px',
+                      textDecoration: 'none',
+                      display: 'inline-block',
+                    }}>
+                      Go to dashboard
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div style={{
+                  border: '1px solid rgba(0,0,0,0.07)',
+                  borderRadius: 16,
+                  padding: '32px 28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 16,
+                }}>
+                  <p style={{
+                    fontFamily: CORMORANT,
+                    fontSize: '1.375rem',
+                    fontWeight: 400,
+                    fontStyle: 'italic',
+                    letterSpacing: '-0.01em',
+                    color: '#1a1a1a',
+                    margin: 0,
+                    lineHeight: 1.25,
+                  }}>
+                    Your whole self, present when it matters.
+                  </p>
+                  <p style={{
+                    fontFamily: GEIST,
+                    fontSize: '0.875rem',
+                    fontWeight: 300,
+                    color: '#6b6b6b',
+                    margin: 0,
+                    lineHeight: 1.65,
+                  }}>
+                    Share your knowledge, perspective, and way of thinking — with the people who matter, at the depth you choose. From open discovery to a private inner circle, you set the limits.
+                  </p>
+                  <div>
+                    <Link href="/dashboard/create" style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      color: '#fff',
+                      backgroundColor: '#1a1a1a',
+                      borderRadius: '980px',
+                      padding: '10px 24px',
+                      textDecoration: 'none',
+                      display: 'inline-block',
+                    }}>
+                      Create your Sona
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Card 2 — always shown */}
+              <div style={{
+                border: '1px solid rgba(0,0,0,0.07)',
+                borderRadius: 16,
+                padding: '32px 28px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
               }}>
-                Your circle is empty.
-              </p>
-              <p style={{
-                fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 300,
-                color: '#9b9b9b', margin: '0 0 24px',
-              }}>
-                Add someone to your circle to start a conversation.
-              </p>
-              <Link href="/explore" style={{
-                fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 500,
-                color: '#fff', backgroundColor: '#1a1a1a',
-                borderRadius: '980px', padding: '10px 24px',
-                textDecoration: 'none', display: 'inline-block',
-              }}>
-                Discover Sonas
-              </Link>
+                <p style={{
+                  fontFamily: CORMORANT,
+                  fontSize: '1.375rem',
+                  fontWeight: 400,
+                  fontStyle: 'italic',
+                  letterSpacing: '-0.01em',
+                  color: '#1a1a1a',
+                  margin: 0,
+                  lineHeight: 1.25,
+                }}>
+                  The right mind in the room.
+                </p>
+                <p style={{
+                  fontFamily: GEIST,
+                  fontSize: '0.875rem',
+                  fontWeight: 300,
+                  color: '#6b6b6b',
+                  margin: 0,
+                  lineHeight: 1.65,
+                }}>
+                  Build a circle of Sonas from thinkers, leaders, and people who inspire you. Their insights stay with you — a collection of minds to turn to whenever you need perspective, wisdom, or a second opinion.
+                </p>
+                <div>
+                  <Link href="/explore" style={{
+                    fontFamily: GEIST,
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: '#fff',
+                    backgroundColor: '#1a1a1a',
+                    borderRadius: '980px',
+                    padding: '10px 24px',
+                    textDecoration: 'none',
+                    display: 'inline-block',
+                  }}>
+                    Discover Sonas
+                  </Link>
+                </div>
+              </div>
+
             </div>
           )}
         </section>
