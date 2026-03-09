@@ -107,27 +107,36 @@ ${context}
 ---
 Use the reference material above to ground your responses in what ${portrait.display_name} has actually said and expressed. If the reference material doesn't contain relevant information for the question, draw on the persona description but note that you're speaking more generally.`
 
-  // Stream response
+  // Stream response — forward request.signal so Anthropic stream aborts on client disconnect
   const stream = await anthropic.messages.stream({
     model: 'claude-sonnet-4-6',
     max_tokens: 2048,
     system: systemPrompt,
     messages,
-  })
+  }, { signal: request.signal })
 
   const encoder = new TextEncoder()
   const readable = new ReadableStream({
     async start(controller) {
       let fullResponse = ''
 
-      for await (const event of stream) {
-        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-          fullResponse += event.delta.text
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`))
+      try {
+        for await (const event of stream) {
+          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+            fullResponse += event.delta.text
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`))
+          }
         }
+      } catch (err: unknown) {
+        // Client disconnected — discard partial response cleanly
+        if (err instanceof Error && err.name === 'AbortError') {
+          controller.close()
+          return
+        }
+        throw err
       }
 
-      // Save assistant message
+      // Save assistant message (only on clean completion)
       await supabase.from('messages').insert({
         conversation_id: convId,
         role: 'assistant',

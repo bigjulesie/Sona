@@ -1,4 +1,5 @@
 // src/app/api/creator/ingest/route.ts
+import { after } from 'next/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -44,44 +45,29 @@ export async function POST(request: NextRequest) {
   if (!VALID_TIERS.includes(min_tier)) return NextResponse.json({ error: 'Invalid min_tier' }, { status: 400 })
   if (!pastedContent && !file) return NextResponse.json({ error: 'content or file required' }, { status: 400 })
 
+  // File validation (before reading bytes)
+  if (file) {
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: 'File too large (max 10 MB)' }, { status: 400 })
+    }
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
+    if (!ACCEPTED_EXTENSIONS.includes(ext)) {
+      return NextResponse.json({ error: 'Unsupported file type. Use PDF, DOCX, or TXT.' }, { status: 400 })
+    }
+  }
+
   // Verify creator owns portrait
   const { data: portrait } = await supabase
     .from('portraits')
     .select('id')
     .eq('id', portrait_id)
-    // creator_id is a FK to profiles(id), which mirrors auth.users.id per the
-    // profile-creation trigger — so user.id (auth UID) is safe to use here.
     .eq('creator_id', user.id)
     .single()
   if (!portrait) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  // Extract text
-  let text: string
-  try {
-    if (file) {
-      if (file.size > MAX_FILE_SIZE) {
-        return NextResponse.json({ error: 'File too large (max 10 MB)' }, { status: 400 })
-      }
-      const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
-      if (!ACCEPTED_EXTENSIONS.includes(ext)) {
-        return NextResponse.json({ error: 'Unsupported file type. Use PDF, DOCX, or TXT.' }, { status: 400 })
-      }
-      const buffer = Buffer.from(await file.arrayBuffer())
-      text = await extractText(buffer, file.type, file.name)
-    } else {
-      text = pastedContent!
-    }
-  } catch {
-    return NextResponse.json({ error: 'Failed to extract text from file' }, { status: 422 })
-  }
-
-  if (!text.trim()) {
-    return NextResponse.json({ error: 'No text content found' }, { status: 422 })
-  }
-
   const admin = createAdminClient()
 
-  // Create content_source record
+  // Create content_source record immediately (status: 'processing')
   // content_sources was added in migration 00012 and is not yet in the generated types,
   // so we cast to any to bypass the type checker for this table.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -95,56 +81,62 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 })
   }
 
-  // Chunk + embed + insert
-  try {
-    const chunks = chunkText(text)
-    const embeddings = await generateEmbeddings(chunks)
+  // Read file bytes now — buffer is unavailable after response is sent
+  const fileBuffer = file ? Buffer.from(await file.arrayBuffer()) : null
+  const fileType = file?.type ?? ''
+  const fileName = file?.name ?? ''
 
-    // source_id was added to knowledge_chunks in migration 00012 and is not in generated
-    // types yet, so we cast to any[] to include it without a type error.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rows: any[] = chunks.map((chunk, i) => ({
-      portrait_id,
-      source_id: source.id,
-      content: chunk,
-      embedding: JSON.stringify(embeddings[i]),
-      source_title: title,
-      source_type,
-      min_tier,
-      chunk_index: i,
-    }))
+  // Defer heavy processing until after response is sent
+  after(async () => {
+    try {
+      const text = fileBuffer
+        ? await extractText(fileBuffer, fileType, fileName)
+        : pastedContent!
 
-    const { error: chunkError } = await admin.from('knowledge_chunks').insert(rows)
-    if (chunkError) throw chunkError
+      if (!text.trim()) throw new Error('No text content found')
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin as any)
-      .from('content_sources')
-      .update({ status: 'ready' })
-      .eq('id', source.id)
+      const chunks = chunkText(text)
+      const embeddings = await generateEmbeddings(chunks)
 
-    await admin.from('audit_log').insert({
-      user_id: user.id,
-      action: 'ingest',
-      resource_type: 'content_source',
-      resource_id: source.id,
-      metadata: { portrait_id, title, chunks_created: chunks.length },
-    })
+      // source_id was added to knowledge_chunks in migration 00012 and is not in generated
+      // types yet, so we cast to any[] to include it without a type error.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const rows: any[] = chunks.map((chunk, i) => ({
+        portrait_id,
+        source_id: source.id,
+        content: chunk,
+        embedding: JSON.stringify(embeddings[i]),
+        source_title: title,
+        source_type,
+        min_tier,
+        chunk_index: i,
+      }))
 
-    return NextResponse.json({ ok: true, source_id: source.id, chunks_created: chunks.length })
-  } catch {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin as any)
-      .from('content_sources')
-      .update({ status: 'error', error_msg: 'Processing failed' })
-      .eq('id', source.id)
-    await admin.from('audit_log').insert({
-      user_id: user.id,
-      action: 'ingest',
-      resource_type: 'content_source',
-      resource_id: source.id,
-      metadata: { portrait_id, title, chunks_created: 0, status: 'error' },
-    })
-    return NextResponse.json({ error: 'Processing failed' }, { status: 500 })
-  }
+      const { error: chunkError } = await admin.from('knowledge_chunks').insert(rows)
+      if (chunkError) throw chunkError
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (admin as any)
+        .from('content_sources')
+        .update({ status: 'ready' })
+        .eq('id', source.id)
+
+      await admin.from('audit_log').insert({
+        user_id: user.id,
+        action: 'ingest',
+        resource_type: 'content_source',
+        resource_id: source.id,
+        metadata: { portrait_id, title, chunks_created: chunks.length },
+      })
+    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (admin as any)
+        .from('content_sources')
+        .update({ status: 'error', error_msg: err instanceof Error ? err.message : 'Processing failed' })
+        .eq('id', source.id)
+    }
+  })
+
+  // Return immediately — client polls content_sources.status for completion
+  return NextResponse.json({ ok: true, source_id: source.id, status: 'processing' })
 }
