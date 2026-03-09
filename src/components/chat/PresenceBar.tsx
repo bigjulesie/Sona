@@ -95,23 +95,25 @@ export function PresenceBar({
   return (
     <>
       {/* Presence row — tappable to open controls */}
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setControlsOpen(o => !o)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setControlsOpen(o => !o) } }}
+        aria-expanded={controlsOpen}
+        aria-label={isActive
+          ? `${portraitName} is in the room — tap to manage`
+          : `${portraitName} has stepped out — tap to manage`}
         style={{
           width: '100%',
           padding: '10px clamp(16px, 4vw, 24px)',
+          borderBottom: '1px solid rgba(0,0,0,0.05)',
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          background: 'none',
-          border: 'none',
-          borderBottom: '1px solid rgba(0,0,0,0.05)',
           cursor: 'pointer',
-          textAlign: 'left' as const,
           minHeight: 40,
         }}
-        aria-expanded={controlsOpen}
-        aria-label={`${portraitName} is in the room — tap to manage`}
       >
         {/* Animated coral dot */}
         <span
@@ -163,7 +165,7 @@ export function PresenceBar({
         >
           {isActive ? 'Pause' : 'Resume'}
         </button>
-      </button>
+      </div>
 
       {/* Inline controls disclosure */}
       {controlsOpen && (
