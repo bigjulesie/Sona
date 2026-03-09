@@ -2,8 +2,10 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { useChat } from '@/lib/hooks/useChat'
+import { useGroupSession } from '@/lib/hooks/useGroupSession'
 import { MessageBubble } from './MessageBubble'
 import { ChatInput } from './ChatInput'
+import { PresenceBar } from './PresenceBar'
 import { RatingPrompt } from '@/components/sona/RatingPrompt'
 
 const GEIST = 'var(--font-geist-sans)'
@@ -29,6 +31,7 @@ export function ChatInterface({
   const { messages, isStreaming, conversationId, sendMessage, loadConversation } =
     useChat(portraitId)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   // Voice mode state
   const [voiceMode, setVoiceMode] = useState(false)
@@ -39,6 +42,26 @@ export function ChatInterface({
   const [playingMessageId, setPlayingMessageId] = useState<string | null>(null)
   const autoPlayedRef = useRef<Set<string>>(new Set())
 
+  // Group session state
+  const [groupSessionConvId, setGroupSessionConvId] = useState<string | null>(null)
+  const [groupError, setGroupError] = useState<string | null>(null)
+  const [asideMessages, setAsideMessages] = useState<Array<{
+    id: string; content: string; trigger: 'proactive' | 'direct'; timestamp: number
+  }>>([])
+
+  const {
+    status: sessionStatus,
+    invite,
+    pause,
+    resume,
+    leave,
+  } = useGroupSession({
+    portraitId,
+    conversationId: groupSessionConvId,
+    onAside: (msg) => setAsideMessages(prev => [...prev, msg]),
+    onError: (msg) => setGroupError(msg),
+  })
+
   useEffect(() => {
     if (initialConversationId) loadConversation(initialConversationId)
   }, [initialConversationId, loadConversation])
@@ -47,7 +70,16 @@ export function ChatInterface({
     if (conversationId) onConversationChange?.(conversationId)
   }, [conversationId, onConversationChange])
 
+  // Sync groupSessionConvId when a conversation is established
   useEffect(() => {
+    if (conversationId) setGroupSessionConvId(conversationId)
+  }, [conversationId])
+
+  useEffect(() => {
+    // Suppress auto-scroll when subscriber has focus in the textarea or has unsent text
+    // Prevents asides from yanking the screen during active typing
+    const textarea = textareaRef.current
+    if (textarea && (document.activeElement === textarea || textarea.value.trim())) return
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
@@ -129,12 +161,27 @@ export function ChatInterface({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
+      {/* ── Presence bar ───────────────────────────────────────────── */}
+      <PresenceBar
+        portraitName={portraitName}
+        status={sessionStatus}
+        onInvite={invite}
+        onPause={pause}
+        onResume={resume}
+        onLeave={leave}
+      />
+
       {/* ── Message list ───────────────────────────────────────────── */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '32px clamp(16px, 4vw, 24px)',
-      }}>
+      <div
+        role="log"
+        aria-live="polite"
+        aria-atomic={false}
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '32px clamp(16px, 4vw, 24px)',
+        }}
+      >
 
         {/* Empty state */}
         {messages.length === 0 && !isRecording && (
@@ -165,6 +212,29 @@ export function ChatInterface({
           </div>
         )}
 
+        {/* Session-start divider */}
+        {(sessionStatus === 'active' || sessionStatus === 'paused') && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            margin: '8px 0 20px',
+          }}>
+            <div style={{ flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.07)' }} />
+            <span style={{
+              fontFamily: 'var(--font-geist-sans)',
+              fontSize: '0.6875rem',
+              fontWeight: 400,
+              color: '#b0b0b0',
+              letterSpacing: '0.04em',
+              whiteSpace: 'nowrap',
+            }}>
+              {portraitName} joined the room
+            </span>
+            <div style={{ flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.07)' }} />
+          </div>
+        )}
+
         {/* Messages — skip empty assistant placeholder while waiting for first token */}
         {messages.filter(msg => !(isStreaming && msg.role === 'assistant' && msg.content === '')).map((msg) => (
           <MessageBubble
@@ -172,8 +242,9 @@ export function ChatInterface({
             role={msg.role}
             content={msg.content}
             portraitName={portraitName}
+            variant={(msg as { metadata?: { trigger?: string } }).metadata?.trigger === 'proactive' ? 'aside' : undefined}
             onPlayTTS={
-              msg.role === 'assistant' && voiceEnabled
+              msg.role === 'assistant' && voiceEnabled && !((msg as { metadata?: { trigger?: string } }).metadata?.trigger === 'proactive')
                 ? () => {
                     if (playingMessageId === msg.id) stopTTS()
                     else playTTS(msg.id, msg.content)
@@ -181,6 +252,17 @@ export function ChatInterface({
                 : undefined
             }
             isPlayingTTS={playingMessageId === msg.id}
+          />
+        ))}
+
+        {/* Proactive asides from current session (not yet in DB-backed messages) */}
+        {asideMessages.map((aside) => (
+          <MessageBubble
+            key={aside.id}
+            role="assistant"
+            content={aside.content}
+            portraitName={portraitName}
+            variant="aside"
           />
         ))}
 
@@ -234,6 +316,25 @@ export function ChatInterface({
             messageCount={userMessageCount}
             existingRating={existingRating}
           />
+        </div>
+      )}
+
+      {/* ── Group session error banner ──────────────────────────────── */}
+      {groupError && (
+        <div style={{
+          padding: '8px clamp(16px, 4vw, 24px)',
+          backgroundColor: 'rgba(222,62,123,0.06)',
+          borderTop: '1px solid rgba(222,62,123,0.12)',
+        }}>
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.75rem',
+            fontWeight: 400,
+            color: '#DE3E7B',
+            margin: 0,
+          }}>
+            {groupError}
+          </p>
         </div>
       )}
 
