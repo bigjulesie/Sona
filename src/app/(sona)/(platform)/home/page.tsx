@@ -210,7 +210,7 @@ export default async function HomePage() {
                   flexDirection: 'column',
                   gap: 16,
                 }}>
-                  <p style={{
+                  <h2 style={{
                     fontFamily: CORMORANT,
                     fontSize: '1.375rem',
                     fontWeight: 400,
@@ -221,7 +221,7 @@ export default async function HomePage() {
                     lineHeight: 1.25,
                   }}>
                     Be present. Even when you can&apos;t be.
-                  </p>
+                  </h2>
                   <p style={{
                     fontFamily: GEIST,
                     fontSize: '0.875rem',
@@ -257,7 +257,7 @@ export default async function HomePage() {
                   flexDirection: 'column',
                   gap: 16,
                 }}>
-                  <p style={{
+                  <h2 style={{
                     fontFamily: CORMORANT,
                     fontSize: '1.375rem',
                     fontWeight: 400,
@@ -268,7 +268,7 @@ export default async function HomePage() {
                     lineHeight: 1.25,
                   }}>
                     Your whole self, present when it matters.
-                  </p>
+                  </h2>
                   <p style={{
                     fontFamily: GEIST,
                     fontSize: '0.875rem',
@@ -306,7 +306,7 @@ export default async function HomePage() {
                 flexDirection: 'column',
                 gap: 16,
               }}>
-                <p style={{
+                <h2 style={{
                   fontFamily: CORMORANT,
                   fontSize: '1.375rem',
                   fontWeight: 400,
@@ -317,7 +317,7 @@ export default async function HomePage() {
                   lineHeight: 1.25,
                 }}>
                   The right mind in the room.
-                </p>
+                </h2>
                 <p style={{
                   fontFamily: GEIST,
                   fontSize: '0.875rem',
