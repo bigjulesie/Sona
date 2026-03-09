@@ -40,10 +40,20 @@ export function useGroupSession({
   const streamRef = useRef<MediaStream | null>(null)
   const processorRef = useRef<ScriptProcessorNode | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null)
   const transcriptRef = useRef<string>('')
   const transcriptWindowRef = useRef<string>('')  // rolling 90s window
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const contributingRef = useRef(false)  // mutual exclusion
+  // Issue 1: keep onAside in a ref so the recursive timer always sees the latest callback
+  const onAsideRef = useRef(onAside)
+  // Issue 2: guard against double-tap race before state flush
+  const inviteInFlightRef = useRef(false)
+  // Issue 3: track whether audio capture is running
+  const activeRef = useRef(false)
+
+  // Keep onAsideRef in sync with the latest prop value
+  useEffect(() => { onAsideRef.current = onAside }, [onAside])
 
   // Schedule next contribution based on current pace
   const scheduleContribution = useCallback((currentSessionId: string) => {
@@ -85,7 +95,8 @@ export function useGroupSession({
             const data = JSON.parse(line.slice(6))
             if (data.text) fullText += data.text
             if (data.done && fullText.trim()) {
-              onAside({
+              // Issue 1: use ref so stale closure doesn't capture an old callback
+              onAsideRef.current({
                 id: crypto.randomUUID(),
                 content: fullText.trim(),
                 trigger: 'proactive',
@@ -100,15 +111,23 @@ export function useGroupSession({
       } finally {
         contributingRef.current = false
         setIsContributing(false)
-        scheduleContribution(currentSessionId)
+        // Issue 3: only reschedule if audio capture is still active
+        if (activeRef.current) scheduleContribution(currentSessionId)
       }
     }, cadenceMs)
-  }, [onAside])
+  }, [])
 
   const stopStream = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current)
       timerRef.current = null
+    }
+    // Issue 3: mark as inactive before disconnecting
+    activeRef.current = false
+    // Issue 4: disconnect the source node explicitly
+    if (sourceRef.current) {
+      sourceRef.current.disconnect()
+      sourceRef.current = null
     }
     if (processorRef.current) {
       processorRef.current.disconnect()
@@ -185,6 +204,8 @@ export function useGroupSession({
     // Stream microphone audio to Deepgram via ScriptProcessorNode
     const audioContext = new AudioContext({ sampleRate: 16000 })
     const source = audioContext.createMediaStreamSource(stream)
+    // Issue 4: store source node so stopStream can disconnect it
+    sourceRef.current = source
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const processor = audioContext.createScriptProcessor(4096, 1, 1)
 
@@ -207,43 +228,52 @@ export function useGroupSession({
     processorRef.current = processor
     audioContextRef.current = audioContext
 
+    // Issue 3: mark as active now that audio pipeline is running
+    activeRef.current = true
     return true
   }, [openDeepgramSocket, onError])
 
   const invite = useCallback(async () => {
-    if (status !== 'idle') return
-    setStatus('starting')
+    // Issue 2: guard against double-tap race before state flush
+    if (status !== 'idle' || inviteInFlightRef.current) return
+    inviteInFlightRef.current = true
 
-    // Create session via API
-    const res = await fetch('/api/group-sessions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ portrait_id: portraitId }),
-    })
+    try {
+      setStatus('starting')
 
-    if (!res.ok) {
-      setStatus('error')
-      onError('Unable to start session — try again in a moment.')
-      return
-    }
-
-    const { session_id } = await res.json()
-    setSessionId(session_id)
-
-    const started = await start(session_id)
-    if (!started) {
-      setStatus('error')
-      // Update session to ended
-      await fetch(`/api/group-sessions/${session_id}`, {
-        method: 'PATCH',
+      // Create session via API
+      const res = await fetch('/api/group-sessions', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'ended' }),
+        body: JSON.stringify({ portrait_id: portraitId }),
       })
-      return
-    }
 
-    setStatus('active')
-    scheduleContribution(session_id)
+      if (!res.ok) {
+        setStatus('error')
+        onError('Unable to start session — try again in a moment.')
+        return
+      }
+
+      const { session_id } = await res.json()
+      setSessionId(session_id)
+
+      const started = await start(session_id)
+      if (!started) {
+        setStatus('error')
+        // Update session to ended
+        await fetch(`/api/group-sessions/${session_id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'ended' }),
+        })
+        return
+      }
+
+      setStatus('active')
+      scheduleContribution(session_id)
+    } finally {
+      inviteInFlightRef.current = false
+    }
   }, [status, portraitId, start, scheduleContribution, onError])
 
   const pause = useCallback(async () => {
