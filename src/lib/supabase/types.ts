@@ -50,6 +50,7 @@ export type Database = {
       conversations: {
         Row: {
           created_at: string | null
+          group_session_id: string | null
           id: string
           portrait_id: string
           title: string | null
@@ -58,6 +59,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          group_session_id?: string | null
           id?: string
           portrait_id: string
           title?: string | null
@@ -66,6 +68,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          group_session_id?: string | null
           id?: string
           portrait_id?: string
           title?: string | null
@@ -73,6 +76,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "conversations_group_session_id_fkey"
+            columns: ["group_session_id"]
+            isOneToOne: false
+            referencedRelation: "group_sessions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "conversations_portrait_id_fkey"
             columns: ["portrait_id"]
@@ -90,6 +100,71 @@ export type Database = {
           {
             foreignKeyName: "conversations_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_sessions: {
+        Row: {
+          conversation_id: string | null
+          created_at: string | null
+          ended_at: string | null
+          id: string
+          mode: string
+          portrait_id: string
+          started_at: string | null
+          status: string
+          subscriber_id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string | null
+          ended_at?: string | null
+          id?: string
+          mode?: string
+          portrait_id: string
+          started_at?: string | null
+          status?: string
+          subscriber_id: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string | null
+          ended_at?: string | null
+          id?: string
+          mode?: string
+          portrait_id?: string
+          started_at?: string | null
+          status?: string
+          subscriber_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_sessions_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_sessions_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_sessions_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_sessions_subscriber_id_fkey"
+            columns: ["subscriber_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
