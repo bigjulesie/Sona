@@ -11,7 +11,16 @@ import type { Database } from '@/lib/supabase/types'
 
 type AccessTier = Database['public']['Enums']['access_tier']
 const VALID_TIERS: AccessTier[] = ['public', 'acquaintance', 'colleague', 'family']
-const VALID_TYPES = ['transcript', 'interview', 'article', 'book', 'essay', 'speech', 'letter', 'other']
+const VALID_TYPES = ['transcript', 'interview', 'interview_audio', 'article', 'book', 'essay', 'speech', 'letter', 'other']
+
+const AUDIO_EXTENSIONS = ['mp3', 'm4a', 'wav', 'ogg', 'mp4']
+const AUDIO_MIME_TYPES = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/ogg', 'video/mp4', 'audio/x-m4a']
+const MAX_AUDIO_FILE_SIZE = 200 * 1024 * 1024 // 200MB
+
+function isAudioFile(file: File): boolean {
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
+  return AUDIO_EXTENSIONS.includes(ext) || AUDIO_MIME_TYPES.includes(file.type)
+}
 
 export async function POST(request: NextRequest) {
   // Auth
@@ -47,12 +56,18 @@ export async function POST(request: NextRequest) {
 
   // File validation (before reading bytes)
   if (file) {
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'File too large (max 10 MB)' }, { status: 400 })
-    }
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
-    if (!ACCEPTED_EXTENSIONS.includes(ext)) {
-      return NextResponse.json({ error: 'Unsupported file type. Use PDF, DOCX, or TXT.' }, { status: 400 })
+    if (isAudioFile(file)) {
+      if (file.size > MAX_AUDIO_FILE_SIZE) {
+        return NextResponse.json({ error: 'Audio file too large (max 200 MB)' }, { status: 400 })
+      }
+    } else {
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json({ error: 'File too large (max 10 MB)' }, { status: 400 })
+      }
+      const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
+      if (!ACCEPTED_EXTENSIONS.includes(ext)) {
+        return NextResponse.json({ error: 'Unsupported file type. Use PDF, DOCX, or TXT.' }, { status: 400 })
+      }
     }
   }
 
@@ -79,6 +94,31 @@ export async function POST(request: NextRequest) {
 
   if (sourceError || !source) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 })
+  }
+
+  // For audio files: return a presigned upload URL; processing happens after client confirms upload
+  if (file && isAudioFile(file)) {
+    const storagePath = `${portrait_id}/${source.id}/${file.name}`
+    const { data: uploadData, error: uploadError } = await admin.storage
+      .from('sona-content')
+      .createSignedUploadUrl(storagePath)
+    if (uploadError || !uploadData) {
+      return NextResponse.json({ error: 'Storage error' }, { status: 500 })
+    }
+    // Store storage_path on the source record
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (admin as any)
+      .from('content_sources')
+      .update({ storage_path: storagePath })
+      .eq('id', source.id)
+
+    return NextResponse.json({
+      ok: true,
+      source_id: source.id,
+      status: 'awaiting_upload',
+      upload_url: uploadData.signedUrl,
+      storage_path: storagePath,
+    })
   }
 
   // Read file bytes now — buffer is unavailable after response is sent
