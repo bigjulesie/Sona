@@ -52,7 +52,8 @@ export function ContentLibrary({ sources, portraitId, portraitName }: Props) {
   const [showForm, setShowForm] = useState(false)
 
   function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    const d = new Date(iso)
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
   }
 
   return (
