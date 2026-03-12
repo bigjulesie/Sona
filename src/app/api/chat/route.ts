@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { retrieveRelevantChunks } from '@/lib/rag/retrieve'
 import { hasActiveSubscription } from '@/lib/subscriptions'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { assemblePrompt } from '@/lib/synthesis/assembly'
 import Anthropic from '@anthropic-ai/sdk'
 
 export async function POST(request: NextRequest) {
@@ -43,13 +44,6 @@ export async function POST(request: NextRequest) {
 
   // Retrieve relevant knowledge chunks (RLS filters by user tier)
   const chunks = await retrieveRelevantChunks(supabase, message, portrait_id)
-
-  // Build context from retrieved chunks
-  const context = chunks
-    .map((c: { source_title?: string; content: string }) =>
-      `[Source: ${c.source_title ?? 'Unknown'}]\n${c.content}`
-    )
-    .join('\n\n---\n\n')
 
   // Get or create conversation
   let convId = conversation_id
@@ -96,16 +90,12 @@ export async function POST(request: NextRequest) {
     { role: 'user', content: message },
   ]
 
-  // System prompt with RAG context
-  const systemPrompt = `${portrait.system_prompt}
-
----
-REFERENCE MATERIAL (from ${portrait.display_name}'s own words and writings):
-
-${context}
-
----
-Use the reference material above to ground your responses in what ${portrait.display_name} has actually said and expressed. If the reference material doesn't contain relevant information for the question, draw on the persona description but note that you're speaking more generally.`
+  // Assemble system prompt — uses synthesis layer if portrait is ready, falls back to system_prompt
+  const ragChunks = chunks.map((c: { source_title?: string; content: string }) => ({
+    content: c.content,
+    source_title: c.source_title ?? 'Unknown',
+  }))
+  const systemPrompt = await assemblePrompt(supabase, portrait_id, user.id, message, ragChunks)
 
   // Stream response — forward request.signal so Anthropic stream aborts on client disconnect
   const stream = await anthropic.messages.stream({

@@ -22,11 +22,20 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: portrait } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: portrait } = await (supabase as any)
     .from('portraits')
-    .select('id, display_name, slug, is_public, monthly_price_cents')
+    .select('id, display_name, slug, is_public, monthly_price_cents, synthesis_status, last_synthesised_at')
     .eq('creator_id', user.id)
-    .maybeSingle()
+    .maybeSingle() as { data: {
+      id: string
+      display_name: string
+      slug: string
+      is_public: boolean
+      monthly_price_cents: number | null
+      synthesis_status: string
+      last_synthesised_at: string | null
+    } | null }
 
   if (!portrait) redirect('/dashboard/create')
 
@@ -100,6 +109,31 @@ export default async function DashboardPage() {
 
   return (
     <div style={{ maxWidth: 680 }}>
+
+      {/* ── Synthesis nudge ──────────────────────────────────────── */}
+      {portrait.synthesis_status === 'never' && (
+        <div style={{
+          border: '1px solid rgba(0,0,0,0.07)',
+          borderRadius: 12,
+          padding: '1rem 1.5rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <p style={{ fontFamily: GEIST, fontSize: '0.875rem', color: '#6b6b6b', margin: 0 }}>
+            Your Sona&rsquo;s depth hasn&rsquo;t been built yet. Add content and deepen it.
+          </p>
+          <a href="/dashboard/mind" style={{
+            fontFamily: GEIST,
+            fontSize: '0.875rem',
+            color: '#1a1a1a',
+            textDecoration: 'none',
+          }}>
+            Go to Mind →
+          </a>
+        </div>
+      )}
 
       {/* ── Page header ─────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 40, gap: 16 }}>
