@@ -264,41 +264,41 @@ export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
           />
         ) : (
           <div
-            onDragOver={e => e.preventDefault()}
-            onDrop={e => {
-              e.preventDefault()
-              const file = e.dataTransfer.files?.[0]
-              if (!file || !fileRef.current) return
-              const dt = new DataTransfer()
-              dt.items.add(file)
-              fileRef.current.files = dt.files
-              if (fileLabelRef.current) fileLabelRef.current.textContent = file.name
-            }}
             style={{
+              position: 'relative',
               border: '1.5px dashed rgba(0,0,0,0.15)',
               borderRadius: 12,
-              padding: '28px 24px',
+              padding: '36px 24px',
               textAlign: 'center',
+              cursor: 'pointer',
               backgroundColor: '#fafafa',
             }}
           >
-            <p ref={fileLabelRef} style={{ fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 300, color: '#9b9b9b', margin: '0 0 8px' }}>
-              Drag a file here
-            </p>
-            <p style={{ fontFamily: GEIST, fontSize: '0.75rem', fontWeight: 300, color: '#c0c0c0', margin: '0 0 14px' }}>
-              PDF, DOCX, TXT — up to 10 MB · Audio (MP3, M4A, WAV) — up to 200 MB
-            </p>
             <input
               ref={fileRef}
               name="file"
               type="file"
               accept=".pdf,.docx,.txt,.md,.mp3,.m4a,.wav,.ogg,.flac,.aac,.webm"
               required
+              style={{
+                position: 'absolute',
+                inset: 0,
+                opacity: 0,
+                cursor: 'pointer',
+                width: '100%',
+                height: '100%',
+              }}
               onChange={e => {
                 const name = e.target.files?.[0]?.name
-                if (fileLabelRef.current) fileLabelRef.current.textContent = name ?? 'Drag a file here'
+                if (fileLabelRef.current) fileLabelRef.current.textContent = name ?? 'Click or drag a file here'
               }}
             />
+            <p ref={fileLabelRef} style={{ fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 300, color: '#9b9b9b', margin: '0 0 6px', pointerEvents: 'none' }}>
+              Click or drag a file here
+            </p>
+            <p style={{ fontFamily: GEIST, fontSize: '0.75rem', fontWeight: 300, color: '#c0c0c0', margin: 0, pointerEvents: 'none' }}>
+              PDF, DOCX, TXT — up to 10 MB · Audio (MP3, M4A, WAV) — up to 200 MB
+            </p>
           </div>
         )}
       </div>
