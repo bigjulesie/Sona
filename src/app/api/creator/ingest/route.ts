@@ -46,13 +46,17 @@ export async function POST(request: NextRequest) {
   const min_tier = (formData.get('min_tier') as AccessTier | null) ?? 'public'
   const pastedContent = formData.get('content') as string | null
   const file = formData.get('file') as File | null
+  // Audio init requests send filename/content_type metadata instead of the file itself
+  const audioFilename = formData.get('filename') as string | null
+  const audioContentType = formData.get('content_type') as string | null
+  const isAudioInitRequest = !file && !pastedContent && !!(audioFilename || audioContentType)
 
   // Validate required fields
   if (!portrait_id) return NextResponse.json({ error: 'portrait_id required' }, { status: 400 })
   if (!title) return NextResponse.json({ error: 'title required' }, { status: 400 })
   if (!VALID_TYPES.includes(source_type)) return NextResponse.json({ error: 'Invalid source_type' }, { status: 400 })
   if (!VALID_TIERS.includes(min_tier)) return NextResponse.json({ error: 'Invalid min_tier' }, { status: 400 })
-  if (!pastedContent && !file) return NextResponse.json({ error: 'content or file required' }, { status: 400 })
+  if (!pastedContent && !file && !isAudioInitRequest) return NextResponse.json({ error: 'content or file required' }, { status: 400 })
 
   // File validation (before reading bytes)
   if (file) {
@@ -97,8 +101,10 @@ export async function POST(request: NextRequest) {
   }
 
   // For audio files: return a presigned upload URL; processing happens after client confirms upload
-  if (file && isAudioFile(file)) {
-    const storagePath = `${portrait_id}/${source.id}/${file.name}`
+  // Supports both a direct file upload and a metadata-only init request (audioFilename/audioContentType)
+  const resolvedAudioName = file?.name ?? audioFilename
+  if ((file && isAudioFile(file)) || (isAudioInitRequest && resolvedAudioName)) {
+    const storagePath = `${portrait_id}/${source.id}/${resolvedAudioName}`
     const { data: uploadData, error: uploadError } = await admin.storage
       .from('sona-content')
       .createSignedUploadUrl(storagePath)

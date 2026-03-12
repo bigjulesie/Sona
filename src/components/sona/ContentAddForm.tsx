@@ -290,7 +290,7 @@ export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
               Choose a file
             </p>
             <p style={{ fontFamily: GEIST, fontSize: '0.75rem', fontWeight: 300, color: '#c0c0c0', margin: 0 }}>
-              PDF, DOCX, TXT, or audio (MP3, M4A, WAV) — up to 10 MB
+              PDF, DOCX, TXT — up to 10 MB · Audio (MP3, M4A, WAV) — up to 200 MB
             </p>
           </div>
         )}
