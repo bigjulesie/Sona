@@ -26,6 +26,16 @@ export async function proxy(request: NextRequest) {
   const host = request.headers.get('host') ?? ''
   const brand = detectBrand(host)
 
+  // Invite gate — redirect Sona public routes to holding page when cookie absent
+  if (brand === 'sona' && isSonaPublicRoute(pathname)) {
+    const hasInvite = request.cookies.get('sona-invite')?.value === '1'
+    if (!hasInvite) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+  }
+
   const isSharedPublicRoute =
     pathname.startsWith('/auth') ||
     pathname.startsWith('/api') ||
