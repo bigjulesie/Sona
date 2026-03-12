@@ -31,7 +31,7 @@ export function HoldingPage() {
       if (res.ok) {
         setStatus('success')
         setTimeout(() => {
-          router.replace('/explore')
+          router.replace('/')
         }, 1800)
       } else {
         // Shake
