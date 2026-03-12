@@ -278,7 +278,7 @@ export function HoldingPage() {
               value={code}
               onChange={e => setCode(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={status === 'success'}
+              disabled={false}
               style={{
                 width: '100%',
                 background: 'transparent',
