@@ -264,8 +264,8 @@ export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
           />
         ) : (
           <div
-            onClick={() => fileRef.current?.click()}
             style={{
+              position: 'relative',
               border: '1.5px dashed rgba(0,0,0,0.15)',
               borderRadius: 12,
               padding: '36px 24px',
@@ -280,17 +280,24 @@ export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
               type="file"
               accept=".pdf,.docx,.txt,.md,.mp3,.m4a,.wav,.ogg,.flac,.aac,.webm"
               required
-              style={{ display: 'none' }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                opacity: 0,
+                cursor: 'pointer',
+                width: '100%',
+                height: '100%',
+              }}
               onChange={e => {
                 const name = e.target.files?.[0]?.name
-                if (fileLabelRef.current) fileLabelRef.current.textContent = name ?? 'Choose a file'
+                if (fileLabelRef.current) fileLabelRef.current.textContent = name ?? 'Click or drag a file here'
               }}
             />
-            <p ref={fileLabelRef} style={{ fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 300, color: '#9b9b9b', margin: '0 0 6px' }}>
-              Choose a file
+            <p ref={fileLabelRef} style={{ fontFamily: GEIST, fontSize: '0.875rem', fontWeight: 300, color: '#9b9b9b', margin: '0 0 6px', pointerEvents: 'none' }}>
+              Click or drag a file here
             </p>
-            <p style={{ fontFamily: GEIST, fontSize: '0.75rem', fontWeight: 300, color: '#c0c0c0', margin: 0 }}>
-              PDF, DOCX, TXT, or audio (MP3, M4A, WAV) — up to 10 MB
+            <p style={{ fontFamily: GEIST, fontSize: '0.75rem', fontWeight: 300, color: '#c0c0c0', margin: 0, pointerEvents: 'none' }}>
+              PDF, DOCX, TXT — up to 10 MB · Audio (MP3, M4A, WAV) — up to 200 MB
             </p>
           </div>
         )}
