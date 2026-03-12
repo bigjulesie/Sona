@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { retrieveRelevantChunks } from '@/lib/rag/retrieve'
+import { assemblePrompt } from '@/lib/synthesis/assembly'
 import Anthropic from '@anthropic-ai/sdk'
 
 export async function POST(
@@ -37,19 +38,16 @@ export async function POST(
 
   // RAG retrieval — use the transcript as the query
   const chunks = await retrieveRelevantChunks(supabase, transcript, session.portrait_id)
-  const context = chunks
-    .map((c: { source_title?: string; content: string }) =>
-      `[Source: ${c.source_title ?? 'Unknown'}]\n${c.content}`
-    )
-    .join('\n\n---\n\n')
+  const ragChunks = chunks.map((c: { source_title?: string; content: string }) => ({
+    content: c.content,
+    source_title: c.source_title ?? 'Unknown',
+  }))
+
+  // Assemble base prompt via synthesis layer, then append listening-aside instructions
+  const basePrompt = await assemblePrompt(supabase, session.portrait_id, user.id, transcript, ragChunks)
 
   // Listening aside system prompt — distinct from the standard conversation prompt
-  const systemPrompt = `${portrait.system_prompt}
-
----
-REFERENCE MATERIAL (from ${portrait.display_name}'s own words and writings):
-
-${context || 'No directly relevant material found — draw on the persona description.'}
+  const systemPrompt = `${basePrompt}
 
 ---
 You are currently present in a room, listening to a conversation. You are speaking privately to the person who invited you. The conversation has included the following:
