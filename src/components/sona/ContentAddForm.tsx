@@ -8,15 +8,20 @@ const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
 
 const SOURCE_TYPES = [
-  { value: 'transcript', label: 'Transcript' },
-  { value: 'interview',  label: 'Interview' },
-  { value: 'article',    label: 'Article' },
-  { value: 'book',       label: 'Book' },
-  { value: 'essay',      label: 'Essay' },
-  { value: 'speech',     label: 'Speech' },
-  { value: 'letter',     label: 'Letter' },
-  { value: 'other',      label: 'Other' },
+  { value: 'transcript',       label: 'Transcript' },
+  { value: 'interview',        label: 'Interview' },
+  { value: 'interview_audio',  label: 'Interview (audio)' },
+  { value: 'article',          label: 'Article' },
+  { value: 'book',             label: 'Book' },
+  { value: 'essay',            label: 'Essay' },
+  { value: 'speech',           label: 'Speech' },
+  { value: 'letter',           label: 'Letter' },
+  { value: 'other',            label: 'Other' },
 ]
+
+function isAudioFile(file: File) {
+  return file.type.startsWith('audio/') || /\.(mp3|m4a|wav|ogg|flac|aac|webm)$/i.test(file.name)
+}
 
 interface Props {
   portraitId: string
@@ -26,6 +31,7 @@ interface Props {
 
 export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
   const [inputMode, setInputMode] = useState<'paste' | 'upload'>('paste')
+  const [sourceDate, setSourceDate] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -38,22 +44,76 @@ export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
     setError(null)
 
     const form = e.currentTarget
-    const data = new FormData(form)
-    data.set('portrait_id', portraitId)
+    const formData = new FormData(form)
+    formData.set('portrait_id', portraitId)
+    if (sourceDate) formData.set('source_date', sourceDate)
 
     // If paste mode, remove file field
     if (inputMode === 'paste') {
-      data.delete('file')
+      formData.delete('file')
     }
 
     try {
-      const res = await fetch('/api/creator/ingest', { method: 'POST', body: data })
-      const json = await res.json()
-      if (!res.ok) {
-        setError(json.error ?? 'Something went wrong')
-        return
+      const file = inputMode === 'upload' ? fileRef.current?.files?.[0] : undefined
+
+      // Audio file: use presigned URL flow
+      if (file && isAudioFile(file)) {
+        const initData = new FormData()
+        initData.set('portrait_id', portraitId)
+        initData.set('title', formData.get('title') as string)
+        initData.set('source_type', formData.get('source_type') as string)
+        initData.set('min_tier', formData.get('min_tier') as string)
+        initData.set('filename', file.name)
+        initData.set('content_type', file.type || 'audio/mpeg')
+        if (sourceDate) initData.set('source_date', sourceDate)
+
+        const initRes = await fetch('/api/creator/ingest', { method: 'POST', body: initData })
+        const initJson = await initRes.json()
+        if (!initRes.ok) {
+          setError(initJson.error ?? 'Something went wrong')
+          return
+        }
+
+        const { upload_url, source_id } = initJson
+        if (!upload_url || !source_id) {
+          setError('Upload not available for this file type')
+          return
+        }
+
+        // PUT file directly to presigned URL
+        const uploadRes = await fetch(upload_url, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type || 'audio/mpeg' },
+        })
+        if (!uploadRes.ok) {
+          setError('File upload failed. Please try again.')
+          return
+        }
+
+        // Confirm upload
+        const confirmRes = await fetch('/api/creator/ingest/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source_id }),
+        })
+        const confirmJson = await confirmRes.json()
+        if (!confirmRes.ok) {
+          setError(confirmJson.error ?? 'Something went wrong')
+          return
+        }
+      } else {
+        // Non-audio: existing FormData submission
+        const res = await fetch('/api/creator/ingest', { method: 'POST', body: formData })
+        const json = await res.json()
+        if (!res.ok) {
+          setError(json.error ?? 'Something went wrong')
+          return
+        }
       }
+
       form.reset()
+      setSourceDate('')
       router.refresh()
       onSuccess()
     } catch {
@@ -117,6 +177,19 @@ export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
           name="title"
           required
           placeholder="e.g. Interview with The Guardian, 2019"
+          className="sona-input"
+          style={inputStyle}
+        />
+      </div>
+
+      {/* Source date */}
+      <div>
+        <label style={labelStyle}>Date <span style={{ textTransform: 'none', fontWeight: 400, letterSpacing: 0 }}>(optional)</span></label>
+        <input
+          type="date"
+          name="source_date"
+          value={sourceDate}
+          onChange={e => setSourceDate(e.target.value)}
           className="sona-input"
           style={inputStyle}
         />
@@ -205,7 +278,7 @@ export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
               ref={fileRef}
               name="file"
               type="file"
-              accept=".pdf,.docx,.txt,.md"
+              accept=".pdf,.docx,.txt,.md,.mp3,.m4a,.wav,.ogg,.flac,.aac,.webm"
               required
               style={{ display: 'none' }}
               onChange={e => {
@@ -217,7 +290,7 @@ export function ContentAddForm({ portraitId, portraitName, onSuccess }: Props) {
               Choose a file
             </p>
             <p style={{ fontFamily: GEIST, fontSize: '0.75rem', fontWeight: 300, color: '#c0c0c0', margin: 0 }}>
-              PDF, DOCX, or TXT — up to 10 MB
+              PDF, DOCX, TXT, or audio (MP3, M4A, WAV) — up to 10 MB
             </p>
           </div>
         )}

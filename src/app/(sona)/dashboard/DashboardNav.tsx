@@ -8,11 +8,12 @@ import { SignOutButton } from '@/components/sona/SignOutButton'
 const GEIST = 'var(--font-geist-sans)'
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Overview', exact: true },
+  { href: '/dashboard',           label: 'Overview',  exact: true },
   { href: '/dashboard/content',   label: 'Content',   exact: false },
+  { href: '/dashboard/mind',      label: 'Mind',      exact: false },
   { href: '/dashboard/pricing',   label: 'Pricing',   exact: false },
   { href: '/dashboard/interview', label: 'Interview', exact: false },
-  { href: '/dashboard/settings', label: 'Settings', exact: false },
+  { href: '/dashboard/settings',  label: 'Settings',  exact: false },
 ]
 
 export function DashboardNav() {
@@ -68,19 +69,11 @@ export function DashboardNav() {
                   padding: '6px 12px',
                   borderRadius: '6px',
                   backgroundColor: active ? 'rgba(0,0,0,0.05)' : 'transparent',
+                  borderBottom: active ? '2px solid #DE3E7B' : '2px solid transparent',
                   transition: 'background-color 0.15s',
                 }}
               >
                 {item.label}
-                {active && (
-                  <span style={{
-                    display: 'block',
-                    height: 2,
-                    backgroundColor: '#DE3E7B',
-                    borderRadius: 1,
-                    marginTop: 2,
-                  }} />
-                )}
               </Link>
             )
           })}
