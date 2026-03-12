@@ -161,6 +161,10 @@ export async function POST(request: NextRequest) {
         .update({ status: 'ready' })
         .eq('id', source.id)
 
+      // Trigger evidence extraction for non-audio sources
+      const { extractEvidenceForSource } = await import('@/lib/synthesis/evidence-extract')
+      await extractEvidenceForSource(source.id, portrait_id, source_type)
+
       await admin.from('audit_log').insert({
         user_id: user.id,
         action: 'ingest',
