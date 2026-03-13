@@ -25,6 +25,9 @@ export async function togglePortraitPublished(portraitId: string, isPublic: bool
     .from('portraits')
     .update({ is_public: isPublic })
     .eq('id', portraitId)
-  if (error) throw new Error('Failed to update portrait')
+  if (error) {
+    console.error('togglePortraitPublished error:', { portraitId, isPublic, error })
+    throw new Error('Failed to update portrait')
+  }
   revalidatePath('/admin')
 }
