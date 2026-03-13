@@ -28,7 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <nav className="w-16 md:w-48 border-r border-brass/20 bg-parchment p-2 md:p-4 space-y-0.5 flex-shrink-0 overflow-y-auto">
         <Link href="/admin" className="hidden md:flex items-center mb-4 px-3 py-2">
           <Image
-            src="/brand_assets/nh/logo-dark.svg"
+            src="/brand_assets/nh/logo.svg"
             alt="Neural Heirloom"
             width={120}
             height={28}

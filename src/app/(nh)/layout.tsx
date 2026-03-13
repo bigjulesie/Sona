@@ -24,7 +24,7 @@ export default async function AuthenticatedLayout({
     <div className="h-screen bg-parchment flex flex-col overflow-hidden">
       <header className="border-b border-brass/20 bg-parchment px-4 md:px-6 py-3 flex items-center justify-between sticky top-0 z-10 flex-shrink-0">
         <Image
-          src="/brand_assets/nh/logo-dark.svg"
+          src="/brand_assets/nh/logo.svg"
           alt="Neural Heirloom"
           width={120}
           height={36}
