@@ -29,5 +29,5 @@ export async function togglePortraitPublished(portraitId: string, isPublic: bool
     console.error('togglePortraitPublished error:', { portraitId, isPublic, error })
     throw new Error('Failed to update portrait')
   }
-  revalidatePath('/admin')
+  revalidatePath('/sona-admin')
 }
