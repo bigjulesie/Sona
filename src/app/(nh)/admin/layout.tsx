@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createServerSupabaseClient()
@@ -25,6 +26,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex flex-1 min-h-0 overflow-hidden">
       <nav className="w-16 md:w-48 border-r border-brass/20 bg-parchment p-2 md:p-4 space-y-0.5 flex-shrink-0 overflow-y-auto">
+        <Link href="/admin" className="hidden md:flex items-center mb-4 px-3 py-2">
+          <Image
+            src="/brand_assets/nh/logo-dark.svg"
+            alt="Neural Heirloom"
+            width={120}
+            height={28}
+            priority
+          />
+        </Link>
         <Link href="/admin" className={navLink}>
           <span className="hidden md:inline">Overview</span>
           <span className="md:hidden text-center block" title="Overview">⊞</span>
