@@ -23,6 +23,7 @@ export default async function SonaAdminPage() {
     // replace `content_sources ( count )` and `subscriptions ( count )` with separate
     // queries: admin.from('content_sources').select('portrait_id').then(...)
     // and build lookup maps by portrait_id.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (admin as any)
       .from('portraits')
       .select(`
@@ -41,14 +42,16 @@ export default async function SonaAdminPage() {
     admin.from('interview_requests').select('portrait_id'),
   ])
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  type AnyRow = any
   // Count distinct creators from the portraits result (no separate query needed)
-  const uniqueCreators = new Set((portraits ?? []).map((p: any) => p.creator_id)).size
+  const uniqueCreators = new Set((portraits ?? []).map((p: AnyRow) => p.creator_id)).size
 
   // Build a Set of portrait IDs that have an interview request
-  const interviewPortraitIds = new Set((interviewRows ?? []).map((r: any) => r.portrait_id))
+  const interviewPortraitIds = new Set((interviewRows ?? []).map((r: AnyRow) => r.portrait_id))
 
   // Shape portrait rows for PortraitsTable
-  const rows = (portraits ?? []).map((p: any) => ({
+  const rows = (portraits ?? []).map((p: AnyRow) => ({
     id: p.id,
     display_name: p.display_name,
     creator_email: p.profiles?.email ?? '—',
