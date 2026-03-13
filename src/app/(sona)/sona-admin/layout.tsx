@@ -39,7 +39,7 @@ export default async function SonaAdminLayout({ children }: { children: React.Re
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <Link href="/admin" style={{ display: 'flex', alignItems: 'center' }}>
+          <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center' }}>
             <Image
               src="/brand_assets/sona/Sona brand on white bg 1.svg"
               alt="Sona"
