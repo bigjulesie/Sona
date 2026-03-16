@@ -423,7 +423,7 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
                 textDecoration: 'none',
               }}
             >
-              Add content
+              Add context
             </a>
             <a
               href={`/dashboard/create?step=4&portrait_id=${encodeURIComponent(verifiedPortraitId)}`}
