@@ -42,18 +42,19 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
       .eq('creator_id', user.id)
       .maybeSingle()
     verifiedPortraitId = ownedPortrait?.id
-  } else {
-    verifiedPortraitId = portrait_id
   }
+  // step === '1' doesn't use verifiedPortraitId, so leave it undefined
 
-  let webResearchStatus: string | null = null
+  type WebResearchStatus = 'never' | 'running' | 'complete' | 'error'
+  let webResearchStatus: WebResearchStatus | null = null
   if (verifiedPortraitId && ['3', '4', '5'].includes(step)) {
     const { data: portrait } = await supabase
       .from('portraits')
       .select('web_research_status')
       .eq('id', verifiedPortraitId)
       .maybeSingle()
-    webResearchStatus = (portrait as any)?.web_research_status ?? null
+    // any cast needed: web_research_status column not yet in generated Supabase types
+    webResearchStatus = ((portrait as any)?.web_research_status as WebResearchStatus) ?? null
   }
 
   const currentStep = parseInt(step)
@@ -482,7 +483,7 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a
-              href={`/dashboard/content?portrait_id=${verifiedPortraitId}`}
+              href={`/dashboard/content?portrait_id=${encodeURIComponent(verifiedPortraitId)}`}
               className="sona-btn-outline"
               style={{
                 fontFamily: GEIST,
