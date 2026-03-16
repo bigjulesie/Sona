@@ -13,6 +13,7 @@ const SOURCE_TYPE_WEIGHTS: Record<string, number> = {
   letter: 1.0,
   social_media: 0.8,
   other: 0.9,
+  web_research: 1.0,
 }
 
 export const EVIDENCE_TYPE_WEIGHTS: Record<string, number> = {
