@@ -206,6 +206,7 @@ export function ContentLibrary({ sources, portraitId, portraitName }: Props) {
                 <button
                   className="sona-row-delete"
                   onClick={() => setConfirmDeleteId(source.id)}
+                  disabled={!!deletingId}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -239,10 +240,13 @@ export function ContentLibrary({ sources, portraitId, portraitName }: Props) {
                   <button
                     onClick={async () => {
                       setDeletingId(source.id)
-                      setConfirmDeleteId(null)
-                      await deleteContentSource(source.id)
-                      setDeletingId(null)
-                      router.refresh()
+                      try {
+                        await deleteContentSource(source.id)
+                        setConfirmDeleteId(null)
+                        router.refresh()
+                      } finally {
+                        setDeletingId(null)
+                      }
                     }}
                     disabled={deletingId === source.id}
                     style={{
