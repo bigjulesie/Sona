@@ -1,6 +1,6 @@
 // src/lib/research/fetch-url.ts
-import { JSDOM } from 'jsdom'
-import { Readability } from '@mozilla/readability'
+// jsdom and @mozilla/readability are heavy Node.js-only packages — dynamic imports
+// prevent Vercel/Turbopack from attempting to bundle them at build time.
 
 export interface FetchedArticle {
   text: string
@@ -16,6 +16,8 @@ export async function extractArticleText(
   url: string,
 ): Promise<FetchedArticle> {
   try {
+    const { JSDOM } = await import('jsdom')
+    const { Readability } = await import('@mozilla/readability')
     const dom = new JSDOM(html, { url })
     const reader = new Readability(dom.window.document)
     const article = reader.parse()
