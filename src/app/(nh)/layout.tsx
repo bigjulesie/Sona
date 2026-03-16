@@ -7,7 +7,7 @@ import Image from 'next/image'
 export const metadata: Metadata = {
   title: { default: 'Neural Heirloom', template: '%s | Neural Heirloom' },
   description: 'A private archive of memory and voice',
-  icons: { icon: '/brand_assets/favicon.svg' },
+  icons: { icon: '/brand_assets/nh/favicon.svg', other: [{ rel: 'icon', url: '/brand_assets/nh/favicon.svg', type: 'image/svg+xml' }] },
 }
 
 export default async function AuthenticatedLayout({

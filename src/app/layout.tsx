@@ -20,6 +20,7 @@ const lora = Lora({
 export const metadata: Metadata = {
   title: { default: 'Sona', template: '%s | Sona' },
   description: 'Meet the people who shaped your world',
+  icons: { icon: '/favicon.ico', other: [{ rel: 'icon', url: '/icon.svg', type: 'image/svg+xml' }] },
   openGraph: {
     title: 'Sona',
     description: 'Meet the people who shaped your world',
