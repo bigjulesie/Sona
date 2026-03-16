@@ -36,12 +36,10 @@ export async function POST(request: NextRequest) {
 
   let stripe_price_id: string | null = null
 
-  const stripe = getStripe()
-
   // Archive the old price whenever one exists — covers both reprice and going free
   if (portrait.stripe_price_id) {
     try {
-      await stripe.prices.update(portrait.stripe_price_id, { active: false })
+      await getStripe().prices.update(portrait.stripe_price_id, { active: false })
     } catch {
       // Best-effort: old price archival failure is non-blocking
     }
