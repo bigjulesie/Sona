@@ -32,10 +32,13 @@ export default async function SonaAdminPage() {
         display_name,
         is_public,
         synthesis_status,
+        web_research_status,
+        last_synthesised_at,
         created_at,
         profiles!portraits_creator_id_fkey ( email ),
         content_sources ( count ),
-        subscriptions ( count )
+        subscriptions ( count ),
+        sona_evidence ( count )
       `)
       .order('created_at', { ascending: false }),
     // Portrait IDs that have interview requests
@@ -57,8 +60,11 @@ export default async function SonaAdminPage() {
     creator_email: p.profiles?.email ?? '—',
     is_public: p.is_public ?? false,
     synthesis_status: p.synthesis_status ?? null,
+    web_research_status: p.web_research_status ?? 'never',
+    last_synthesised_at: p.last_synthesised_at ?? null,
     created_at: p.created_at,
     content_count: p.content_sources?.[0]?.count ?? 0,
+    evidence_count: p.sona_evidence?.[0]?.count ?? 0,
     subscriber_count: p.subscriptions?.[0]?.count ?? 0,
     has_interview: interviewPortraitIds.has(p.id),
   }))

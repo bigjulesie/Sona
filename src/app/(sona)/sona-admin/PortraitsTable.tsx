@@ -12,8 +12,11 @@ interface PortraitData {
   creator_email: string
   is_public: boolean
   synthesis_status: string | null
+  web_research_status: string
+  last_synthesised_at: string | null
   created_at: string
   content_count: number
+  evidence_count: number
   subscriber_count: number
   has_interview: boolean
 }
@@ -23,14 +26,18 @@ interface Props {
 }
 
 function StatusBadge({ status }: { status: string | null }) {
-  const label = status ?? 'none'
+  const label = status ?? 'never'
   const colors: Record<string, { bg: string; color: string }> = {
-    ready:      { bg: 'rgba(42,124,79,0.08)',  color: '#2a7c4f' },
-    processing: { bg: 'rgba(180,120,20,0.08)', color: '#b08850' },
-    error:      { bg: 'rgba(222,62,123,0.08)', color: '#DE3E7B' },
-    none:       { bg: 'rgba(0,0,0,0.05)',       color: '#9b9b9b' },
+    ready:       { bg: 'rgba(42,124,79,0.08)',   color: '#2a7c4f' },
+    complete:    { bg: 'rgba(42,124,79,0.08)',   color: '#2a7c4f' },
+    processing:  { bg: 'rgba(180,120,20,0.08)',  color: '#b08850' },
+    synthesising:{ bg: 'rgba(180,120,20,0.08)',  color: '#b08850' },
+    running:     { bg: 'rgba(100,100,220,0.08)', color: '#5555cc' },
+    pending:     { bg: 'rgba(180,120,20,0.08)',  color: '#b08850' },
+    error:       { bg: 'rgba(222,62,123,0.08)',  color: '#DE3E7B' },
+    never:       { bg: 'rgba(0,0,0,0.04)',        color: '#c0c0c0' },
   }
-  const c = colors[label] ?? colors.none
+  const c = colors[label] ?? colors.never
   return (
     <span style={{
       fontFamily: GEIST,
@@ -96,13 +103,30 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
       </td>
 
       {/* Content */}
-      <td style={{ padding: '14px 16px', fontFamily: GEIST, fontSize: '0.8125rem', color: '#6b6b6b' }}>
-        {portrait.content_count}
+      <td style={{ padding: '14px 16px' }}>
+        <span style={{ fontFamily: GEIST, fontSize: '0.8125rem', color: '#6b6b6b' }}>
+          {portrait.content_count} source{portrait.content_count !== 1 ? 's' : ''}
+        </span>
+        {portrait.web_research_status !== 'never' && (
+          <div style={{ marginTop: 4 }}>
+            <StatusBadge status={portrait.web_research_status} />
+          </div>
+        )}
       </td>
 
       {/* Synthesis */}
       <td style={{ padding: '14px 16px' }}>
         <StatusBadge status={portrait.synthesis_status} />
+        {portrait.evidence_count > 0 && (
+          <div style={{ marginTop: 4, fontFamily: GEIST, fontSize: '0.6875rem', color: '#b0b0b0' }}>
+            {portrait.evidence_count} evidence
+          </div>
+        )}
+        {portrait.last_synthesised_at && (
+          <div style={{ marginTop: 2, fontFamily: GEIST, fontSize: '0.6875rem', color: '#c0c0c0' }}>
+            {formatDate(portrait.last_synthesised_at)}
+          </div>
+        )}
       </td>
 
       {/* Subscribers */}
@@ -176,7 +200,7 @@ export function PortraitsTable({ portraits }: Props) {
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            {['Portrait', 'Interview', 'Content', 'Synthesis', 'Subscribers', 'Joined', 'Status'].map(h => (
+            {['Portrait', 'Interview', 'Context', 'Synthesis', 'Subscribers', 'Joined', 'Status'].map(h => (
               <th key={h} style={thStyle}>{h}</th>
             ))}
           </tr>
