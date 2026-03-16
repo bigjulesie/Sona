@@ -332,7 +332,9 @@ export type Database = {
           display_name: string
           id: string
           is_public: boolean
+          linkedin_url: string | null
           monthly_price_cents: number | null
+          search_context: string | null
           slug: string
           stripe_price_id: string | null
           system_prompt: string
@@ -341,6 +343,8 @@ export type Database = {
           updated_at: string | null
           voice_enabled: boolean
           voice_provider_id: string | null
+          web_research_status: string | null
+          website_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -352,7 +356,9 @@ export type Database = {
           display_name: string
           id?: string
           is_public?: boolean
+          linkedin_url?: string | null
           monthly_price_cents?: number | null
+          search_context?: string | null
           slug: string
           stripe_price_id?: string | null
           system_prompt: string
@@ -361,6 +367,8 @@ export type Database = {
           updated_at?: string | null
           voice_enabled?: boolean
           voice_provider_id?: string | null
+          web_research_status?: string | null
+          website_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -372,7 +380,9 @@ export type Database = {
           display_name?: string
           id?: string
           is_public?: boolean
+          linkedin_url?: string | null
           monthly_price_cents?: number | null
+          search_context?: string | null
           slug?: string
           stripe_price_id?: string | null
           system_prompt?: string
@@ -381,6 +391,8 @@ export type Database = {
           updated_at?: string | null
           voice_enabled?: boolean
           voice_provider_id?: string | null
+          web_research_status?: string | null
+          website_url?: string | null
         }
         Relationships: [
           {

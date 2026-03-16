@@ -13,6 +13,7 @@ const SOURCE_TYPE_WEIGHTS: Record<string, number> = {
   letter: 1.0,
   social_media: 0.8,
   other: 0.9,
+  web_research: 1.0,
 }
 
 export const EVIDENCE_TYPE_WEIGHTS: Record<string, number> = {
@@ -43,6 +44,7 @@ export async function createJob(
   sourceId?: string,
 ): Promise<string> {
   const admin = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (admin as any)
     .from('sona_synthesis_jobs')
     .insert({
@@ -65,6 +67,7 @@ export async function updateJob(
   errorMsg?: string,
 ) {
   const admin = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (admin as any)
     .from('sona_synthesis_jobs')
     .update({
@@ -84,6 +87,7 @@ export async function countRecentExtractions(
   sinceLastSynthesis: Date | null,
 ): Promise<number> {
   const admin = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query = (admin as any)
     .from('sona_synthesis_jobs')
     .select('id', { count: 'exact', head: true })

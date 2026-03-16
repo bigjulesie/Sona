@@ -48,7 +48,9 @@ On "Continue" (whether or not any fields are filled), the server action saves th
 
 The web research job is **not** run inside `after()`. The full job — 9 parallel searches, up to ~44 URL fetches, Haiku filtering, chunking, embedding, and evidence extraction — can take several minutes and will exceed Next.js function timeouts on Vercel.
 
-Instead, `saveVerifyStep` calls a dedicated internal API route **`POST /api/research/start`** as a fire-and-forget fetch (no `await`). That route returns `202` immediately and runs the pipeline using `after()` for each individual URL's evidence extraction — matching the existing per-source ingest pattern. This keeps each `after()` call to a single document, within timeout bounds.
+Instead, `saveVerifyStep` calls a dedicated internal API route **`POST /api/research/start`** as a fire-and-forget fetch (no `await`). That route returns `202` immediately and runs the entire pipeline — search, filter, ingest, chunking, embedding, and evidence extraction — inside a **single top-level `after()` call**. Evidence extraction for each source runs sequentially within that callback.
+
+> Next.js does not support nested `after()` calls, so the "per-URL after()" pattern used in `/api/creator/ingest` cannot be applied here. The single `after()` approach works because the route is called fire-and-forget — the creator has already advanced to Step 3 before the pipeline starts, so there is no user-facing latency impact.
 
 ```
 saveVerifyStep (server action)
@@ -57,7 +59,8 @@ saveVerifyStep (server action)
   → redirects creator to Step 3
 
 POST /api/research/start
-  → runs search → filter → per-URL ingest (each extraction via after())
+  → returns 202 immediately
+  → after(): search → filter → ingest → chunk/embed → evidence extraction (sequential per source)
   → sets web_research_status = 'complete' | 'error' when done
 ```
 
@@ -104,7 +107,7 @@ export type SynthesisJobType =
   | 'web_research'
 ```
 
-`src/lib/synthesis/jobs.ts` — `SOURCE_TYPE_WEIGHTS` must include `'web_research'` with weight `1.0` (web-researched sources are treated as equivalent to articles; the per-URL source_type carries the actual weight):
+`src/lib/synthesis/jobs.ts` — `SOURCE_TYPE_WEIGHTS` must include `'web_research'` with weight `1.0` (web-researched sources are treated as equivalent to articles):
 
 ```ts
 web_research: 1.0,
@@ -144,18 +147,18 @@ src/lib/research/
 
 ### Search strategies (run in parallel via `Promise.all`)
 
-| Query pattern | Mapped `source_type` | Max results |
-|---|---|---|
-| `"[name]" [context]` (general) | `other` | 5 |
-| `"[name]" [context] interview` | `interview` | 5 |
-| `"[name]" [context] article OR essay` | `article` | 5 |
-| `"[name]" [context] talk OR keynote OR speech` | `speech` | 5 |
-| `"[name]" [context] podcast` | `interview` | 5 |
-| `"[name]" [context] book` | `book` | 5 |
-| `"[name]" wikipedia` | `article` | 3 |
-| `"[name]" [context] scholar OR research OR paper` | `article` | 5 |
-| Personal website URL (direct fetch, no search) | `article` | 1 |
-| LinkedIn URL (direct fetch if provided) | `article` | 1 |
+| Query pattern | Max results |
+|---|---|
+| `"[name]" [context]` (general) | 5 |
+| `"[name]" [context] interview` | 5 |
+| `"[name]" [context] article OR essay` | 5 |
+| `"[name]" [context] talk OR keynote OR speech` | 5 |
+| `"[name]" [context] podcast` | 5 |
+| `"[name]" [context] book` | 5 |
+| `"[name]" wikipedia` | 3 |
+| `"[name]" [context] scholar OR research OR paper` | 5 |
+| Personal website URL (direct fetch, no search) | 1 |
+| LinkedIn URL (direct fetch if provided) | 1 |
 
 `[name]` = `portraits.display_name`. `[context]` = `portraits.search_context` (omitted if empty). Up to ~44 candidate URLs before deduplication.
 
@@ -182,12 +185,14 @@ Both must pass. Failures are logged in the job `metadata` but not surfaced to th
 ### Ingestion
 
 Each URL that passes the filter is inserted as a `content_sources` row:
-- `source_type` = strategy-mapped type (interview, article, speech etc.)
+- `source_type` = `'web_research'` (all web-researched sources use this type uniformly — it is the storage-layer marker that drives the "Web" badge in the content library and maps to `SOURCE_TYPE_WEIGHTS['web_research'] = 1.0`)
 - `title` = article title from Tavily or extracted from HTML
 - `min_tier` = `'public'` (default — creator can change later)
 - `status` = `'processing'`
+- `raw_content` = article text (stored temporarily for evidence extraction)
+- `source_url` = origin URL
 
-Evidence extraction is triggered per-source via `after()` inside `/api/research/start`, matching the existing per-upload pattern in `/api/creator/ingest`. The auto-synthesis trigger (fires when ≥3 extractions complete since last synthesis) runs identically.
+Evidence extraction runs sequentially per source within the single `after()` callback in `/api/research/start`. The auto-synthesis trigger (fires when ≥3 extractions complete since last synthesis) runs identically.
 
 Job metadata records: queries run, total URLs found, URLs passing filter, URLs successfully ingested.
 

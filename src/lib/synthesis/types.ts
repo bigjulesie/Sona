@@ -58,6 +58,7 @@ export type SynthesisJobType =
   | 'evidence_extraction'
   | 'dimension_synthesis'
   | 'module_generation'
+  | 'web_research'
 
 export type SynthesisJobStatus = 'pending' | 'running' | 'complete' | 'error'
 

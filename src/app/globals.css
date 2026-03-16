@@ -87,6 +87,15 @@ body {
   background-color: rgba(0,0,0,0.03);
 }
 
+/* Delete button hidden until row is hovered */
+.sona-row-hover .sona-row-delete {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.sona-row-hover:hover .sona-row-delete {
+  opacity: 1 !important;
+}
+
 /* Portrait cards */
 .sona-card {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;

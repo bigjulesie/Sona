@@ -13,8 +13,8 @@ describe('getBrand', () => {
     expect(await getBrand()).toBe('nh')
   })
 
-  it('returns sona when x-brand is sona', async () => {
-    vi.mocked(headers).mockResolvedValue({ get: (k: string) => k === 'x-brand' ? 'sona' : null } as any)
+  it('returns sona when host is entersona.com', async () => {
+    vi.mocked(headers).mockResolvedValue({ get: (k: string) => k === 'host' ? 'entersona.com' : null } as any)
     expect(await getBrand()).toBe('sona')
   })
 

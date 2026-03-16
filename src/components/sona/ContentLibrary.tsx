@@ -2,8 +2,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { TIER_LABELS } from '@/lib/tiers'
 import { ContentAddForm } from './ContentAddForm'
+import { deleteContentSource } from '@/app/(sona)/dashboard/content/actions'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
@@ -49,7 +51,10 @@ interface Props {
 }
 
 export function ContentLibrary({ sources, portraitId, portraitName }: Props) {
+  const router = useRouter()
   const [showForm, setShowForm] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   function formatDate(iso: string) {
     const d = new Date(iso)
@@ -133,49 +138,147 @@ export function ContentLibrary({ sources, portraitId, portraitName }: Props) {
           {sources.map(source => (
             <div
               key={source.id}
+              className="sona-row-hover"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
                 padding: '14px 16px',
                 borderRadius: 12,
                 border: '1px solid rgba(0,0,0,0.06)',
                 backgroundColor: '#fff',
               }}
             >
-              {/* Title + type */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{
+              {/* Main row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {/* Title + type */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{
+                    fontFamily: GEIST,
+                    fontSize: '0.875rem',
+                    fontWeight: 400,
+                    color: '#1a1a1a',
+                    margin: '0 0 2px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {source.title}
+                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <p style={{ fontFamily: GEIST, fontSize: '0.75rem', fontWeight: 300, color: '#b0b0b0', margin: 0 }}>
+                      {source.source_type === 'web_research'
+                        ? 'Web research'
+                        : (TYPE_LABELS[source.source_type] ?? source.source_type)
+                      } · {formatDate(source.created_at)}
+                    </p>
+                    {source.source_type === 'web_research' && (
+                      <span style={{
+                        fontFamily: GEIST,
+                        fontSize: '0.6875rem',
+                        fontWeight: 500,
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        color: '#6b6b6b',
+                        background: 'rgba(0,0,0,0.05)',
+                        borderRadius: 4,
+                        padding: '2px 6px',
+                      }}>
+                        Web
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Tier badge */}
+                <span style={{
                   fontFamily: GEIST,
-                  fontSize: '0.875rem',
-                  fontWeight: 400,
-                  color: '#1a1a1a',
-                  margin: '0 0 2px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  fontSize: '0.6875rem',
+                  fontWeight: 500,
+                  letterSpacing: '0.04em',
+                  padding: '3px 10px',
+                  borderRadius: '980px',
+                  backgroundColor: TIER_COLORS[source.min_tier] ?? 'rgba(0,0,0,0.06)',
+                  color: TIER_TEXT_COLORS[source.min_tier] ?? '#9b9b9b',
+                  flexShrink: 0,
                 }}>
-                  {source.title}
-                </p>
-                <p style={{ fontFamily: GEIST, fontSize: '0.75rem', fontWeight: 300, color: '#b0b0b0', margin: 0 }}>
-                  {TYPE_LABELS[source.source_type] ?? source.source_type} · {formatDate(source.created_at)}
-                </p>
+                  {TIER_LABELS[source.min_tier as keyof typeof TIER_LABELS] ?? source.min_tier}
+                </span>
+
+                {/* Delete button — visible on row hover via CSS */}
+                <button
+                  className="sona-row-delete"
+                  onClick={() => setConfirmDeleteId(source.id)}
+                  disabled={!!deletingId}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#b0b0b0',
+                    fontFamily: GEIST,
+                    fontSize: '1rem',
+                    lineHeight: 1,
+                    padding: '0 4px',
+                    flexShrink: 0,
+                  }}
+                  title="Remove source"
+                  aria-label="Remove source"
+                >
+                  ×
+                </button>
               </div>
 
-              {/* Tier badge */}
-              <span style={{
-                fontFamily: GEIST,
-                fontSize: '0.6875rem',
-                fontWeight: 500,
-                letterSpacing: '0.04em',
-                padding: '3px 10px',
-                borderRadius: '980px',
-                backgroundColor: TIER_COLORS[source.min_tier] ?? 'rgba(0,0,0,0.06)',
-                color: TIER_TEXT_COLORS[source.min_tier] ?? '#9b9b9b',
-                flexShrink: 0,
-              }}>
-                {TIER_LABELS[source.min_tier as keyof typeof TIER_LABELS] ?? source.min_tier}
-              </span>
+              {/* Inline confirmation */}
+              {confirmDeleteId === source.id && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  paddingTop: 8,
+                  fontFamily: GEIST,
+                  fontSize: '0.8125rem',
+                  color: '#6b6b6b',
+                }}>
+                  <span>Remove this source? This cannot be undone.</span>
+                  <button
+                    onClick={async () => {
+                      setDeletingId(source.id)
+                      try {
+                        await deleteContentSource(source.id)
+                        setConfirmDeleteId(null)
+                        router.refresh()
+                      } finally {
+                        setDeletingId(null)
+                      }
+                    }}
+                    disabled={deletingId === source.id}
+                    style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.8125rem',
+                      fontWeight: 500,
+                      color: '#DE3E7B',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {deletingId === source.id ? 'Removing…' : 'Remove'}
+                  </button>
+                  <button
+                    onClick={() => setConfirmDeleteId(null)}
+                    style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.8125rem',
+                      fontWeight: 300,
+                      color: '#b0b0b0',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
