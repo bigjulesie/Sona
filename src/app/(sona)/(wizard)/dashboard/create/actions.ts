@@ -66,3 +66,72 @@ export async function createSonaIdentity(formData: FormData) {
 
   redirect(`/dashboard/create?step=2&portrait_id=${portrait.id}`)
 }
+
+export async function saveVerifyStep(
+  _prevState: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const portrait_id = formData.get('portrait_id') as string
+  const linkedin_url = (formData.get('linkedin_url') as string | null)?.trim() ?? ''
+  const search_context_raw = (formData.get('search_context') as string | null)?.trim() ?? ''
+  const website_url = (formData.get('website_url') as string | null)?.trim() ?? ''
+
+  // Field validation
+  if (linkedin_url && !linkedin_url.includes('linkedin.com/in/')) {
+    return { error: 'LinkedIn URL must include linkedin.com/in/' }
+  }
+
+  if (website_url) {
+    try {
+      new URL(website_url)
+    } catch {
+      return { error: 'Website URL is not valid' }
+    }
+  }
+
+  // Trim search context to 200 chars without erroring
+  const search_context = search_context_raw.slice(0, 200)
+
+  // Verify portrait belongs to current user
+  const { data: portrait } = await createAdminClient()
+    .from('portraits')
+    .select('id')
+    .eq('id', portrait_id)
+    .eq('creator_id', user.id)
+    .maybeSingle()
+
+  if (!portrait) {
+    return { error: 'Portrait not found.' }
+  }
+
+  // Update portrait with verify fields and mark research as running
+  await createAdminClient()
+    .from('portraits')
+    .update({
+      linkedin_url: linkedin_url || null,
+      search_context: search_context || null,
+      website_url: website_url || null,
+      web_research_status: 'running',
+    })
+    .eq('id', portrait_id)
+
+  // Fire-and-forget: kick off web research
+  try {
+    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/research/start`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.INTERNAL_API_SECRET ?? '',
+      },
+      body: JSON.stringify({ portrait_id }),
+    }).catch(err => console.error('[research/start] fire-and-forget error:', err))
+  } catch (err) {
+    console.error('[research/start] fetch setup error:', err)
+  }
+
+  redirect(`/dashboard/create?step=3&portrait_id=${portrait_id}`)
+}
