@@ -40,13 +40,14 @@ export async function POST(request: NextRequest) {
     try {
       await updateJob(jobId, 'running')
 
-      // Get public URL for Deepgram to fetch
-      const { data: { publicUrl } } = admin.storage
+      // Generate a signed URL — sona-content bucket is private so getPublicUrl returns a broken URL
+      const { data: signedData, error: signedError } = await admin.storage
         .from('sona-content')
-        .getPublicUrl(source.storage_path)
+        .createSignedUrl(source.storage_path, 600) // 10-minute TTL, enough for Deepgram to fetch
+      if (signedError || !signedData?.signedUrl) throw new Error('Failed to create signed URL for audio')
 
       // Transcribe
-      const rawResult = await transcribeAudio(publicUrl)
+      const rawResult = await transcribeAudio(signedData.signedUrl)
       const parsed = parseDeepgramResponse(rawResult)
 
       // Store transcript
