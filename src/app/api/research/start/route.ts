@@ -5,6 +5,11 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { runWebResearch } from '@/lib/research/web-research'
 
 export async function POST(request: NextRequest) {
+  const secret = request.headers.get('x-internal-secret')
+  if (!secret || secret !== process.env.INTERNAL_API_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   let portrait_id: string
   try {
     const body = await request.json() as { portrait_id?: string }
@@ -57,7 +62,8 @@ export async function POST(request: NextRequest) {
             chunk_index: i,
           }))
 
-          await admin.from('knowledge_chunks').insert(rows)
+          const { error: chunkError } = await admin.from('knowledge_chunks').insert(rows)
+          if (chunkError) throw chunkError
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (admin as any)
