@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
 
   if (monthly_price_cents) {
     try {
+      const stripe = getStripe()
       // Idempotency keys prevent duplicate products/prices on double-submit
       // Timestamp suffix avoids 24h collision window when repricing to the same amount
       const idemProduct = `product_${portrait_id}_${monthly_price_cents}_${Date.now()}`
