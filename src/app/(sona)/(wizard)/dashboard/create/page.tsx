@@ -53,7 +53,7 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
       .select('web_research_status')
       .eq('id', verifiedPortraitId)
       .maybeSingle()
-    // any cast needed: web_research_status column not yet in generated Supabase types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- web_research_status column not yet in generated Supabase types
     webResearchStatus = ((portrait as any)?.web_research_status as WebResearchStatus) ?? null
   }
 
@@ -449,7 +449,7 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
             margin: '0 0 40px',
             lineHeight: 1.6,
           }}>
-            We'll conduct a WhatsApp conversation to capture your voice, beliefs, and values.
+            We&apos;ll conduct a WhatsApp conversation to capture your voice, beliefs, and values.
           </p>
           <InterviewStep portraitId={verifiedPortraitId} />
         </>

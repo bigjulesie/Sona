@@ -8,9 +8,9 @@ export async function deleteContentSource(sourceId: string): Promise<{ error?: s
   if (!user) return { error: 'Unauthorized' }
 
   // Verify source exists and belongs to this user (via portrait.creator_id)
-  // TODO: remove as any once supabase gen types is run after migration 00019 is applied
+  // TODO: remove type casts once supabase gen types is regenerated after migration 00019
   const { data: source } = await supabase
-    .from('content_sources' as any)
+    .from('content_sources' as unknown as 'portraits')
     .select('id, portrait_id')
     .eq('id', sourceId)
     .maybeSingle() as { data: { id: string; portrait_id: string } | null }
@@ -27,9 +27,8 @@ export async function deleteContentSource(sourceId: string): Promise<{ error?: s
   if (!portrait) return { error: 'Not found' }
 
   // Delete the source row (CASCADE removes knowledge_chunks and sona_evidence)
-  // TODO: remove as any once supabase gen types is run after migration 00019 is applied
   const { error: deleteError } = await supabase
-    .from('content_sources' as any)
+    .from('content_sources' as unknown as 'portraits')
     .delete()
     .eq('id', sourceId)
 
@@ -38,6 +37,7 @@ export async function deleteContentSource(sourceId: string): Promise<{ error?: s
   // Reset synthesis status so the portrait re-synthesises without this source
   const { error: resetError } = await supabase
     .from('portraits')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .update({ synthesis_status: 'pending' } as any)
     .eq('id', source.portrait_id)
   if (resetError) {
