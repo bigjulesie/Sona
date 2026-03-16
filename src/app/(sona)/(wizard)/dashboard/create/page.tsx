@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createSonaIdentity } from './actions'
 import { InterviewStep } from './InterviewStep'
 import { PricingStep } from './PricingStep'
+import { VerifyStep } from './VerifyStep'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
@@ -12,7 +13,7 @@ const CATEGORIES = [
   'Sport', 'Politics', 'Education', 'Health', 'Other',
 ]
 
-const STEPS = ['Identity', 'Interview', 'Content', 'Pricing']
+const STEPS = ['Identity', 'Verify', 'Interview', 'Content', 'Pricing']
 
 interface PageProps {
   searchParams: Promise<{ step?: string; portrait_id?: string }>
@@ -43,6 +44,16 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
     verifiedPortraitId = ownedPortrait?.id
   } else {
     verifiedPortraitId = portrait_id
+  }
+
+  let webResearchStatus: string | null = null
+  if (verifiedPortraitId && ['3', '4', '5'].includes(step)) {
+    const { data: portrait } = await supabase
+      .from('portraits')
+      .select('web_research_status')
+      .eq('id', verifiedPortraitId)
+      .maybeSingle()
+    webResearchStatus = (portrait as any)?.web_research_status ?? null
   }
 
   const currentStep = parseInt(step)
@@ -116,6 +127,40 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
           )
         })}
       </div>
+
+      {/* ── Web research status banner ──────────────────────────── */}
+      {webResearchStatus === 'running' && (
+        <div style={{
+          fontFamily: GEIST,
+          fontSize: '0.8125rem',
+          fontWeight: 300,
+          color: '#6b6b6b',
+          background: 'rgba(0,0,0,0.03)',
+          border: '1px solid rgba(0,0,0,0.07)',
+          borderRadius: 10,
+          padding: '10px 16px',
+          marginBottom: 32,
+          lineHeight: 1.5,
+        }}>
+          We&apos;re researching you on the web — sources will appear in your content library as they&apos;re found.
+        </div>
+      )}
+      {webResearchStatus === 'error' && (
+        <div style={{
+          fontFamily: GEIST,
+          fontSize: '0.8125rem',
+          fontWeight: 300,
+          color: '#6b6b6b',
+          background: 'rgba(0,0,0,0.03)',
+          border: '1px solid rgba(0,0,0,0.07)',
+          borderRadius: 10,
+          padding: '10px 16px',
+          marginBottom: 32,
+          lineHeight: 1.5,
+        }}>
+          Web research couldn&apos;t complete. You can add sources manually.
+        </div>
+      )}
 
       {/* ── Step 1: Identity ────────────────────────────────────── */}
       {step === '1' && (
@@ -351,8 +396,37 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
         </>
       )}
 
-      {/* ── Step 2: Interview ───────────────────────────────────── */}
+      {/* ── Step 2: Verify ──────────────────────────────────────── */}
       {step === '2' && verifiedPortraitId && (
+        <>
+          <h1 style={{
+            fontFamily: CORMORANT,
+            fontSize: 'clamp(1.75rem, 3vw, 2.25rem)',
+            fontWeight: 400,
+            fontStyle: 'italic',
+            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+            color: '#1a1a1a',
+            margin: '0 0 8px',
+          }}>
+            Help us find you online
+          </h1>
+          <p style={{
+            fontFamily: GEIST,
+            fontSize: '0.875rem',
+            fontWeight: 300,
+            color: '#6b6b6b',
+            margin: '0 0 40px',
+            lineHeight: 1.6,
+          }}>
+            We&apos;ll research you on the web to enrich your Sona. All fields are optional.
+          </p>
+          <VerifyStep portraitId={verifiedPortraitId} />
+        </>
+      )}
+
+      {/* ── Step 3: Interview ───────────────────────────────────── */}
+      {step === '3' && verifiedPortraitId && (
         <>
           <h1 style={{
             fontFamily: CORMORANT,
@@ -380,8 +454,8 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
         </>
       )}
 
-      {/* ── Step 3: Content ─────────────────────────────────────── */}
-      {step === '3' && verifiedPortraitId && (
+      {/* ── Step 4: Content ─────────────────────────────────────── */}
+      {step === '4' && verifiedPortraitId && (
         <div style={{ textAlign: 'center' }}>
           <h1 style={{
             fontFamily: CORMORANT,
@@ -426,7 +500,7 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
               Add context
             </a>
             <a
-              href={`/dashboard/create?step=4&portrait_id=${encodeURIComponent(verifiedPortraitId)}`}
+              href={`/dashboard/create?step=5&portrait_id=${encodeURIComponent(verifiedPortraitId)}`}
               className="sona-btn-dark"
               style={{
                 fontFamily: GEIST,
@@ -447,8 +521,8 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
         </div>
       )}
 
-      {/* ── Step 4: Pricing ─────────────────────────────────────── */}
-      {step === '4' && verifiedPortraitId && (
+      {/* ── Step 5: Pricing ─────────────────────────────────────── */}
+      {step === '5' && verifiedPortraitId && (
         <>
           <h1 style={{
             fontFamily: CORMORANT,
