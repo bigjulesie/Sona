@@ -70,12 +70,13 @@ export async function createSonaIdentity(formData: FormData) {
 export async function saveVerifyStep(
   _prevState: unknown,
   formData: FormData
-): Promise<{ error?: string; field?: 'linkedin_url' | 'website_url' | 'search_context' } | never> {
+): Promise<{ error?: string; field?: 'linkedin_url' | 'website_url' | 'search_context' } | null> {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   const portrait_id = formData.get('portrait_id') as string
+  if (!portrait_id) return { error: 'Invalid request.' }
   const linkedin_url = (formData.get('linkedin_url') as string | null)?.trim() ?? ''
   const search_context_raw = (formData.get('search_context') as string | null)?.trim() ?? ''
   const website_url = (formData.get('website_url') as string | null)?.trim() ?? ''
@@ -111,7 +112,7 @@ export async function saveVerifyStep(
   }
 
   // Update portrait with verify fields and mark research as running
-  await createAdminClient()
+  const { error: updateError } = await createAdminClient()
     .from('portraits')
     .update({
       linkedin_url: linkedin_url || null,
@@ -120,6 +121,7 @@ export async function saveVerifyStep(
       web_research_status: 'running',
     })
     .eq('id', portrait_id)
+  if (updateError) return { error: 'Failed to save. Please try again.' }
 
   // Fire-and-forget: kick off web research
   try {
