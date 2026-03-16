@@ -70,7 +70,7 @@ export async function createSonaIdentity(formData: FormData) {
 export async function saveVerifyStep(
   _prevState: unknown,
   formData: FormData
-): Promise<{ error?: string }> {
+): Promise<{ error?: string; field?: 'linkedin_url' | 'website_url' | 'search_context' } | never> {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -82,19 +82,21 @@ export async function saveVerifyStep(
 
   // Field validation
   if (linkedin_url && !linkedin_url.includes('linkedin.com/in/')) {
-    return { error: 'LinkedIn URL must include linkedin.com/in/' }
+    return { error: 'LinkedIn URL must include linkedin.com/in/', field: 'linkedin_url' as const }
   }
 
   if (website_url) {
     try {
       new URL(website_url)
     } catch {
-      return { error: 'Website URL is not valid' }
+      return { error: 'Website URL is not valid', field: 'website_url' as const }
     }
   }
 
-  // Trim search context to 200 chars without erroring
-  const search_context = search_context_raw.slice(0, 200)
+  if (search_context_raw.length > 200) {
+    return { error: 'Search context must be 200 characters or fewer', field: 'search_context' as const }
+  }
+  const search_context = search_context_raw || null
 
   // Verify portrait belongs to current user
   const { data: portrait } = await createAdminClient()

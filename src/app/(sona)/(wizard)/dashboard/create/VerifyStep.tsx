@@ -4,7 +4,6 @@ import { useActionState } from 'react'
 import { saveVerifyStep } from './actions'
 
 const GEIST = 'var(--font-geist-sans)'
-const CORMORANT = 'var(--font-cormorant)'
 
 const LABEL_STYLE: React.CSSProperties = {
   fontFamily: GEIST,
@@ -54,6 +53,11 @@ export function VerifyStep({ portraitId }: { portraitId: string }) {
           className="sona-input"
           style={INPUT_STYLE}
         />
+        {state?.field === 'linkedin_url' && state?.error && (
+          <span style={{ fontFamily: GEIST, fontSize: '0.75rem', color: '#e55', marginTop: 4, display: 'block' }}>
+            {state.error}
+          </span>
+        )}
       </div>
 
       {/* Search context */}
@@ -72,6 +76,11 @@ export function VerifyStep({ portraitId }: { portraitId: string }) {
           className="sona-input"
           style={INPUT_STYLE}
         />
+        {state?.field === 'search_context' && state?.error && (
+          <span style={{ fontFamily: GEIST, fontSize: '0.75rem', color: '#e55', marginTop: 4, display: 'block' }}>
+            {state.error}
+          </span>
+        )}
       </div>
 
       {/* Personal website */}
@@ -90,15 +99,15 @@ export function VerifyStep({ portraitId }: { portraitId: string }) {
           className="sona-input"
           style={INPUT_STYLE}
         />
+        {state?.field === 'website_url' && state?.error && (
+          <span style={{ fontFamily: GEIST, fontSize: '0.75rem', color: '#e55', marginTop: 4, display: 'block' }}>
+            {state.error}
+          </span>
+        )}
       </div>
 
-      {state?.error && (
-        <p style={{
-          fontFamily: GEIST,
-          fontSize: '0.8125rem',
-          color: '#DE3E7B',
-          margin: '-16px 0 0',
-        }}>
+      {state?.error && !state?.field && (
+        <p style={{ fontFamily: GEIST, fontSize: '0.8125rem', color: '#e55', margin: '0 0 16px' }}>
           {state.error}
         </p>
       )}
