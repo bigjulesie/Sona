@@ -19,9 +19,10 @@ export interface ResearchJobMeta {
   urls_ingested: number
 }
 
-interface IngestedSource {
+export interface IngestedSource {
   id: string
   raw_content: string
+  title: string
   source_type: string
 }
 
@@ -122,7 +123,7 @@ export async function runWebResearch(
         .single()
       if (error || !source) continue
       meta.urls_ingested++
-      ingestedSources.push({ id: source.id, raw_content: article.content, source_type: 'web_research' })
+      ingestedSources.push({ id: source.id, raw_content: article.content, title: article.title, source_type: 'web_research' })
     } catch {
       // One failing URL never stops the rest
     }

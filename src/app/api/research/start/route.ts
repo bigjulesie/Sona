@@ -28,13 +28,13 @@ export async function POST(request: NextRequest) {
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: portrait } = await (admin as any)
+      const { data: portrait, error: portraitError } = await (admin as any)
         .from('portraits')
         .select('id, display_name, search_context, linkedin_url, website_url')
         .eq('id', portrait_id)
         .single()
 
-      if (!portrait) return
+      if (portraitError || !portrait) throw portraitError ?? new Error('Portrait not found')
 
       const { meta, sources } = await runWebResearch(portrait)
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
             source_id: source.id,
             content: chunk,
             embedding: JSON.stringify(embeddings[i]),
-            source_title: '',
+            source_title: source.title,
             source_type: source.source_type,
             min_tier: 'public',
             chunk_index: i,
