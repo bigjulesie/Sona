@@ -5,13 +5,19 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 // directly to Deepgram for real-time streaming transcription.
 // Tokens are valid for 30 seconds — enough to establish the WebSocket connection.
 export async function POST() {
+  console.log('[deepgram-token] invoked')
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user) {
+    console.log('[deepgram-token] no user')
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   if (!process.env.DEEPGRAM_API_KEY) {
+    console.error('[deepgram-token] DEEPGRAM_API_KEY not set')
     return NextResponse.json({ error: 'DEEPGRAM_API_KEY not configured' }, { status: 500 })
   }
+  console.log('[deepgram-token] key present, calling grant endpoint')
 
   try {
     const res = await fetch('https://api.deepgram.com/v1/auth/grant', {
