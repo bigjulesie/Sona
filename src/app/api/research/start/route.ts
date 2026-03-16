@@ -5,6 +5,11 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { runWebResearch } from '@/lib/research/web-research'
 
 export async function POST(request: NextRequest) {
+  if (!process.env.INTERNAL_API_SECRET) {
+    console.error('[/api/research/start] INTERNAL_API_SECRET env var not set — rejecting all requests')
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const secret = request.headers.get('x-internal-secret')
   if (!secret || secret !== process.env.INTERNAL_API_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

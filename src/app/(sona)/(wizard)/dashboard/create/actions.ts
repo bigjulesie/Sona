@@ -82,8 +82,15 @@ export async function saveVerifyStep(
   const website_url = (formData.get('website_url') as string | null)?.trim() ?? ''
 
   // Field validation
-  if (linkedin_url && !linkedin_url.includes('linkedin.com/in/')) {
-    return { error: 'LinkedIn URL must include linkedin.com/in/', field: 'linkedin_url' as const }
+  if (linkedin_url) {
+    try {
+      const parsed = new URL(linkedin_url)
+      if (!parsed.hostname.endsWith('linkedin.com') || !parsed.pathname.startsWith('/in/')) {
+        return { error: 'LinkedIn URL must be a linkedin.com/in/ profile URL', field: 'linkedin_url' as const }
+      }
+    } catch {
+      return { error: 'LinkedIn URL is not valid', field: 'linkedin_url' as const }
+    }
   }
 
   if (website_url) {
@@ -124,17 +131,24 @@ export async function saveVerifyStep(
   if (updateError) return { error: 'Failed to save. Please try again.' }
 
   // Fire-and-forget: kick off web research
-  try {
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/research/start`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-internal-secret': process.env.INTERNAL_API_SECRET ?? '',
-      },
-      body: JSON.stringify({ portrait_id }),
-    }).catch(err => console.error('[research/start] fire-and-forget error:', err))
-  } catch (err) {
-    console.error('[research/start] fetch setup error:', err)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+    ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+
+  if (!appUrl) {
+    console.error('[saveVerifyStep] No app URL configured (NEXT_PUBLIC_APP_URL or VERCEL_URL) — skipping web research')
+  } else {
+    try {
+      fetch(`${appUrl}/api/research/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': process.env.INTERNAL_API_SECRET ?? '',
+        },
+        body: JSON.stringify({ portrait_id }),
+      }).catch(err => console.error('[research/start] fire-and-forget error:', err))
+    } catch (err) {
+      console.error('[research/start] fetch setup error:', err)
+    }
   }
 
   redirect(`/dashboard/create?step=3&portrait_id=${portrait_id}`)
