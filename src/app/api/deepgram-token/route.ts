@@ -27,12 +27,19 @@ export async function POST() {
 
     if (!res.ok) {
       const text = await res.text()
+      console.error('[deepgram-token] grant failed', res.status, text)
       return NextResponse.json({ error: `Deepgram token error: ${text}` }, { status: 500 })
     }
 
-    const { key } = await res.json()
-    return NextResponse.json({ token: key })
-  } catch {
+    const body = await res.json()
+    const token = body.key ?? body.token ?? body.access_token
+    if (!token) {
+      console.error('[deepgram-token] unexpected response shape', JSON.stringify(body))
+      return NextResponse.json({ error: 'Unexpected Deepgram response' }, { status: 500 })
+    }
+    return NextResponse.json({ token })
+  } catch (err) {
+    console.error('[deepgram-token] fetch threw', err)
     return NextResponse.json({ error: 'Token service unavailable' }, { status: 500 })
   }
 }
