@@ -37,7 +37,7 @@ export function InterviewStep({ portraitId, returnHref }: { portraitId: string; 
     }
   }
 
-  const continueHref = returnHref ?? `/dashboard/create?step=3&portrait_id=${portraitId}`
+  const continueHref = returnHref ?? `/dashboard/create?step=4&portrait_id=${portraitId}`
 
   if (done) {
     return (
@@ -210,7 +210,7 @@ export function InterviewStep({ portraitId, returnHref }: { portraitId: string; 
 
         {!returnHref && (
           <a
-            href={`/dashboard/create?step=3&portrait_id=${portraitId}`}
+            href={`/dashboard/create?step=4&portrait_id=${portraitId}`}
             className="sona-link"
             style={{
               fontFamily: GEIST,
