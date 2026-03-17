@@ -55,7 +55,9 @@ export function useGroupSession({
     const cadenceMs = wpm > 150 ? 90_000 : 120_000
 
     timerRef.current = setTimeout(async () => {
+      console.log('[GroupSession] contribution timer fired — transcriptWords:', transcriptWindowRef.current.trim().split(/\s+/).filter(Boolean).length)
       if (contributingRef.current || !transcriptWindowRef.current.trim()) {
+        console.log('[GroupSession] skipping contribution — transcript empty or already contributing')
         scheduleContribution(currentSessionId)
         return
       }
@@ -106,20 +108,31 @@ export function useGroupSession({
 
   // Send one audio chunk to the server for transcription and append the result
   const transcribeChunk = useCallback(async (blob: Blob, mimeType: string) => {
+    console.log('[GroupSession] transcribeChunk — size:', blob.size, 'type:', mimeType)
+    if (blob.size === 0) {
+      console.warn('[GroupSession] transcribeChunk — skipping empty blob')
+      return
+    }
     const formData = new FormData()
     formData.append('audio', blob, 'chunk.webm')
     formData.append('mimeType', mimeType)
     try {
       const res = await fetch('/api/group-sessions/transcribe', { method: 'POST', body: formData })
-      if (!res.ok) return
+      if (!res.ok) {
+        const text = await res.text().catch(() => '(unreadable)')
+        console.warn('[GroupSession] transcribeChunk — server error', res.status, text)
+        return
+      }
       const { transcript } = await res.json()
+      console.log('[GroupSession] transcribeChunk — transcript:', JSON.stringify(transcript))
       if (transcript?.trim()) {
         transcriptRef.current += ' ' + transcript
         const words = transcriptRef.current.trim().split(/\s+/)
         transcriptWindowRef.current = words.slice(-400).join(' ')
+        console.log('[GroupSession] transcript window words:', words.length)
       }
-    } catch {
-      // Non-fatal — a missed chunk doesn't end the session
+    } catch (err) {
+      console.warn('[GroupSession] transcribeChunk — fetch error:', err)
     }
   }, [])
 
@@ -127,11 +140,16 @@ export function useGroupSession({
   const recordChunk = useCallback((stream: MediaStream, mimeType: string) => {
     if (!activeRef.current) return
 
+    console.log('[GroupSession] recordChunk — starting new chunk, mimeType:', mimeType)
     const chunks: Blob[] = []
     const recorder = new MediaRecorder(stream, { mimeType })
 
-    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data) }
+    recorder.ondataavailable = (e) => {
+      console.log('[GroupSession] ondataavailable — size:', e.data.size)
+      if (e.data.size > 0) chunks.push(e.data)
+    }
     recorder.onstop = async () => {
+      console.log('[GroupSession] recorder stopped — chunks:', chunks.length, 'totalSize:', chunks.reduce((s, c) => s + c.size, 0))
       if (chunks.length > 0) {
         const blob = new Blob(chunks, { type: mimeType })
         await transcribeChunk(blob, mimeType)
