@@ -32,7 +32,7 @@ export async function POST() {
       body: JSON.stringify({
         comment: 'sona-browser-session',
         scopes: ['usage:write'],
-        time_to_live_in_seconds: 60,
+        time_to_live_in_seconds: 300,
       }),
     })
 
