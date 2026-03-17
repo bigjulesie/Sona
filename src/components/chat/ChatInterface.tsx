@@ -151,6 +151,16 @@ export function ChatInterface({
 
   const userMessageCount = messages.filter(m => m.role === 'user').length
 
+  // Merge chat messages and group-session asides into a single chronological timeline
+  type TimelineEntry =
+    | { kind: 'chat'; id: string; role: 'user' | 'assistant'; content: string; timestamp: number; metadata?: { trigger?: string } }
+    | { kind: 'aside'; id: string; content: string; timestamp: number }
+
+  const timeline: TimelineEntry[] = [
+    ...messages.map(m => ({ kind: 'chat' as const, id: m.id, role: m.role, content: m.content, timestamp: m.timestamp, metadata: (m as { metadata?: { trigger?: string } }).metadata })),
+    ...asideMessages.map(a => ({ kind: 'aside' as const, id: a.id, content: a.content, timestamp: a.timestamp })),
+  ].sort((a, b) => a.timestamp - b.timestamp)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 
@@ -228,36 +238,36 @@ export function ChatInterface({
           </div>
         )}
 
-        {/* Messages — skip empty assistant placeholder while waiting for first token */}
-        {messages.filter(msg => !(isStreaming && msg.role === 'assistant' && msg.content === '')).map((msg) => (
-          <MessageBubble
-            key={msg.id}
-            role={msg.role}
-            content={msg.content}
-            portraitName={portraitName}
-            variant={(msg as { metadata?: { trigger?: string } }).metadata?.trigger === 'proactive' ? 'aside' : undefined}
-            onPlayTTS={
-              msg.role === 'assistant' && voiceEnabled && !((msg as { metadata?: { trigger?: string } }).metadata?.trigger === 'proactive')
-                ? () => {
-                    if (playingMessageId === msg.id) stopTTS()
-                    else playTTS(msg.id, msg.content)
-                  }
-                : undefined
-            }
-            isPlayingTTS={playingMessageId === msg.id}
-          />
-        ))}
-
-        {/* Proactive asides from current session (not yet in DB-backed messages) */}
-        {asideMessages.map((aside) => (
-          <MessageBubble
-            key={aside.id}
-            role="assistant"
-            content={aside.content}
-            portraitName={portraitName}
-            variant="aside"
-          />
-        ))}
+        {/* Unified timeline: chat messages and group-session asides in chronological order */}
+        {timeline
+          .filter(entry => !(isStreaming && entry.kind === 'chat' && entry.role === 'assistant' && entry.content === ''))
+          .map(entry => entry.kind === 'aside' ? (
+            <MessageBubble
+              key={entry.id}
+              role="assistant"
+              content={entry.content}
+              portraitName={portraitName}
+              variant="aside"
+            />
+          ) : (
+            <MessageBubble
+              key={entry.id}
+              role={entry.role}
+              content={entry.content}
+              portraitName={portraitName}
+              variant={entry.metadata?.trigger === 'proactive' ? 'aside' : undefined}
+              onPlayTTS={
+                entry.role === 'assistant' && voiceEnabled && entry.metadata?.trigger !== 'proactive'
+                  ? () => {
+                      if (playingMessageId === entry.id) stopTTS()
+                      else playTTS(entry.id, entry.content)
+                    }
+                  : undefined
+              }
+              isPlayingTTS={playingMessageId === entry.id}
+            />
+          ))
+        }
 
         {/* Streaming indicator — only while waiting for the first token */}
         {isStreaming && messages[messages.length - 1]?.content === '' && (

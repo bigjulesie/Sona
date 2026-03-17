@@ -6,6 +6,8 @@ interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
+  timestamp: number
+  metadata?: { trigger?: string }
 }
 
 export function useChat(portraitId: string) {
@@ -15,16 +17,18 @@ export function useChat(portraitId: string) {
   const abortRef = useRef<AbortController | null>(null)
 
   const sendMessage = useCallback(async (content: string) => {
+    const now = Date.now()
     const userMsg: Message = {
       id: crypto.randomUUID(),
       role: 'user',
       content,
+      timestamp: now,
     }
     setMessages(prev => [...prev, userMsg])
     setIsStreaming(true)
 
     const assistantId = crypto.randomUUID()
-    setMessages(prev => [...prev, { id: assistantId, role: 'assistant', content: '' }])
+    setMessages(prev => [...prev, { id: assistantId, role: 'assistant', content: '', timestamp: now + 1 }])
 
     try {
       abortRef.current = new AbortController()
@@ -87,10 +91,14 @@ export function useChat(portraitId: string) {
     if (!res.ok) return
     const data = await res.json()
     setConversationId(convId)
-    setMessages(data.messages.map((m: { id: string; role: string; content: string }) => ({
+    // Loaded history predates the current session; use index-based timestamps
+    // so they sort before any new messages or asides from this session.
+    setMessages(data.messages.map((m: { id: string; role: string; content: string; metadata?: { trigger?: string } }, i: number) => ({
       id: m.id,
       role: m.role,
       content: m.content,
+      timestamp: i,
+      metadata: m.metadata,
     })))
   }, [])
 
