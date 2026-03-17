@@ -147,7 +147,7 @@ export function useGroupSession({
 
   const openDeepgramSocket = useCallback(async (token: string): Promise<WebSocket> => {
     return new Promise((resolve, reject) => {
-      const url = `wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=false&token=${token}`
+      const url = `wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=false&token=${encodeURIComponent(token)}`
       const ws = new WebSocket(url)
 
       ws.onopen = () => resolve(ws)
