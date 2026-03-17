@@ -344,6 +344,7 @@ export function ChatInterface({
         onPause={pause}
         onResume={resume}
         onLeave={leave}
+        onSessionError={setGroupError}
       />
     </div>
   )

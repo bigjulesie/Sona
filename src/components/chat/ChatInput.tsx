@@ -18,10 +18,11 @@ interface ChatInputProps {
   textareaRef?: React.RefObject<HTMLTextAreaElement | null>
   // Session controls
   sessionStatus?: SessionStatus
-  onInvite?: () => void
+  onInvite?: (stream: MediaStream) => void
   onPause?: () => void
-  onResume?: () => void
+  onResume?: (stream: MediaStream) => void
   onLeave?: () => void
+  onSessionError?: (msg: string) => void
 }
 
 export function ChatInput({
@@ -38,6 +39,7 @@ export function ChatInput({
   onPause,
   onResume,
   onLeave,
+  onSessionError,
 }: ChatInputProps) {
   const [value, setValue] = useState('')
   const [controlsOpen, setControlsOpen] = useState(false)
@@ -99,6 +101,21 @@ export function ChatInput({
     else if (status === 'recording') stopRecording()
   }
 
+  // Acquire the mic stream directly in the user-gesture handler (no await before
+  // getUserMedia) so browsers never consider the gesture consumed.  Same pattern
+  // as handleMicClick → startRecording() in useVoice.
+  function handleInviteClick() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => onInvite?.(stream))
+      .catch(() => onSessionError?.('Microphone access is required. Please allow access when prompted and try again.'))
+  }
+
+  function handleResumeClick() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => onResume?.(stream))
+      .catch(() => onSessionError?.('Microphone access is required. Please allow access when prompted and try again.'))
+  }
+
   const isRecording = status === 'recording'
   const isTranscribing = status === 'transcribing'
   const isActive = sessionStatus === 'active'
@@ -124,7 +141,7 @@ export function ChatInput({
             <div style={{ padding: '8px clamp(16px, 4vw, 24px)' }}>
               <div style={{ position: 'relative', display: 'inline-block' }}>
                 <button
-                  onClick={onInvite}
+                  onClick={handleInviteClick}
                   onMouseEnter={() => setInviteTooltip(true)}
                   onMouseLeave={() => setInviteTooltip(false)}
                   onFocus={() => setInviteTooltip(true)}
@@ -274,7 +291,8 @@ export function ChatInput({
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    isActive ? onPause?.() : onResume?.()
+                    if (isActive) onPause?.()
+                    else handleResumeClick()
                   }}
                   style={{
                     fontFamily: GEIST,
@@ -302,7 +320,7 @@ export function ChatInput({
                   padding: '4px clamp(16px, 4vw, 24px) 10px',
                 }}>
                   <button
-                    onClick={() => { isActive ? onPause?.() : onResume?.(); setControlsOpen(false) }}
+                    onClick={() => { if (isActive) { onPause?.(); setControlsOpen(false) } else { handleResumeClick(); setControlsOpen(false) } }}
                     style={{
                       fontFamily: GEIST,
                       fontSize: '0.75rem',
