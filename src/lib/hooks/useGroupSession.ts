@@ -161,33 +161,10 @@ export function useGroupSession({
   const start = useCallback(async () => {
     let stream: MediaStream
     try {
-      // Disable browser-side voice processing — signals a non-call audio context
-      // which is the best available mitigation for Bluetooth A2DP→HFP switching.
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false,
-          channelCount: 1,
-        },
-      })
-    } catch (err) {
-      const name = (err as Error).name
-      // Some browsers (Safari) reject specific constraints — retry with bare audio
-      if (name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError') {
-        try {
-          stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-        } catch {
-          onError('Microphone access was denied. Check your browser settings for entersona.com and allow microphone access, then try again.')
-          return false
-        }
-      } else if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-        onError('Microphone access was denied. Allow microphone access for entersona.com in your browser settings, then try again.')
-        return false
-      } else {
-        onError("Your microphone isn't available. Check that no other app has exclusive access to it.")
-        return false
-      }
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    } catch {
+      onError("Microphone access is required for this feature. Please allow microphone access when prompted and try again.")
+      return false
     }
 
     const mimeType =
