@@ -47,20 +47,6 @@ export function ChatInput({
   const localTextareaRef = useRef<HTMLTextAreaElement>(null)
   const textareaRef = textareaRefProp ?? localTextareaRef
 
-  // Refs for callbacks used inside native event listeners (avoids stale closures)
-  const onInviteRef = useRef(onInvite)
-  const onResumeRef = useRef(onResume)
-  const onSessionErrorRef = useRef(onSessionError)
-  useEffect(() => { onInviteRef.current = onInvite }, [onInvite])
-  useEffect(() => { onResumeRef.current = onResume }, [onResume])
-  useEffect(() => { onSessionErrorRef.current = onSessionError }, [onSessionError])
-
-  // Button refs for native DOM listeners — bypass React's root-level event
-  // delegation so Safari recognises getUserMedia as coming from a user gesture.
-  const inviteBtnRef     = useRef<HTMLButtonElement>(null)
-  const resumeBtnRef     = useRef<HTMLButtonElement>(null)   // single-tap row
-  const resumeExpandBtnRef = useRef<HTMLButtonElement>(null) // expanded controls
-
   const handleTranscript = useCallback(
     (text: string) => {
       if (voiceMode) {
@@ -72,7 +58,7 @@ export function ChatInput({
     },
     [onSend, voiceMode]
   )
-  const { status, error, analyser, devices, selectedDeviceId, setSelectedDeviceId, startRecording, stopRecording } = useVoice({
+  const { status, error, analyser, devices, selectedDeviceId, setSelectedDeviceId, startRecording, stopRecording, requestStream } = useVoice({
     onTranscript: handleTranscript,
   })
 
@@ -96,62 +82,22 @@ export function ChatInput({
     }
   }, [sessionStatus])
 
-  // Native DOM listeners on the invite / resume buttons so getUserMedia is called
-  // within a native click event — Safari's user-activation check does not always
-  // propagate through React's root-level event delegation.
-  useEffect(() => {
-    const btn = inviteBtnRef.current
-    if (!btn) return
-    function handleNativeInvite() {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        onSessionErrorRef.current?.('Microphone access is not supported in this browser.')
-        return
-      }
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => onInviteRef.current?.(stream))
-        .catch((err: DOMException) => {
-          console.error('[Sona] getUserMedia (invite) failed:', err.name, err.message)
-          if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-            onSessionErrorRef.current?.('Microphone permission was denied. Please enable it in Safari Settings → Websites → Microphone (or macOS System Settings → Privacy & Security → Microphone) and try again.')
-          } else if (err.name === 'NotFoundError') {
-            onSessionErrorRef.current?.('No microphone was found. Please connect a microphone and try again.')
-          } else if (err.name === 'NotReadableError') {
-            onSessionErrorRef.current?.('The microphone is in use by another app. Please close it and try again.')
-          } else {
-            onSessionErrorRef.current?.(`Microphone error (${err.name}). Please check your settings and try again.`)
-          }
-        })
-    }
-    btn.addEventListener('click', handleNativeInvite)
-    return () => btn.removeEventListener('click', handleNativeInvite)
-  }, [])  // intentionally empty — callbacks accessed via refs
+  // Acquire mic stream and start group session — called directly from onClick,
+  // matching the handleMicClick → startRecording() pattern that works in Safari.
+  function handleInviteClick() {
+    requestStream().then(stream => {
+      if (stream) onInvite?.(stream)
+      else onSessionError?.('Could not access the microphone. Please check your browser permissions and try again.')
+    })
+  }
 
-  // Resume buttons only exist when status === 'paused', so re-run on every status change.
-  // Guard: only attach when paused so the same button element's pause path (React onClick)
-  // fires unimpeded when active.
-  useEffect(() => {
-    if (sessionStatus !== 'paused') return
-
-    function makeNativeResumeHandler(btn: HTMLButtonElement | null) {
-      if (!btn) return () => {}
-      function handler(e: Event) {
-        e.stopPropagation()
-        if (!navigator.mediaDevices?.getUserMedia) return
-        navigator.mediaDevices.getUserMedia({ audio: true })
-          .then(stream => onResumeRef.current?.(stream))
-          .catch((err: DOMException) => {
-            console.error('[Sona] getUserMedia (resume) failed:', err.name, err.message)
-            onSessionErrorRef.current?.(`Microphone error (${(err as DOMException).name}). Please check your settings.`)
-          })
-      }
-      btn.addEventListener('click', handler)
-      return () => btn.removeEventListener('click', handler)
-    }
-
-    const cleanupRow    = makeNativeResumeHandler(resumeBtnRef.current)
-    const cleanupExpand = makeNativeResumeHandler(resumeExpandBtnRef.current)
-    return () => { cleanupRow(); cleanupExpand() }
-  }, [sessionStatus, controlsOpen])  // controlsOpen gates resumeExpandBtnRef's existence
+  function handleResumeClick(e: React.MouseEvent) {
+    e.stopPropagation()
+    requestStream().then(stream => {
+      if (stream) onResume?.(stream)
+      else onSessionError?.('Could not access the microphone. Please check your browser permissions and try again.')
+    })
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -197,8 +143,8 @@ export function ChatInput({
             <div style={{ padding: '8px clamp(16px, 4vw, 24px)' }}>
               <div style={{ position: 'relative', display: 'inline-block' }}>
                 <button
-                  ref={inviteBtnRef}
                   type="button"
+                  onClick={handleInviteClick}
                   onMouseEnter={() => setInviteTooltip(true)}
                   onMouseLeave={() => setInviteTooltip(false)}
                   onFocus={() => setInviteTooltip(true)}
@@ -344,14 +290,12 @@ export function ChatInput({
                     : `${portraitName ?? 'Sona'} has stepped out`}
                 </span>
 
-                {/* Single-tap pause/resume — native listener handles resume getUserMedia */}
+                {/* Single-tap pause/resume */}
                 <button
-                  ref={resumeBtnRef}
                   type="button"
                   onClick={(e) => {
-                    e.stopPropagation()
-                    if (isActive) onPause?.()
-                    // resume path handled by native listener via resumeBtnRef
+                    if (isActive) { e.stopPropagation(); onPause?.() }
+                    else handleResumeClick(e)
                   }}
                   style={{
                     fontFamily: GEIST,
@@ -378,11 +322,12 @@ export function ChatInput({
                   gap: 8,
                   padding: '4px clamp(16px, 4vw, 24px) 10px',
                 }}>
-                  {/* Pause path: React onClick; resume path: native listener via resumeExpandBtnRef */}
                   <button
-                    ref={resumeExpandBtnRef}
                     type="button"
-                    onClick={() => { if (isActive) { onPause?.(); setControlsOpen(false) } else { setControlsOpen(false) } }}
+                    onClick={(e) => {
+                      if (isActive) { onPause?.(); setControlsOpen(false) }
+                      else { handleResumeClick(e); setControlsOpen(false) }
+                    }}
                     style={{
                       fontFamily: GEIST,
                       fontSize: '0.75rem',
