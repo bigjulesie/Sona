@@ -207,6 +207,16 @@ export function useGroupSession({
     try {
       setStatus('starting')
 
+      // Safari requires getUserMedia to be called within the same task as the
+      // user gesture. Any await before this call (e.g. a fetch) causes Safari
+      // to treat the gesture as consumed and silently reject the mic request.
+      // So we acquire the stream FIRST, then create the session on the server.
+      const started = await start()
+      if (!started) {
+        setStatus('error')
+        return
+      }
+
       const res = await fetch('/api/group-sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -214,6 +224,7 @@ export function useGroupSession({
       })
 
       if (!res.ok) {
+        stopStream()
         setStatus('error')
         onError('Unable to start session — try again in a moment.')
         return
@@ -222,23 +233,12 @@ export function useGroupSession({
       const { session_id } = await res.json()
       setSessionId(session_id)
 
-      const started = await start()
-      if (!started) {
-        setStatus('error')
-        await fetch(`/api/group-sessions/${session_id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'ended' }),
-        })
-        return
-      }
-
       setStatus('active')
       scheduleContribution(session_id)
     } finally {
       inviteInFlightRef.current = false
     }
-  }, [status, portraitId, start, scheduleContribution, onError])
+  }, [status, portraitId, start, stopStream, scheduleContribution, onError])
 
   const pause = useCallback(async () => {
     if (status !== 'active' || !sessionId) return
