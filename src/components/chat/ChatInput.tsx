@@ -73,7 +73,7 @@ export function ChatInput({
     onRecordingChange?.(status === 'recording')
   }, [status, onRecordingChange])
 
-  // Close controls disclosure when session ends
+  // Reset disclosure state when session ends or returns to idle
   useEffect(() => {
     if (sessionStatus === 'idle' || sessionStatus === 'ended') {
       setControlsOpen(false)
@@ -157,7 +157,6 @@ export function ChatInput({
                   Invite {portraitName ?? 'them'} in
                 </button>
 
-                {/* Tooltip */}
                 {inviteTooltip && (
                   <div
                     id="invite-tooltip"
@@ -180,8 +179,7 @@ export function ChatInput({
                       zIndex: 20,
                     }}
                   >
-                    Enable &ldquo;Share system audio&rdquo; to let {portraitName ?? 'them'} listen in
-                    {/* Arrow */}
+                    {portraitName ?? 'Sona'} will listen in through your microphone
                     <span style={{
                       position: 'absolute',
                       top: '100%',

@@ -159,49 +159,23 @@ export function useGroupSession({
   }, [])
 
   const start = useCallback(async () => {
-    let stream: MediaStream | null = null
-
-    // Prefer system-audio capture via getDisplayMedia — this doesn't claim the
-    // microphone, so active meetings (Zoom, Teams, FaceTime, etc.) aren't
-    // interrupted by a competing audio session or Bluetooth profile switch.
-    // Not supported on iOS/iPadOS Safari, so we gracefully fall through to mic.
-    if (typeof navigator.mediaDevices?.getDisplayMedia === 'function') {
-      try {
-        // Most browsers require video:true even when we only want audio;
-        // we stop the video track immediately after capture.
-        const raw = await (navigator.mediaDevices.getDisplayMedia as (
-          constraints: MediaStreamConstraints
-        ) => Promise<MediaStream>)({ video: true, audio: true })
-
-        // Discard video immediately — stops the visible screen-share overlay.
-        raw.getVideoTracks().forEach(t => t.stop())
-
-        if (raw.getAudioTracks().length > 0) {
-          stream = raw
-          // If the user clicks "Stop sharing" in the browser banner, pause.
-          raw.getAudioTracks()[0].addEventListener('ended', () => {
-            if (activeRef.current) {
-              stopStream()
-              setStatus('paused')
-            }
-          })
-        } else {
-          // User didn't enable "Share system audio" in the picker — fall through.
-          raw.getTracks().forEach(t => t.stop())
-        }
-      } catch {
-        // User cancelled the picker or browser rejected — fall through to mic.
-      }
-    }
-
-    // Fall back to microphone if display-audio capture wasn't available or failed.
-    if (!stream) {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      } catch {
-        onError("Your microphone isn't available.")
-        return false
-      }
+    let stream: MediaStream
+    try {
+      // Disable browser-side voice processing — signals a non-call audio context
+      // which is the best available mitigation for Bluetooth A2DP→HFP switching.
+      // The profile switch is ultimately an OS/Bluetooth protocol constraint and
+      // cannot be fully prevented from a browser; wired or built-in mics avoid it.
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 1,
+        },
+      })
+    } catch {
+      onError("Your microphone isn't available.")
+      return false
     }
 
     const mimeType =
@@ -212,7 +186,7 @@ export function useGroupSession({
     activeRef.current = true
     recordChunk(stream, mimeType)
     return true
-  }, [onError, recordChunk, stopStream])
+  }, [onError, recordChunk])
 
   const invite = useCallback(async () => {
     if (status !== 'idle' || inviteInFlightRef.current) return
