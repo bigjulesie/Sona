@@ -13,14 +13,9 @@ interface GroupSessionMessage {
 
 interface UseGroupSessionOptions {
   portraitId: string
-  portraitName?: string
   onAside: (message: GroupSessionMessage) => void
   onError: (message: string) => void
 }
-
-type StartResult =
-  | { ok: true }
-  | { ok: false; reason: 'cancelled' | 'no_audio' | 'mic_unavailable' }
 
 // Transcribe a 20-second chunk of audio per cycle.
 const CHUNK_INTERVAL_MS = 20_000
@@ -33,7 +28,6 @@ function measureWpm(transcript: string, windowMs = 60000): number {
 
 export function useGroupSession({
   portraitId,
-  portraitName,
   onAside,
   onError,
 }: UseGroupSessionOptions) {
@@ -164,68 +158,35 @@ export function useGroupSession({
     streamRef.current = null
   }, [])
 
-  const start = useCallback(async (): Promise<StartResult> => {
-    // Prefer system-audio capture via getDisplayMedia — doesn't claim the
-    // microphone, so active meetings aren't interrupted by a competing audio
-    // session or Bluetooth A2DP→HFP profile switch.
-    if (typeof navigator.mediaDevices?.getDisplayMedia === 'function') {
-      let raw: MediaStream
-      try {
-        // Most browsers require video:true even when only audio is needed;
-        // we discard the video track immediately after capture.
-        raw = await (navigator.mediaDevices.getDisplayMedia as (
-          constraints: MediaStreamConstraints
-        ) => Promise<MediaStream>)({ video: true, audio: true })
-      } catch {
-        // User cancelled the picker — return to idle without an error.
-        return { ok: false, reason: 'cancelled' }
-      }
-
-      raw.getVideoTracks().forEach(t => t.stop())
-
-      if (raw.getAudioTracks().length === 0) {
-        // User didn't check "Share system audio" in the dialog.
-        raw.getTracks().forEach(t => t.stop())
-        return { ok: false, reason: 'no_audio' }
-      }
-
-      // Gracefully pause when the user clicks the browser "Stop sharing" banner.
-      raw.getAudioTracks()[0].addEventListener('ended', () => {
-        if (activeRef.current) { stopStream(); setStatus('paused') }
-      })
-
-      const mimeType =
-        ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg']
-          .find(t => MediaRecorder.isTypeSupported(t)) ?? 'audio/webm'
-
-      streamRef.current = raw
-      activeRef.current = true
-      recordChunk(raw, mimeType)
-      return { ok: true }
-    }
-
-    // Fallback: microphone — used on iOS/iPadOS where getDisplayMedia is absent.
+  const start = useCallback(async () => {
+    let stream: MediaStream
     try {
-      const mic = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mimeType =
-        ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg']
-          .find(t => MediaRecorder.isTypeSupported(t)) ?? 'audio/webm'
-      streamRef.current = mic
-      activeRef.current = true
-      recordChunk(mic, mimeType)
-      return { ok: true }
+      // Disable browser-side voice processing — signals a non-call audio context
+      // which is the best available mitigation for Bluetooth A2DP→HFP switching.
+      // The profile switch is ultimately an OS/Bluetooth protocol constraint and
+      // cannot be fully prevented from a browser; wired or built-in mics avoid it.
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 1,
+        },
+      })
     } catch {
-      return { ok: false, reason: 'mic_unavailable' }
+      onError("Your microphone isn't available.")
+      return false
     }
-  }, [recordChunk, stopStream])
 
-  const endSessionOnServer = useCallback(async (sessionId: string) => {
-    await fetch(`/api/group-sessions/${sessionId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'ended' }),
-    })
-  }, [])
+    const mimeType =
+      ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg']
+        .find(t => MediaRecorder.isTypeSupported(t)) ?? 'audio/webm'
+
+    streamRef.current = stream
+    activeRef.current = true
+    recordChunk(stream, mimeType)
+    return true
+  }, [onError, recordChunk])
 
   const invite = useCallback(async () => {
     if (status !== 'idle' || inviteInFlightRef.current) return
@@ -249,21 +210,14 @@ export function useGroupSession({
       const { session_id } = await res.json()
       setSessionId(session_id)
 
-      const result = await start()
-
-      if (!result.ok) {
-        await endSessionOnServer(session_id)
-        if (result.reason === 'cancelled') {
-          setStatus('idle')
-        } else if (result.reason === 'no_audio') {
-          setStatus('idle')
-          onError(
-            `Enable "Share system audio" in the sharing dialog so ${portraitName ?? 'the Sona'} can hear the room, then try again.`
-          )
-        } else {
-          setStatus('error')
-          onError("Your microphone isn't available.")
-        }
+      const started = await start()
+      if (!started) {
+        setStatus('error')
+        await fetch(`/api/group-sessions/${session_id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'ended' }),
+        })
         return
       }
 
@@ -272,7 +226,7 @@ export function useGroupSession({
     } finally {
       inviteInFlightRef.current = false
     }
-  }, [status, portraitId, portraitName, start, endSessionOnServer, scheduleContribution, onError])
+  }, [status, portraitId, start, scheduleContribution, onError])
 
   const pause = useCallback(async () => {
     if (status !== 'active' || !sessionId) return
@@ -287,18 +241,8 @@ export function useGroupSession({
 
   const resume = useCallback(async () => {
     if (status !== 'paused' || !sessionId) return
-    const result = await start()
-    if (!result.ok) {
-      if (result.reason === 'no_audio') {
-        onError(
-          `Enable "Share system audio" in the sharing dialog so ${portraitName ?? 'the Sona'} can hear the room.`
-        )
-      } else if (result.reason === 'mic_unavailable') {
-        onError("Your microphone isn't available.")
-      }
-      // 'cancelled' → silently stay paused
-      return
-    }
+    const started = await start()
+    if (!started) return
     setStatus('active')
     await fetch(`/api/group-sessions/${sessionId}`, {
       method: 'PATCH',
@@ -306,7 +250,7 @@ export function useGroupSession({
       body: JSON.stringify({ status: 'active' }),
     })
     scheduleContribution(sessionId)
-  }, [status, sessionId, portraitName, start, scheduleContribution, onError])
+  }, [status, sessionId, start, scheduleContribution])
 
   const leave = useCallback(async () => {
     if (status === 'idle' || status === 'ended' || !sessionId) return
