@@ -41,6 +41,7 @@ export function ChatInput({
 }: ChatInputProps) {
   const [value, setValue] = useState('')
   const [controlsOpen, setControlsOpen] = useState(false)
+  const [inviteTooltip, setInviteTooltip] = useState(false)
   const localTextareaRef = useRef<HTMLTextAreaElement>(null)
   const textareaRef = textareaRefProp ?? localTextareaRef
 
@@ -121,34 +122,81 @@ export function ChatInput({
           {/* Idle — invite pill */}
           {(sessionStatus === 'idle') && onInvite && (
             <div style={{ padding: '8px clamp(16px, 4vw, 24px)' }}>
-              <button
-                onClick={onInvite}
-                style={{
-                  fontFamily: GEIST,
-                  fontSize: '0.75rem',
-                  fontWeight: 400,
-                  color: '#6b6b6b',
-                  background: 'none',
-                  border: '1px solid rgba(0,0,0,0.10)',
-                  borderRadius: '980px',
-                  padding: '5px 14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 7,
-                }}
-                aria-label={`Invite ${portraitName ?? 'them'} into the room`}
-              >
-                <span style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  backgroundColor: '#b0b0b0',
-                  display: 'inline-block',
-                  flexShrink: 0,
-                }} />
-                Invite {portraitName ?? 'them'} in
-              </button>
+              <div style={{ position: 'relative', display: 'inline-block' }}>
+                <button
+                  onClick={onInvite}
+                  onMouseEnter={() => setInviteTooltip(true)}
+                  onMouseLeave={() => setInviteTooltip(false)}
+                  onFocus={() => setInviteTooltip(true)}
+                  onBlur={() => setInviteTooltip(false)}
+                  style={{
+                    fontFamily: GEIST,
+                    fontSize: '0.75rem',
+                    fontWeight: 400,
+                    color: '#6b6b6b',
+                    background: 'none',
+                    border: '1px solid rgba(0,0,0,0.10)',
+                    borderRadius: '980px',
+                    padding: '5px 14px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 7,
+                  }}
+                  aria-label={`Invite ${portraitName ?? 'them'} into the room`}
+                  aria-describedby="invite-tooltip"
+                >
+                  <span style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    backgroundColor: '#b0b0b0',
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }} />
+                  Invite {portraitName ?? 'them'} in
+                </button>
+
+                {/* Tooltip */}
+                {inviteTooltip && (
+                  <div
+                    id="invite-tooltip"
+                    role="tooltip"
+                    style={{
+                      position: 'absolute',
+                      bottom: 'calc(100% + 9px)',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      backgroundColor: '#1a1a1a',
+                      color: '#fff',
+                      padding: '7px 11px',
+                      borderRadius: 8,
+                      fontFamily: GEIST,
+                      fontSize: '0.6875rem',
+                      fontWeight: 400,
+                      letterSpacing: '0.01em',
+                      whiteSpace: 'nowrap',
+                      pointerEvents: 'none',
+                      zIndex: 20,
+                    }}
+                  >
+                    Enable &ldquo;Share system audio&rdquo; to let {portraitName ?? 'them'} listen in
+                    {/* Arrow */}
+                    <span style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 0,
+                      height: 0,
+                      borderLeft: '5px solid transparent',
+                      borderRight: '5px solid transparent',
+                      borderTop: '5px solid #1a1a1a',
+                      display: 'block',
+                    }} />
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
