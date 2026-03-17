@@ -158,41 +158,24 @@ export function useGroupSession({
     streamRef.current = null
   }, [])
 
-  const start = useCallback(async () => {
-    let stream: MediaStream
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    } catch {
-      onError("Microphone access is required for this feature. Please allow microphone access when prompted and try again.")
-      return false
-    }
-
+  // Accept a pre-acquired stream so getUserMedia is called directly from the
+  // user-gesture handler in ChatInput (same pattern as useVoice.startRecording).
+  const start = useCallback((stream: MediaStream) => {
     const mimeType =
       ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg']
         .find(t => MediaRecorder.isTypeSupported(t)) ?? 'audio/webm'
-
     streamRef.current = stream
     activeRef.current = true
     recordChunk(stream, mimeType)
-    return true
-  }, [onError, recordChunk])
+  }, [recordChunk])
 
-  const invite = useCallback(async () => {
+  const invite = useCallback(async (stream: MediaStream) => {
     if (status !== 'idle' || inviteInFlightRef.current) return
     inviteInFlightRef.current = true
 
     try {
       setStatus('starting')
-
-      // Safari requires getUserMedia to be called within the same task as the
-      // user gesture. Any await before this call (e.g. a fetch) causes Safari
-      // to treat the gesture as consumed and silently reject the mic request.
-      // So we acquire the stream FIRST, then create the session on the server.
-      const started = await start()
-      if (!started) {
-        setStatus('error')
-        return
-      }
+      start(stream)
 
       const res = await fetch('/api/group-sessions', {
         method: 'POST',
@@ -228,10 +211,9 @@ export function useGroupSession({
     })
   }, [status, sessionId, stopStream])
 
-  const resume = useCallback(async () => {
+  const resume = useCallback(async (stream: MediaStream) => {
     if (status !== 'paused' || !sessionId) return
-    const started = await start()
-    if (!started) return
+    start(stream)
     setStatus('active')
     await fetch(`/api/group-sessions/${sessionId}`, {
       method: 'PATCH',
