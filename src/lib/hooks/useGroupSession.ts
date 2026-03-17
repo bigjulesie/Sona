@@ -151,7 +151,13 @@ export function useGroupSession({
       const ws = new WebSocket(url)
 
       ws.onopen = () => resolve(ws)
-      ws.onerror = () => reject(new Error('Deepgram WebSocket failed to open'))
+      ws.onerror = (e) => {
+        console.error('[useGroupSession] WebSocket error', e)
+      }
+      ws.onclose = (e) => {
+        console.warn('[useGroupSession] WebSocket closed', e.code, e.reason)
+        reject(new Error(`Deepgram WebSocket closed: ${e.code} ${e.reason}`))
+      }
 
       ws.onmessage = (event) => {
         try {
