@@ -163,8 +163,6 @@ export function useGroupSession({
     try {
       // Disable browser-side voice processing — signals a non-call audio context
       // which is the best available mitigation for Bluetooth A2DP→HFP switching.
-      // The profile switch is ultimately an OS/Bluetooth protocol constraint and
-      // cannot be fully prevented from a browser; wired or built-in mics avoid it.
       stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
@@ -173,9 +171,23 @@ export function useGroupSession({
           channelCount: 1,
         },
       })
-    } catch {
-      onError("Your microphone isn't available.")
-      return false
+    } catch (err) {
+      const name = (err as Error).name
+      // Some browsers (Safari) reject specific constraints — retry with bare audio
+      if (name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError') {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        } catch {
+          onError('Microphone access was denied. Check your browser settings for entersona.com and allow microphone access, then try again.')
+          return false
+        }
+      } else if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        onError('Microphone access was denied. Allow microphone access for entersona.com in your browser settings, then try again.')
+        return false
+      } else {
+        onError("Your microphone isn't available. Check that no other app has exclusive access to it.")
+        return false
+      }
     }
 
     const mimeType =
