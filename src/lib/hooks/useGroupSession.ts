@@ -163,8 +163,6 @@ export function useGroupSession({
     try {
       // Disable browser-side voice processing — signals a non-call audio context
       // which is the best available mitigation for Bluetooth A2DP→HFP switching.
-      // The profile switch is ultimately an OS/Bluetooth protocol constraint and
-      // cannot be fully prevented from a browser; wired or built-in mics avoid it.
       stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
@@ -173,9 +171,23 @@ export function useGroupSession({
           channelCount: 1,
         },
       })
-    } catch {
-      onError("Your microphone isn't available.")
-      return false
+    } catch (err) {
+      const name = (err as Error).name
+      // Some browsers (Safari) reject specific constraints — retry with bare audio
+      if (name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError') {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        } catch {
+          onError('Microphone access was denied. Check your browser settings for entersona.com and allow microphone access, then try again.')
+          return false
+        }
+      } else if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        onError('Microphone access was denied. Allow microphone access for entersona.com in your browser settings, then try again.')
+        return false
+      } else {
+        onError("Your microphone isn't available. Check that no other app has exclusive access to it.")
+        return false
+      }
     }
 
     const mimeType =
@@ -195,6 +207,16 @@ export function useGroupSession({
     try {
       setStatus('starting')
 
+      // Safari requires getUserMedia to be called within the same task as the
+      // user gesture. Any await before this call (e.g. a fetch) causes Safari
+      // to treat the gesture as consumed and silently reject the mic request.
+      // So we acquire the stream FIRST, then create the session on the server.
+      const started = await start()
+      if (!started) {
+        setStatus('error')
+        return
+      }
+
       const res = await fetch('/api/group-sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -202,6 +224,7 @@ export function useGroupSession({
       })
 
       if (!res.ok) {
+        stopStream()
         setStatus('error')
         onError('Unable to start session — try again in a moment.')
         return
@@ -210,23 +233,12 @@ export function useGroupSession({
       const { session_id } = await res.json()
       setSessionId(session_id)
 
-      const started = await start()
-      if (!started) {
-        setStatus('error')
-        await fetch(`/api/group-sessions/${session_id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'ended' }),
-        })
-        return
-      }
-
       setStatus('active')
       scheduleContribution(session_id)
     } finally {
       inviteInFlightRef.current = false
     }
-  }, [status, portraitId, start, scheduleContribution, onError])
+  }, [status, portraitId, start, stopStream, scheduleContribution, onError])
 
   const pause = useCallback(async () => {
     if (status !== 'active' || !sessionId) return
