@@ -42,6 +42,18 @@ export function ChatInput({
   const [value, setValue] = useState('')
   const [controlsOpen, setControlsOpen] = useState(false)
   const [inviteTooltip, setInviteTooltip] = useState(false)
+  const [showInviteGuide, setShowInviteGuide] = useState(false)
+
+  function handleInviteClick() {
+    const supportsDisplayMedia =
+      typeof navigator !== 'undefined' &&
+      typeof navigator.mediaDevices?.getDisplayMedia === 'function'
+    if (supportsDisplayMedia) {
+      setShowInviteGuide(true)
+    } else {
+      onInvite?.()
+    }
+  }
   const localTextareaRef = useRef<HTMLTextAreaElement>(null)
   const textareaRef = textareaRefProp ?? localTextareaRef
 
@@ -73,10 +85,11 @@ export function ChatInput({
     onRecordingChange?.(status === 'recording')
   }, [status, onRecordingChange])
 
-  // Close controls disclosure when session ends
+  // Reset disclosure state when session ends or returns to idle
   useEffect(() => {
     if (sessionStatus === 'idle' || sessionStatus === 'ended') {
       setControlsOpen(false)
+      setShowInviteGuide(false)
     }
   }, [sessionStatus])
 
@@ -119,84 +132,141 @@ export function ChatInput({
           borderBottom: '1px solid rgba(0,0,0,0.05)',
         }}>
 
-          {/* Idle — invite pill */}
+          {/* Idle — invite pill or guide */}
           {(sessionStatus === 'idle') && onInvite && (
             <div style={{ padding: '8px clamp(16px, 4vw, 24px)' }}>
-              <div style={{ position: 'relative', display: 'inline-block' }}>
-                <button
-                  onClick={onInvite}
-                  onMouseEnter={() => setInviteTooltip(true)}
-                  onMouseLeave={() => setInviteTooltip(false)}
-                  onFocus={() => setInviteTooltip(true)}
-                  onBlur={() => setInviteTooltip(false)}
-                  style={{
+              {showInviteGuide ? (
+                /* Pre-dialog guide — explains system audio step */
+                <div style={{
+                  padding: '12px 14px',
+                  backgroundColor: 'rgba(222,62,123,0.04)',
+                  border: '1px solid rgba(222,62,123,0.15)',
+                  borderRadius: 12,
+                }}>
+                  <p style={{
                     fontFamily: GEIST,
-                    fontSize: '0.75rem',
+                    fontSize: '0.8125rem',
                     fontWeight: 400,
-                    color: '#6b6b6b',
-                    background: 'none',
-                    border: '1px solid rgba(0,0,0,0.10)',
-                    borderRadius: '980px',
-                    padding: '5px 14px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 7,
-                  }}
-                  aria-label={`Invite ${portraitName ?? 'them'} into the room`}
-                  aria-describedby="invite-tooltip"
-                >
-                  <span style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: '50%',
-                    backgroundColor: '#b0b0b0',
-                    display: 'inline-block',
-                    flexShrink: 0,
-                  }} />
-                  Invite {portraitName ?? 'them'} in
-                </button>
-
-                {/* Tooltip */}
-                {inviteTooltip && (
-                  <div
-                    id="invite-tooltip"
-                    role="tooltip"
-                    style={{
-                      position: 'absolute',
-                      bottom: 'calc(100% + 9px)',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      backgroundColor: '#1a1a1a',
-                      color: '#fff',
-                      padding: '7px 11px',
-                      borderRadius: 8,
-                      fontFamily: GEIST,
-                      fontSize: '0.6875rem',
-                      fontWeight: 400,
-                      letterSpacing: '0.01em',
-                      whiteSpace: 'nowrap',
-                      pointerEvents: 'none',
-                      zIndex: 20,
-                    }}
-                  >
-                    Enable &ldquo;Share system audio&rdquo; to let {portraitName ?? 'them'} listen in
-                    {/* Arrow */}
-                    <span style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: 0,
-                      height: 0,
-                      borderLeft: '5px solid transparent',
-                      borderRight: '5px solid transparent',
-                      borderTop: '5px solid #1a1a1a',
-                      display: 'block',
-                    }} />
+                    color: '#1a1a1a',
+                    lineHeight: 1.55,
+                    margin: '0 0 10px',
+                  }}>
+                    In the dialog that follows, check{' '}
+                    <strong style={{ fontWeight: 600 }}>&ldquo;Share system audio&rdquo;</strong>
+                    {' '}so {portraitName ?? 'them'} can hear the room.
+                  </p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => setShowInviteGuide(false)}
+                      style={{
+                        fontFamily: GEIST,
+                        fontSize: '0.75rem',
+                        fontWeight: 400,
+                        color: '#6b6b6b',
+                        background: 'none',
+                        border: '1px solid rgba(0,0,0,0.10)',
+                        borderRadius: '980px',
+                        padding: '6px 14px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => { setShowInviteGuide(false); onInvite() }}
+                      style={{
+                        fontFamily: GEIST,
+                        fontSize: '0.75rem',
+                        fontWeight: 500,
+                        color: '#fff',
+                        backgroundColor: '#1a1a1a',
+                        border: 'none',
+                        borderRadius: '980px',
+                        padding: '6px 18px',
+                        cursor: 'pointer',
+                        letterSpacing: '-0.01em',
+                      }}
+                    >
+                      Continue
+                    </button>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                /* Invite pill with hover tooltip */
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <button
+                    onClick={handleInviteClick}
+                    onMouseEnter={() => setInviteTooltip(true)}
+                    onMouseLeave={() => setInviteTooltip(false)}
+                    onFocus={() => setInviteTooltip(true)}
+                    onBlur={() => setInviteTooltip(false)}
+                    style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.75rem',
+                      fontWeight: 400,
+                      color: '#6b6b6b',
+                      background: 'none',
+                      border: '1px solid rgba(0,0,0,0.10)',
+                      borderRadius: '980px',
+                      padding: '5px 14px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 7,
+                    }}
+                    aria-label={`Invite ${portraitName ?? 'them'} into the room`}
+                    aria-describedby="invite-tooltip"
+                  >
+                    <span style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      backgroundColor: '#b0b0b0',
+                      display: 'inline-block',
+                      flexShrink: 0,
+                    }} />
+                    Invite {portraitName ?? 'them'} in
+                  </button>
+
+                  {inviteTooltip && (
+                    <div
+                      id="invite-tooltip"
+                      role="tooltip"
+                      style={{
+                        position: 'absolute',
+                        bottom: 'calc(100% + 9px)',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        backgroundColor: '#1a1a1a',
+                        color: '#fff',
+                        padding: '7px 11px',
+                        borderRadius: 8,
+                        fontFamily: GEIST,
+                        fontSize: '0.6875rem',
+                        fontWeight: 400,
+                        letterSpacing: '0.01em',
+                        whiteSpace: 'nowrap',
+                        pointerEvents: 'none',
+                        zIndex: 20,
+                      }}
+                    >
+                      Enable &ldquo;Share system audio&rdquo; to let {portraitName ?? 'them'} listen in
+                      <span style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: 0,
+                        height: 0,
+                        borderLeft: '5px solid transparent',
+                        borderRight: '5px solid transparent',
+                        borderTop: '5px solid #1a1a1a',
+                        display: 'block',
+                      }} />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

@@ -13,9 +13,14 @@ interface GroupSessionMessage {
 
 interface UseGroupSessionOptions {
   portraitId: string
+  portraitName?: string
   onAside: (message: GroupSessionMessage) => void
   onError: (message: string) => void
 }
+
+type StartResult =
+  | { ok: true }
+  | { ok: false; reason: 'cancelled' | 'no_audio' | 'mic_unavailable' }
 
 // Transcribe a 20-second chunk of audio per cycle.
 const CHUNK_INTERVAL_MS = 20_000
@@ -28,6 +33,7 @@ function measureWpm(transcript: string, windowMs = 60000): number {
 
 export function useGroupSession({
   portraitId,
+  portraitName,
   onAside,
   onError,
 }: UseGroupSessionOptions) {
@@ -158,61 +164,68 @@ export function useGroupSession({
     streamRef.current = null
   }, [])
 
-  const start = useCallback(async () => {
-    let stream: MediaStream | null = null
-
-    // Prefer system-audio capture via getDisplayMedia — this doesn't claim the
-    // microphone, so active meetings (Zoom, Teams, FaceTime, etc.) aren't
-    // interrupted by a competing audio session or Bluetooth profile switch.
-    // Not supported on iOS/iPadOS Safari, so we gracefully fall through to mic.
+  const start = useCallback(async (): Promise<StartResult> => {
+    // Prefer system-audio capture via getDisplayMedia — doesn't claim the
+    // microphone, so active meetings aren't interrupted by a competing audio
+    // session or Bluetooth A2DP→HFP profile switch.
     if (typeof navigator.mediaDevices?.getDisplayMedia === 'function') {
+      let raw: MediaStream
       try {
-        // Most browsers require video:true even when we only want audio;
-        // we stop the video track immediately after capture.
-        const raw = await (navigator.mediaDevices.getDisplayMedia as (
+        // Most browsers require video:true even when only audio is needed;
+        // we discard the video track immediately after capture.
+        raw = await (navigator.mediaDevices.getDisplayMedia as (
           constraints: MediaStreamConstraints
         ) => Promise<MediaStream>)({ video: true, audio: true })
-
-        // Discard video immediately — stops the visible screen-share overlay.
-        raw.getVideoTracks().forEach(t => t.stop())
-
-        if (raw.getAudioTracks().length > 0) {
-          stream = raw
-          // If the user clicks "Stop sharing" in the browser banner, pause.
-          raw.getAudioTracks()[0].addEventListener('ended', () => {
-            if (activeRef.current) {
-              stopStream()
-              setStatus('paused')
-            }
-          })
-        } else {
-          // User didn't enable "Share system audio" in the picker — fall through.
-          raw.getTracks().forEach(t => t.stop())
-        }
       } catch {
-        // User cancelled the picker or browser rejected — fall through to mic.
+        // User cancelled the picker — return to idle without an error.
+        return { ok: false, reason: 'cancelled' }
       }
+
+      raw.getVideoTracks().forEach(t => t.stop())
+
+      if (raw.getAudioTracks().length === 0) {
+        // User didn't check "Share system audio" in the dialog.
+        raw.getTracks().forEach(t => t.stop())
+        return { ok: false, reason: 'no_audio' }
+      }
+
+      // Gracefully pause when the user clicks the browser "Stop sharing" banner.
+      raw.getAudioTracks()[0].addEventListener('ended', () => {
+        if (activeRef.current) { stopStream(); setStatus('paused') }
+      })
+
+      const mimeType =
+        ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg']
+          .find(t => MediaRecorder.isTypeSupported(t)) ?? 'audio/webm'
+
+      streamRef.current = raw
+      activeRef.current = true
+      recordChunk(raw, mimeType)
+      return { ok: true }
     }
 
-    // Fall back to microphone if display-audio capture wasn't available or failed.
-    if (!stream) {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      } catch {
-        onError("Your microphone isn't available.")
-        return false
-      }
+    // Fallback: microphone — used on iOS/iPadOS where getDisplayMedia is absent.
+    try {
+      const mic = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mimeType =
+        ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg']
+          .find(t => MediaRecorder.isTypeSupported(t)) ?? 'audio/webm'
+      streamRef.current = mic
+      activeRef.current = true
+      recordChunk(mic, mimeType)
+      return { ok: true }
+    } catch {
+      return { ok: false, reason: 'mic_unavailable' }
     }
+  }, [recordChunk, stopStream])
 
-    const mimeType =
-      ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg']
-        .find(t => MediaRecorder.isTypeSupported(t)) ?? 'audio/webm'
-
-    streamRef.current = stream
-    activeRef.current = true
-    recordChunk(stream, mimeType)
-    return true
-  }, [onError, recordChunk, stopStream])
+  const endSessionOnServer = useCallback(async (sessionId: string) => {
+    await fetch(`/api/group-sessions/${sessionId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'ended' }),
+    })
+  }, [])
 
   const invite = useCallback(async () => {
     if (status !== 'idle' || inviteInFlightRef.current) return
@@ -236,14 +249,21 @@ export function useGroupSession({
       const { session_id } = await res.json()
       setSessionId(session_id)
 
-      const started = await start()
-      if (!started) {
-        setStatus('error')
-        await fetch(`/api/group-sessions/${session_id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'ended' }),
-        })
+      const result = await start()
+
+      if (!result.ok) {
+        await endSessionOnServer(session_id)
+        if (result.reason === 'cancelled') {
+          setStatus('idle')
+        } else if (result.reason === 'no_audio') {
+          setStatus('idle')
+          onError(
+            `Enable "Share system audio" in the sharing dialog so ${portraitName ?? 'the Sona'} can hear the room, then try again.`
+          )
+        } else {
+          setStatus('error')
+          onError("Your microphone isn't available.")
+        }
         return
       }
 
@@ -252,7 +272,7 @@ export function useGroupSession({
     } finally {
       inviteInFlightRef.current = false
     }
-  }, [status, portraitId, start, scheduleContribution, onError])
+  }, [status, portraitId, portraitName, start, endSessionOnServer, scheduleContribution, onError])
 
   const pause = useCallback(async () => {
     if (status !== 'active' || !sessionId) return
@@ -267,8 +287,18 @@ export function useGroupSession({
 
   const resume = useCallback(async () => {
     if (status !== 'paused' || !sessionId) return
-    const started = await start()
-    if (!started) return
+    const result = await start()
+    if (!result.ok) {
+      if (result.reason === 'no_audio') {
+        onError(
+          `Enable "Share system audio" in the sharing dialog so ${portraitName ?? 'the Sona'} can hear the room.`
+        )
+      } else if (result.reason === 'mic_unavailable') {
+        onError("Your microphone isn't available.")
+      }
+      // 'cancelled' → silently stay paused
+      return
+    }
     setStatus('active')
     await fetch(`/api/group-sessions/${sessionId}`, {
       method: 'PATCH',
@@ -276,7 +306,7 @@ export function useGroupSession({
       body: JSON.stringify({ status: 'active' }),
     })
     scheduleContribution(sessionId)
-  }, [status, sessionId, start, scheduleContribution])
+  }, [status, sessionId, portraitName, start, scheduleContribution, onError])
 
   const leave = useCallback(async () => {
     if (status === 'idle' || status === 'ended' || !sessionId) return

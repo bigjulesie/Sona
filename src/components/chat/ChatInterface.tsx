@@ -55,6 +55,7 @@ export function ChatInterface({
     leave,
   } = useGroupSession({
     portraitId,
+    portraitName,
     onAside: (msg) => setAsideMessages(prev => [...prev, msg]),
     onError: (msg) => setGroupError(msg),
   })
