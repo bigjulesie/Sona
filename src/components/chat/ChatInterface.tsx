@@ -5,7 +5,6 @@ import { useChat } from '@/lib/hooks/useChat'
 import { useGroupSession } from '@/lib/hooks/useGroupSession'
 import { MessageBubble } from './MessageBubble'
 import { ChatInput } from './ChatInput'
-import { PresenceBar } from './PresenceBar'
 import { RatingPrompt } from '@/components/sona/RatingPrompt'
 
 const GEIST = 'var(--font-geist-sans)'
@@ -163,16 +162,6 @@ export function ChatInterface({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-
-      {/* ── Presence bar ───────────────────────────────────────────── */}
-      <PresenceBar
-        portraitName={portraitName}
-        status={sessionStatus}
-        onInvite={invite}
-        onPause={pause}
-        onResume={resume}
-        onLeave={leave}
-      />
 
       {/* ── Message list ───────────────────────────────────────────── */}
       <div
@@ -349,9 +338,12 @@ export function ChatInterface({
         onToggleVoice={() => setVoiceMode((v) => !v)}
         onRecordingChange={setIsRecording}
         portraitName={portraitName}
-        inRoomMode={sessionStatus === 'active' || sessionStatus === 'paused'}
-        inRoomMicActive={sessionStatus === 'active'}
         textareaRef={textareaRef}
+        sessionStatus={sessionStatus}
+        onInvite={invite}
+        onPause={pause}
+        onResume={resume}
+        onLeave={leave}
       />
     </div>
   )
