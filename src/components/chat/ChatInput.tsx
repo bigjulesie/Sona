@@ -101,20 +101,50 @@ export function ChatInput({
     else if (status === 'recording') stopRecording()
   }
 
-  // Acquire the mic stream directly in the user-gesture handler (no await before
-  // getUserMedia) so browsers never consider the gesture consumed.  Same pattern
-  // as handleMicClick → startRecording() in useVoice.
-  function handleInviteClick() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => onInvite?.(stream))
-      .catch(() => onSessionError?.('Microphone access is required. Please allow access when prompted and try again.'))
+  // Acquire the mic stream directly in the user-gesture handler, matching the
+  // exact pattern used by useVoice.startRecording() — an async function called
+  // WITHOUT await so getUserMedia fires while the user activation is still live.
+  async function acquireAndInvite() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      onSessionError?.('Microphone access is not available in this browser or context.')
+      return
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      onInvite?.(stream)
+    } catch (err) {
+      const name = (err as DOMException).name ?? 'UnknownError'
+      const msg  = (err as DOMException).message ?? ''
+      console.error('[Sona] getUserMedia failed:', name, msg)
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        onSessionError?.('Microphone permission was denied. Please allow microphone access in your browser settings and try again.')
+      } else if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        onSessionError?.('No microphone was found. Please connect a microphone and try again.')
+      } else if (name === 'NotReadableError' || name === 'TrackStartError') {
+        onSessionError?.('The microphone is already in use by another app. Please close other apps using the mic and try again.')
+      } else {
+        onSessionError?.(`Could not access the microphone (${name}). Please check your permissions and try again.`)
+      }
+    }
   }
 
-  function handleResumeClick() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => onResume?.(stream))
-      .catch(() => onSessionError?.('Microphone access is required. Please allow access when prompted and try again.'))
+  async function acquireAndResume() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      onSessionError?.('Microphone access is not available in this browser or context.')
+      return
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      onResume?.(stream)
+    } catch (err) {
+      const name = (err as DOMException).name ?? 'UnknownError'
+      console.error('[Sona] getUserMedia (resume) failed:', name)
+      onSessionError?.(`Could not access the microphone (${name}). Please check your permissions and try again.`)
+    }
   }
+
+  function handleInviteClick() { acquireAndInvite() }
+  function handleResumeClick()  { acquireAndResume() }
 
   const isRecording = status === 'recording'
   const isTranscribing = status === 'transcribing'
