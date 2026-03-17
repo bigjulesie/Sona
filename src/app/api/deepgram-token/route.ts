@@ -1,49 +1,38 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
-// Issues a short-lived Deepgram key so the client can open a WebSocket
-// directly to Deepgram for real-time streaming transcription.
-// Uses the Projects API (POST /v1/projects/:id/keys) which works with
-// standard API keys — the /v1/auth/grant endpoint requires keys:write scope.
+// Issues a short-lived Deepgram browser token via /v1/auth/grant.
+// Requires a Deepgram API key with keys:write scope (Member role or above).
+// The returned token works with ?token= in the WebSocket URL for browser clients.
 export async function POST() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const apiKey = process.env.DEEPGRAM_API_KEY
-  const projectId = process.env.DEEPGRAM_PROJECT_ID
-
   if (!apiKey) {
     console.error('[deepgram-token] DEEPGRAM_API_KEY not set')
     return NextResponse.json({ error: 'DEEPGRAM_API_KEY not configured' }, { status: 500 })
   }
-  if (!projectId) {
-    console.error('[deepgram-token] DEEPGRAM_PROJECT_ID not set')
-    return NextResponse.json({ error: 'DEEPGRAM_PROJECT_ID not configured' }, { status: 500 })
-  }
 
   try {
-    const res = await fetch(`https://api.deepgram.com/v1/projects/${projectId}/keys`, {
+    const res = await fetch('https://api.deepgram.com/v1/auth/grant', {
       method: 'POST',
       headers: {
         Authorization: `Token ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        comment: 'sona-browser-session',
-        scopes: ['usage:write'],
-        time_to_live_in_seconds: 300,
-      }),
+      body: JSON.stringify({ time_to_live_in_seconds: 300 }),
     })
 
     if (!res.ok) {
       const text = await res.text()
-      console.error('[deepgram-token] key creation failed', res.status, text)
+      console.error('[deepgram-token] grant failed', res.status, text)
       return NextResponse.json({ error: `Deepgram error: ${text}` }, { status: 500 })
     }
 
     const body = await res.json()
-    const token = body.key
+    const token = body.key ?? body.token ?? body.access_token
     if (!token) {
       console.error('[deepgram-token] unexpected response shape', JSON.stringify(body))
       return NextResponse.json({ error: 'Unexpected Deepgram response' }, { status: 500 })
