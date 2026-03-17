@@ -115,5 +115,20 @@ export function useVoice({ onTranscript }: UseVoiceOptions) {
     }
   }, [onTranscript, status])
 
-  return { status, error, analyser, devices, selectedDeviceId, setSelectedDeviceId, startRecording, stopRecording }
+  // Acquire a mic stream without starting a recording session — for callers
+  // (e.g. group session invite) that need the stream but not STT transcription.
+  // Uses the same useCallback + getUserMedia pattern as startRecording, which
+  // is confirmed to work in Safari when called without await from an onClick.
+  const requestStream = useCallback(async (): Promise<MediaStream | null> => {
+    const audioConstraint = selectedDeviceId
+      ? { deviceId: { exact: selectedDeviceId } }
+      : true
+    try {
+      return await navigator.mediaDevices.getUserMedia({ audio: audioConstraint })
+    } catch {
+      return null
+    }
+  }, [selectedDeviceId])
+
+  return { status, error, analyser, devices, selectedDeviceId, setSelectedDeviceId, startRecording, stopRecording, requestStream }
 }
