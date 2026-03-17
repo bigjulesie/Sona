@@ -32,6 +32,7 @@ export async function POST() {
     }
 
     const body = await res.json()
+    console.log('[deepgram-token] grant response keys:', Object.keys(body))
     const token = body.key ?? body.token ?? body.access_token
     if (!token) {
       console.error('[deepgram-token] unexpected response shape', JSON.stringify(body))
