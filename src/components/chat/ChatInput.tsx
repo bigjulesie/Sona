@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useVoice } from '@/lib/hooks/useVoice'
 import { VoiceWaveform } from './VoiceWaveform'
+import type { SessionStatus } from '@/lib/hooks/useGroupSession'
 
 const GEIST = 'var(--font-geist-sans)'
 
@@ -14,9 +15,13 @@ interface ChatInputProps {
   onToggleVoice?: () => void
   onRecordingChange?: (recording: boolean) => void
   portraitName?: string
-  inRoomMode?: boolean
-  inRoomMicActive?: boolean
   textareaRef?: React.RefObject<HTMLTextAreaElement | null>
+  // Session controls
+  sessionStatus?: SessionStatus
+  onInvite?: () => void
+  onPause?: () => void
+  onResume?: () => void
+  onLeave?: () => void
 }
 
 export function ChatInput({
@@ -27,11 +32,15 @@ export function ChatInput({
   onToggleVoice,
   onRecordingChange,
   portraitName,
-  inRoomMode = false,
-  inRoomMicActive = false,
   textareaRef: textareaRefProp,
+  sessionStatus = 'idle',
+  onInvite,
+  onPause,
+  onResume,
+  onLeave,
 }: ChatInputProps) {
   const [value, setValue] = useState('')
+  const [controlsOpen, setControlsOpen] = useState(false)
   const localTextareaRef = useRef<HTMLTextAreaElement>(null)
   const textareaRef = textareaRefProp ?? localTextareaRef
 
@@ -63,6 +72,13 @@ export function ChatInput({
     onRecordingChange?.(status === 'recording')
   }, [status, onRecordingChange])
 
+  // Close controls disclosure when session ends
+  useEffect(() => {
+    if (sessionStatus === 'idle' || sessionStatus === 'ended') {
+      setControlsOpen(false)
+    }
+  }, [sessionStatus])
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!value.trim() || disabled) return
@@ -84,13 +100,201 @@ export function ChatInput({
 
   const isRecording = status === 'recording'
   const isTranscribing = status === 'transcribing'
+  const isActive = sessionStatus === 'active'
+  const isPaused = sessionStatus === 'paused'
+  const isInRoom = isActive || isPaused
+  const isStarting = sessionStatus === 'starting'
 
   return (
     <div style={{
       borderTop: '1px solid rgba(0,0,0,0.06)',
-      backgroundColor: '#fff',
+      backgroundColor: isInRoom ? 'rgba(222,62,123,0.015)' : '#fff',
+      transition: 'background-color 0.3s ease',
     }}>
-      {/* Device picker — shown when multiple mics available and not recording */}
+
+      {/* ── Session row ──────────────────────────────────────────────── */}
+      {sessionStatus !== 'ended' && (
+        <div style={{
+          borderBottom: '1px solid rgba(0,0,0,0.05)',
+        }}>
+
+          {/* Idle — invite pill */}
+          {(sessionStatus === 'idle') && onInvite && (
+            <div style={{ padding: '8px clamp(16px, 4vw, 24px)' }}>
+              <button
+                onClick={onInvite}
+                style={{
+                  fontFamily: GEIST,
+                  fontSize: '0.75rem',
+                  fontWeight: 400,
+                  color: '#6b6b6b',
+                  background: 'none',
+                  border: '1px solid rgba(0,0,0,0.10)',
+                  borderRadius: '980px',
+                  padding: '5px 14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                }}
+                aria-label={`Invite ${portraitName ?? 'them'} into the room`}
+              >
+                <span style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  backgroundColor: '#b0b0b0',
+                  display: 'inline-block',
+                  flexShrink: 0,
+                }} />
+                Invite {portraitName ?? 'them'} in
+              </button>
+            </div>
+          )}
+
+          {/* Starting */}
+          {isStarting && (
+            <div style={{
+              padding: '10px clamp(16px, 4vw, 24px)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              minHeight: 38,
+            }}>
+              <span style={{
+                fontFamily: GEIST,
+                fontSize: '0.75rem',
+                fontWeight: 400,
+                color: '#b0b0b0',
+              }}>
+                Joining the room…
+              </span>
+            </div>
+          )}
+
+          {/* Active / Paused — presence row */}
+          {isInRoom && (
+            <>
+              <div
+                style={{
+                  padding: '8px clamp(16px, 4vw, 24px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  cursor: 'pointer',
+                }}
+                role="button"
+                tabIndex={0}
+                onClick={() => setControlsOpen(o => !o)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setControlsOpen(o => !o)
+                  }
+                }}
+                aria-expanded={controlsOpen}
+                aria-label={isActive
+                  ? `${portraitName ?? 'Sona'} is in the room — tap to manage`
+                  : `${portraitName ?? 'Sona'} has stepped out — tap to manage`}
+              >
+                <span
+                  aria-hidden="true"
+                  className="presence-dot"
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    backgroundColor: isActive ? '#DE3E7B' : '#b0b0b0',
+                    display: 'inline-block',
+                    flexShrink: 0,
+                    animation: isActive ? 'presence-pulse 2.8s ease-in-out infinite' : 'none',
+                    transition: 'background-color 0.2s ease',
+                  }}
+                />
+                <span style={{
+                  fontFamily: GEIST,
+                  fontSize: '0.75rem',
+                  fontWeight: 400,
+                  color: '#6b6b6b',
+                  letterSpacing: '0.01em',
+                  flex: 1,
+                }}>
+                  {isActive
+                    ? `${portraitName ?? 'Sona'} is in the room`
+                    : `${portraitName ?? 'Sona'} has stepped out`}
+                </span>
+
+                {/* Single-tap pause/resume */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    isActive ? onPause?.() : onResume?.()
+                  }}
+                  style={{
+                    fontFamily: GEIST,
+                    fontSize: '0.6875rem',
+                    fontWeight: 400,
+                    color: '#b0b0b0',
+                    background: 'none',
+                    border: 'none',
+                    padding: '2px 8px',
+                    cursor: 'pointer',
+                    borderRadius: '980px',
+                    flexShrink: 0,
+                  }}
+                  aria-label={isActive ? 'Pause listening' : 'Resume listening'}
+                >
+                  {isActive ? 'Pause' : 'Resume'}
+                </button>
+              </div>
+
+              {/* Expanded controls */}
+              {controlsOpen && (
+                <div style={{
+                  display: 'flex',
+                  gap: 8,
+                  padding: '4px clamp(16px, 4vw, 24px) 10px',
+                }}>
+                  <button
+                    onClick={() => { isActive ? onPause?.() : onResume?.(); setControlsOpen(false) }}
+                    style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.75rem',
+                      fontWeight: 450,
+                      color: '#6b6b6b',
+                      background: 'none',
+                      border: '1px solid rgba(0,0,0,0.10)',
+                      borderRadius: '980px',
+                      padding: '6px 14px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {isActive ? 'Step out for a moment' : 'Come back in'}
+                  </button>
+                  <button
+                    onClick={() => { onLeave?.(); setControlsOpen(false) }}
+                    style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.75rem',
+                      fontWeight: 450,
+                      color: '#6b6b6b',
+                      background: 'none',
+                      border: '1px solid rgba(0,0,0,0.10)',
+                      borderRadius: '980px',
+                      padding: '6px 14px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Leave the room
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── Device picker ────────────────────────────────────────────── */}
       {voiceEnabled && !isRecording && devices.length > 1 && (
         <div style={{ padding: '6px clamp(16px, 4vw, 24px) 0', display: 'flex', alignItems: 'center', gap: 8 }}>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0, color: '#b0b0b0' }}>
@@ -122,8 +326,8 @@ export function ChatInput({
         </div>
       )}
 
-      {/* Privacy banner — visible only while recording and NOT in in-room mode */}
-      {isRecording && !inRoomMode && (
+      {/* ── Privacy banner (voice recording, not in room) ────────────── */}
+      {isRecording && !isInRoom && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -152,39 +356,7 @@ export function ChatInput({
         </div>
       )}
 
-      {/* In-room mic status indicator — calm coral/grey dot */}
-      {inRoomMode && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '6px clamp(16px, 4vw, 24px) 0',
-        }}>
-          <span
-            className="presence-dot"
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              backgroundColor: inRoomMicActive ? '#DE3E7B' : '#b0b0b0',
-              display: 'inline-block',
-              animation: inRoomMicActive ? 'presence-pulse 2.8s ease-in-out infinite' : 'none',
-              transition: 'background-color 0.2s ease',
-            }}
-            aria-label={inRoomMicActive ? 'Microphone active, listening to room' : 'Microphone paused'}
-          />
-          <span style={{
-            fontFamily: GEIST,
-            fontSize: '0.6875rem',
-            fontWeight: 400,
-            color: '#b0b0b0',
-            letterSpacing: '0.04em',
-          }}>
-            {inRoomMicActive ? 'Listening' : 'Paused'}
-          </span>
-        </div>
-      )}
-
+      {/* ── Form row ─────────────────────────────────────────────────── */}
       <form
         onSubmit={handleSubmit}
         style={{
@@ -246,7 +418,7 @@ export function ChatInput({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={inRoomMode ? `Say something to ${portraitName ?? 'them'}…` : 'Ask a question…'}
+            placeholder={isInRoom ? `Say something to ${portraitName ?? 'them'}…` : 'Ask a question…'}
             rows={1}
             disabled={disabled}
             style={{
