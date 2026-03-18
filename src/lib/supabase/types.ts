@@ -47,6 +47,66 @@ export type Database = {
         }
         Relationships: []
       }
+      content_sources: {
+        Row: {
+          created_at: string | null
+          error_msg: string | null
+          id: string
+          min_tier: Database["public"]["Enums"]["access_tier"]
+          portrait_id: string
+          raw_content: string | null
+          source_date: string | null
+          source_type: string
+          source_url: string | null
+          status: string
+          storage_path: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_msg?: string | null
+          id?: string
+          min_tier?: Database["public"]["Enums"]["access_tier"]
+          portrait_id: string
+          raw_content?: string | null
+          source_date?: string | null
+          source_type?: string
+          source_url?: string | null
+          status?: string
+          storage_path?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          error_msg?: string | null
+          id?: string
+          min_tier?: Database["public"]["Enums"]["access_tier"]
+          portrait_id?: string
+          raw_content?: string | null
+          source_date?: string | null
+          source_type?: string
+          source_url?: string | null
+          status?: string
+          storage_path?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_sources_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_sources_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string | null
@@ -237,6 +297,7 @@ export type Database = {
           min_tier: Database["public"]["Enums"]["access_tier"]
           portrait_id: string
           source_date: string | null
+          source_id: string | null
           source_title: string | null
           source_type: string | null
         }
@@ -250,6 +311,7 @@ export type Database = {
           min_tier?: Database["public"]["Enums"]["access_tier"]
           portrait_id: string
           source_date?: string | null
+          source_id?: string | null
           source_title?: string | null
           source_type?: string | null
         }
@@ -263,6 +325,7 @@ export type Database = {
           min_tier?: Database["public"]["Enums"]["access_tier"]
           portrait_id?: string
           source_date?: string | null
+          source_id?: string | null
           source_title?: string | null
           source_type?: string | null
         }
@@ -279,6 +342,13 @@ export type Database = {
             columns: ["portrait_id"]
             isOneToOne: false
             referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_chunks_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "content_sources"
             referencedColumns: ["id"]
           },
         ]
@@ -332,18 +402,18 @@ export type Database = {
           display_name: string
           id: string
           is_public: boolean
+          last_synthesised_at: string | null
           linkedin_url: string | null
           monthly_price_cents: number | null
           search_context: string | null
           slug: string
           stripe_price_id: string | null
+          synthesis_status: string
           system_prompt: string
           tagline: string | null
           tags: string[] | null
           updated_at: string | null
-          voice_enabled: boolean
-          voice_provider_id: string | null
-          web_research_status: string | null
+          web_research_status: string
           website_url: string | null
         }
         Insert: {
@@ -356,18 +426,18 @@ export type Database = {
           display_name: string
           id?: string
           is_public?: boolean
+          last_synthesised_at?: string | null
           linkedin_url?: string | null
           monthly_price_cents?: number | null
           search_context?: string | null
           slug: string
           stripe_price_id?: string | null
+          synthesis_status?: string
           system_prompt: string
           tagline?: string | null
           tags?: string[] | null
           updated_at?: string | null
-          voice_enabled?: boolean
-          voice_provider_id?: string | null
-          web_research_status?: string | null
+          web_research_status?: string
           website_url?: string | null
         }
         Update: {
@@ -380,18 +450,18 @@ export type Database = {
           display_name?: string
           id?: string
           is_public?: boolean
+          last_synthesised_at?: string | null
           linkedin_url?: string | null
           monthly_price_cents?: number | null
           search_context?: string | null
           slug?: string
           stripe_price_id?: string | null
+          synthesis_status?: string
           system_prompt?: string
           tagline?: string | null
           tags?: string[] | null
           updated_at?: string | null
-          voice_enabled?: boolean
-          voice_provider_id?: string | null
-          web_research_status?: string | null
+          web_research_status?: string
           website_url?: string | null
         }
         Relationships: [
@@ -514,6 +584,337 @@ export type Database = {
           },
         ]
       }
+      sona_dimensions: {
+        Row: {
+          confidence: number | null
+          confidence_flag: string | null
+          created_at: string
+          dimension_category: string
+          dimension_key: string
+          evidence_count: number
+          id: string
+          last_synthesised_at: string | null
+          min_tier: Database["public"]["Enums"]["access_tier"]
+          narrative: string | null
+          portrait_id: string
+          score: number | null
+          updated_at: string
+        }
+        Insert: {
+          confidence?: number | null
+          confidence_flag?: string | null
+          created_at?: string
+          dimension_category: string
+          dimension_key: string
+          evidence_count?: number
+          id?: string
+          last_synthesised_at?: string | null
+          min_tier?: Database["public"]["Enums"]["access_tier"]
+          narrative?: string | null
+          portrait_id: string
+          score?: number | null
+          updated_at?: string
+        }
+        Update: {
+          confidence?: number | null
+          confidence_flag?: string | null
+          created_at?: string
+          dimension_category?: string
+          dimension_key?: string
+          evidence_count?: number
+          id?: string
+          last_synthesised_at?: string | null
+          min_tier?: Database["public"]["Enums"]["access_tier"]
+          narrative?: string | null
+          portrait_id?: string
+          score?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sona_dimensions_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sona_dimensions_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sona_evidence: {
+        Row: {
+          confidence: number
+          created_at: string
+          dimension_category: string
+          dimension_key: string
+          evidence_text: string
+          evidence_type: string
+          id: string
+          portrait_id: string
+          source_id: string
+          source_speaker: string | null
+        }
+        Insert: {
+          confidence: number
+          created_at?: string
+          dimension_category: string
+          dimension_key: string
+          evidence_text: string
+          evidence_type: string
+          id?: string
+          portrait_id: string
+          source_id: string
+          source_speaker?: string | null
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          dimension_category?: string
+          dimension_key?: string
+          evidence_text?: string
+          evidence_type?: string
+          id?: string
+          portrait_id?: string
+          source_id?: string
+          source_speaker?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sona_evidence_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sona_evidence_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sona_evidence_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "content_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sona_identity_prompts: {
+        Row: {
+          generated_at: string
+          id: string
+          portrait_id: string
+          prompt_content: string
+          tier: Database["public"]["Enums"]["access_tier"]
+        }
+        Insert: {
+          generated_at?: string
+          id?: string
+          portrait_id: string
+          prompt_content: string
+          tier: Database["public"]["Enums"]["access_tier"]
+        }
+        Update: {
+          generated_at?: string
+          id?: string
+          portrait_id?: string
+          prompt_content?: string
+          tier?: Database["public"]["Enums"]["access_tier"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sona_identity_prompts_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sona_identity_prompts_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sona_modules: {
+        Row: {
+          activation_embedding: string | null
+          activation_keywords: string[]
+          confidence: number | null
+          created_at: string
+          id: string
+          min_tier: Database["public"]["Enums"]["access_tier"]
+          module_type: string
+          nlp_delivery_notes: string | null
+          portrait_id: string
+          prompt_content: string
+          superseded_at: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          activation_embedding?: string | null
+          activation_keywords?: string[]
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          min_tier?: Database["public"]["Enums"]["access_tier"]
+          module_type: string
+          nlp_delivery_notes?: string | null
+          portrait_id: string
+          prompt_content: string
+          superseded_at?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          activation_embedding?: string | null
+          activation_keywords?: string[]
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          min_tier?: Database["public"]["Enums"]["access_tier"]
+          module_type?: string
+          nlp_delivery_notes?: string | null
+          portrait_id?: string
+          prompt_content?: string
+          superseded_at?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sona_modules_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sona_modules_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sona_synthesis_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_msg: string | null
+          id: string
+          job_type: string
+          metadata: Json
+          portrait_id: string
+          source_id: string | null
+          started_at: string | null
+          status: string
+          triggered_by: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_msg?: string | null
+          id?: string
+          job_type: string
+          metadata?: Json
+          portrait_id: string
+          source_id?: string | null
+          started_at?: string | null
+          status?: string
+          triggered_by?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_msg?: string | null
+          id?: string
+          job_type?: string
+          metadata?: Json
+          portrait_id?: string
+          source_id?: string | null
+          started_at?: string | null
+          status?: string
+          triggered_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sona_synthesis_jobs_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portrait_discovery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sona_synthesis_jobs_portrait_id_fkey"
+            columns: ["portrait_id"]
+            isOneToOne: false
+            referencedRelation: "portraits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sona_synthesis_jobs_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "content_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sona_transcriptions: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          language: string
+          model: string
+          source_id: string
+          transcript: string
+          transcript_with_speakers: Json | null
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          language?: string
+          model?: string
+          source_id: string
+          transcript: string
+          transcript_with_speakers?: Json | null
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          language?: string
+          model?: string
+          source_id?: string
+          transcript?: string
+          transcript_with_speakers?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sona_transcriptions_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: true
+            referencedRelation: "content_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           created_at: string | null
@@ -605,9 +1006,30 @@ export type Database = {
           source_type: string
         }[]
       }
+      match_sona_modules: {
+        Args: {
+          match_count?: number
+          portrait_id: string
+          query_embedding: string
+          similarity_threshold?: number
+          tier_level: number
+        }
+        Returns: {
+          id: string
+          module_type: string
+          nlp_delivery_notes: string
+          prompt_content: string
+          similarity: number
+          title: string
+        }[]
+      }
       tier_level: {
         Args: { t: Database["public"]["Enums"]["access_tier"] }
         Returns: number
+      }
+      user_tier_for_portrait: {
+        Args: { portrait_uuid: string }
+        Returns: Database["public"]["Enums"]["access_tier"]
       }
     }
     Enums: {
@@ -743,3 +1165,5 @@ export const Constants = {
     },
   },
 } as const
+A new version of Supabase CLI is available: v2.78.1 (currently installed v2.76.13)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
