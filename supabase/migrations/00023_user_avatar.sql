@@ -10,9 +10,6 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('avatars', 'avatars', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Enable RLS on storage.objects (idempotent — safe to run even if already enabled)
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
 -- RLS: authenticated users may upload only to their own path
 CREATE POLICY "users_upload_own_avatar"
   ON storage.objects FOR INSERT
