@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { SubscribeButton } from '@/components/sona/SubscribeButton'
 import { ChatInterface } from '@/components/chat/ChatInterface'
+import { UserAvatar } from '@/components/account/UserAvatar'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
@@ -55,7 +56,7 @@ export default async function SonaPage({ params }: PageProps) {
 
   const { data: portrait } = await supabase
     .from('portraits')
-    .select('id, display_name, tagline, bio, avatar_url, monthly_price_cents, slug')
+    .select('id, display_name, tagline, bio, avatar_url, monthly_price_cents, slug, creator_id')
     .eq('slug', slug)
     .eq('brand', 'sona')
     .eq('is_public', true)
@@ -67,32 +68,25 @@ export default async function SonaPage({ params }: PageProps) {
   let existingRating: number | null = null
   let userAvatarUrl: string | null = null
   let userHaloColor: string | null = null
+  let userName = 'You'
+  const isCreator = !!user && user.id === portrait.creator_id
   if (user) {
-    const { data: sub } = await supabase
-      .from('subscriptions')
-      .select('id')
-      .eq('subscriber_id', user.id)
-      .eq('portrait_id', portrait.id)
-      .eq('status', 'active')
-      .maybeSingle()
+    const [{ data: sub }, { data: userProfile }] = await Promise.all([
+      supabase.from('subscriptions').select('id')
+        .eq('subscriber_id', user.id).eq('portrait_id', portrait.id).eq('status', 'active').maybeSingle(),
+      supabase.from('profiles').select('avatar_url, avatar_halo_color, full_name')
+        .eq('id', user.id).maybeSingle(),
+    ])
     isSubscribed = !!sub
+    userAvatarUrl = userProfile?.avatar_url ?? null
+    userHaloColor = userProfile?.avatar_halo_color ?? null
+    userName = userProfile?.full_name || user.email || 'You'
 
     if (isSubscribed) {
       const { data: rating } = await supabase
-        .from('ratings')
-        .select('score')
-        .eq('subscriber_id', user.id)
-        .eq('portrait_id', portrait.id)
-        .maybeSingle()
+        .from('ratings').select('score')
+        .eq('subscriber_id', user.id).eq('portrait_id', portrait.id).maybeSingle()
       existingRating = rating?.score ?? null
-
-      const { data: userProfile } = await supabase
-        .from('profiles')
-        .select('avatar_url, avatar_halo_color')
-        .eq('id', user.id)
-        .maybeSingle()
-      userAvatarUrl = userProfile?.avatar_url ?? null
-      userHaloColor = userProfile?.avatar_halo_color ?? null
     }
   }
 
@@ -143,31 +137,24 @@ export default async function SonaPage({ params }: PageProps) {
               <img
                 src={portrait.avatar_url}
                 alt={portrait.display_name}
-                style={{
-                  width: 108,
-                  height: 108,
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                }}
+                style={{ width: 108, height: 108, borderRadius: '50%', objectFit: 'cover' }}
+              />
+            ) : isCreator ? (
+              <UserAvatar
+                avatarUrl={userAvatarUrl}
+                haloColor={userHaloColor}
+                name={userName}
+                size={108}
               />
             ) : (
               <div style={{
-                width: 108,
-                height: 108,
-                borderRadius: '50%',
+                width: 108, height: 108, borderRadius: '50%',
                 backgroundColor: 'rgba(0,0,0,0.04)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <span style={{
-                  fontFamily: CORMORANT,
-                  fontSize: '2.75rem',
-                  fontStyle: 'italic',
-                  fontWeight: 400,
-                  color: '#1a1a1a',
-                  lineHeight: 1,
-                  userSelect: 'none',
+                  fontFamily: CORMORANT, fontSize: '2.75rem', fontStyle: 'italic',
+                  fontWeight: 400, color: '#1a1a1a', lineHeight: 1, userSelect: 'none',
                 }}>
                   {initial}
                 </span>
