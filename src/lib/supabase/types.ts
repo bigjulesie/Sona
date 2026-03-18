@@ -477,6 +477,8 @@ export type Database = {
       profiles: {
         Row: {
           access_tier: Database["public"]["Enums"]["access_tier"]
+          avatar_halo_color: string | null
+          avatar_url: string | null
           created_at: string | null
           email: string
           full_name: string | null
@@ -490,6 +492,8 @@ export type Database = {
         }
         Insert: {
           access_tier?: Database["public"]["Enums"]["access_tier"]
+          avatar_halo_color?: string | null
+          avatar_url?: string | null
           created_at?: string | null
           email: string
           full_name?: string | null
@@ -503,6 +507,8 @@ export type Database = {
         }
         Update: {
           access_tier?: Database["public"]["Enums"]["access_tier"]
+          avatar_halo_color?: string | null
+          avatar_url?: string | null
           created_at?: string | null
           email?: string
           full_name?: string | null
