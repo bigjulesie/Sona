@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { BillingPortalButton } from './BillingPortalButton'
 import { ProfileForm } from './ProfileForm'
 import { DeleteAccountButton } from './DeleteAccountButton'
+import { AvatarUpload } from '@/components/account/AvatarUpload'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
@@ -18,7 +19,7 @@ export default async function AccountPage({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, stripe_customer_id')
+    .select('full_name, stripe_customer_id, avatar_url, avatar_halo_color')
     .eq('id', user.id)
     .single()
 
@@ -59,6 +60,11 @@ export default async function AccountPage({
           }}>
             Profile
           </h2>
+          <AvatarUpload
+            currentAvatarUrl={profile?.avatar_url}
+            currentHaloColor={profile?.avatar_halo_color}
+            name={profile?.full_name || user.email || 'User'}
+          />
           <ProfileForm
             fullName={profile?.full_name ?? ''}
             email={user.email ?? ''}
