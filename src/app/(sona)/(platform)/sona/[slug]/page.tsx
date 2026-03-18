@@ -56,7 +56,7 @@ export default async function SonaPage({ params }: PageProps) {
 
   const { data: portrait } = await supabase
     .from('portraits')
-    .select('id, display_name, tagline, bio, avatar_url, monthly_price_cents, slug, creator_id')
+    .select('id, display_name, tagline, bio, avatar_url, monthly_price_cents, slug')
     .eq('slug', slug)
     .eq('brand', 'sona')
     .eq('is_public', true)
@@ -65,19 +65,22 @@ export default async function SonaPage({ params }: PageProps) {
   if (!portrait) notFound()
 
   let isSubscribed = false
+  let isCreator = false
   let existingRating: number | null = null
   let userAvatarUrl: string | null = null
   let userHaloColor: string | null = null
   let userName = 'You'
-  const isCreator = !!user && user.id === portrait.creator_id
   if (user) {
-    const [{ data: sub }, { data: userProfile }] = await Promise.all([
+    const [{ data: sub }, { data: userProfile }, { data: ownPortrait }] = await Promise.all([
       supabase.from('subscriptions').select('id')
         .eq('subscriber_id', user.id).eq('portrait_id', portrait.id).eq('status', 'active').maybeSingle(),
       supabase.from('profiles').select('avatar_url, avatar_halo_color, full_name')
         .eq('id', user.id).maybeSingle(),
+      supabase.from('portraits').select('id')
+        .eq('id', portrait.id).eq('creator_id', user.id).maybeSingle(),
     ])
     isSubscribed = !!sub
+    isCreator = !!ownPortrait
     userAvatarUrl = userProfile?.avatar_url ?? null
     userHaloColor = userProfile?.avatar_halo_color ?? null
     userName = userProfile?.full_name || user.email || 'You'

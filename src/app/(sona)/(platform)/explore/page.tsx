@@ -30,10 +30,10 @@ export default async function ExplorePage({ searchParams }: PageProps) {
   let creatorHaloColor: string | null = null
   if (user) {
     const [{ data: portrait }, { data: profile }] = await Promise.all([
-      supabase.from('portraits').select('id').eq('creator_id', user.id).eq('brand', 'sona').maybeSingle(),
+      supabase.from('portraits').select('slug').eq('creator_id', user.id).eq('brand', 'sona').maybeSingle(),
       supabase.from('profiles').select('avatar_url, avatar_halo_color').eq('id', user.id).maybeSingle(),
     ])
-    ownPortraitId = portrait?.id ?? null
+    ownPortraitId = portrait?.slug ?? null   // use slug — avoids UUID type ambiguity
     creatorAvatarUrl = profile?.avatar_url ?? null
     creatorHaloColor = profile?.avatar_halo_color ?? null
   }
@@ -199,8 +199,8 @@ export default async function ExplorePage({ searchParams }: PageProps) {
               <SonaCard
                 key={sona.id}
                 {...(sona as any)}
-                creatorAvatarUrl={sona.id === ownPortraitId ? creatorAvatarUrl : null}
-                creatorHaloColor={sona.id === ownPortraitId ? creatorHaloColor : null}
+                creatorAvatarUrl={sona.slug === ownPortraitId ? creatorAvatarUrl : null}
+                creatorHaloColor={sona.slug === ownPortraitId ? creatorHaloColor : null}
               />
             ))}
           </div>
