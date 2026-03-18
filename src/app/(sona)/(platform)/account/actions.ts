@@ -35,3 +35,19 @@ export async function deleteAccount() {
 
   redirect('/')
 }
+
+export async function updateAvatar(avatarUrl: string, haloColor: string) {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ avatar_url: avatarUrl, avatar_halo_color: haloColor })
+    .eq('id', user.id)
+
+  if (error) throw new Error('Failed to save avatar')
+
+  revalidatePath('/account')
+  revalidatePath('/', 'layout')  // revalidates SonaNav across all pages
+}
