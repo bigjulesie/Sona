@@ -24,8 +24,6 @@ export async function createPortrait(formData: FormData) {
       display_name: displayName,
       slug,
       system_prompt: systemPrompt,
-      voice_enabled: false,
-      voice_provider_id: null,
     })
     .select('id')
     .single()
@@ -47,8 +45,6 @@ export async function updatePortrait(portraitId: string, fields: {
   display_name: string
   slug: string
   system_prompt: string
-  voice_enabled: boolean
-  voice_provider_id: string | null
 }) {
   if (!/^[a-z0-9-]+$/.test(fields.slug)) {
     return { error: 'Slug may only contain lowercase letters, numbers, and hyphens' }

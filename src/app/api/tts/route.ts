@@ -25,14 +25,7 @@ export async function POST(req: NextRequest) {
     return new Response('ELEVENLABS_API_KEY not configured', { status: 500 })
   }
 
-  const { data: portrait } = await createAdminClient()
-    .from('portraits')
-    .select('voice_provider_id')
-    .eq('id', portrait_id)
-    .maybeSingle()
-
-  const voiceId =
-    portrait?.voice_provider_id ?? process.env.ELEVENLABS_DEFAULT_VOICE_ID ?? process.env.ELEVENLABS_DEFAULT_VOICE
+  const voiceId = process.env.ELEVENLABS_DEFAULT_VOICE_ID ?? process.env.ELEVENLABS_DEFAULT_VOICE
   if (!voiceId) {
     return new Response('No voice ID configured', { status: 500 })
   }
