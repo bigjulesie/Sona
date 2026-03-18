@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { formatDistanceToNow } from 'date-fns'
+import { UserAvatar } from '@/components/account/UserAvatar'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
@@ -12,6 +13,13 @@ export default async function HomePage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  // User profile (avatar)
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('full_name, avatar_url, avatar_halo_color')
+    .eq('id', user.id)
+    .maybeSingle()
 
   // Own portrait (if creator)
   const { data: ownPortrait } = await supabase
@@ -56,17 +64,25 @@ export default async function HomePage() {
       }}>
 
         {/* ── Page header ─────────────────────────────────────────── */}
-        <h1 style={{
-          fontFamily: CORMORANT,
-          fontSize: 'clamp(2rem, 4vw, 2.75rem)',
-          fontWeight: 400,
-          fontStyle: 'italic',
-          letterSpacing: '-0.02em',
-          color: '#1a1a1a',
-          margin: '0 0 48px',
-        }}>
-          My Circle
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 48 }}>
+          <UserAvatar
+            avatarUrl={userProfile?.avatar_url}
+            haloColor={userProfile?.avatar_halo_color}
+            name={userProfile?.full_name || user.email || 'You'}
+            size={44}
+          />
+          <h1 style={{
+            fontFamily: CORMORANT,
+            fontSize: 'clamp(2rem, 4vw, 2.75rem)',
+            fontWeight: 400,
+            fontStyle: 'italic',
+            letterSpacing: '-0.02em',
+            color: '#1a1a1a',
+            margin: 0,
+          }}>
+            My Circle
+          </h1>
+        </div>
 
         {/* ── Own Sona (creator only) ──────────────────────────────── */}
         {ownPortrait && (
