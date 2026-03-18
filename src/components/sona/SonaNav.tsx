@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { SignOutButton } from './SignOutButton'
+import { UserAvatar } from '@/components/account/UserAvatar'
 
 const GEIST = 'var(--font-geist-sans)'
 
@@ -18,6 +19,9 @@ export async function SonaNav() {
   const { data: { user } } = await supabase.auth.getUser()
 
   let hasPortrait = false
+  let avatarUrl: string | null = null
+  let haloColor: string | null = null
+  let userName = 'User'
   if (user) {
     const { data } = await supabase
       .from('portraits')
@@ -25,6 +29,15 @@ export async function SonaNav() {
       .eq('creator_id', user.id)
       .maybeSingle()
     hasPortrait = !!data
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('avatar_url, avatar_halo_color, full_name')
+      .eq('id', user.id)
+      .maybeSingle()
+    avatarUrl = profile?.avatar_url ?? null
+    haloColor = profile?.avatar_halo_color ?? null
+    userName = profile?.full_name || user.email || 'User'
   }
 
   return (
@@ -62,6 +75,12 @@ export async function SonaNav() {
               <Link href="/dashboard" className="sona-link" style={linkStyle}>Dashboard</Link>
             )}
             <Link href="/account" className="sona-link" style={linkStyle}>Account</Link>
+            <UserAvatar
+              avatarUrl={avatarUrl}
+              haloColor={haloColor}
+              name={userName}
+              size={28}
+            />
             <SignOutButton />
           </>
         ) : (
