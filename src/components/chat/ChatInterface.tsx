@@ -17,6 +17,8 @@ interface ChatInterfaceProps {
   initialConversationId?: string
   onConversationChange?: (id: string) => void
   existingRating?: number | null
+  userAvatarUrl?: string | null
+  userHaloColor?: string | null
 }
 
 export function ChatInterface({
@@ -26,6 +28,8 @@ export function ChatInterface({
   initialConversationId,
   onConversationChange,
   existingRating,
+  userAvatarUrl,
+  userHaloColor,
 }: ChatInterfaceProps) {
   const { messages, isStreaming, conversationId, sendMessage, loadConversation } =
     useChat(portraitId)
@@ -254,6 +258,8 @@ export function ChatInterface({
                   : undefined
               }
               isPlayingTTS={playingMessageId === entry.id}
+              userAvatarUrl={userAvatarUrl}
+              userHaloColor={userHaloColor}
             />
           ))
         }

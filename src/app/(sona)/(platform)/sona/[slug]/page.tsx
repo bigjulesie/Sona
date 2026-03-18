@@ -65,6 +65,8 @@ export default async function SonaPage({ params }: PageProps) {
 
   let isSubscribed = false
   let existingRating: number | null = null
+  let userAvatarUrl: string | null = null
+  let userHaloColor: string | null = null
   if (user) {
     const { data: sub } = await supabase
       .from('subscriptions')
@@ -83,6 +85,14 @@ export default async function SonaPage({ params }: PageProps) {
         .eq('portrait_id', portrait.id)
         .maybeSingle()
       existingRating = rating?.score ?? null
+
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('avatar_url, avatar_halo_color')
+        .eq('id', user.id)
+        .maybeSingle()
+      userAvatarUrl = userProfile?.avatar_url ?? null
+      userHaloColor = userProfile?.avatar_halo_color ?? null
     }
   }
 
@@ -297,6 +307,8 @@ export default async function SonaPage({ params }: PageProps) {
             portraitName={portrait.display_name}
             existingRating={existingRating}
             voiceEnabled={true}
+            userAvatarUrl={userAvatarUrl}
+            userHaloColor={userHaloColor}
           />
         )}
 

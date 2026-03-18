@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import { UserAvatar } from '@/components/account/UserAvatar'
 
 const GEIST = 'var(--font-geist-sans)'
 
@@ -21,6 +22,8 @@ interface MessageBubbleProps {
   onPlayTTS?: () => void
   isPlayingTTS?: boolean
   variant?: 'aside'  // proactive listening aside — coral left border treatment
+  userAvatarUrl?: string | null
+  userHaloColor?: string | null
 }
 
 export function MessageBubble({
@@ -30,6 +33,8 @@ export function MessageBubble({
   onPlayTTS,
   isPlayingTTS,
   variant,
+  userAvatarUrl,
+  userHaloColor,
 }: MessageBubbleProps) {
   const isUser = role === 'user'
   const isAside = variant === 'aside'
@@ -85,8 +90,11 @@ export function MessageBubble({
     <div style={{
       display: 'flex',
       justifyContent: isUser ? 'flex-end' : 'flex-start',
+      alignItems: 'flex-end',
+      gap: 8,
       marginBottom: 20,
     }}>
+      {!isUser && <div style={{ width: 24, flexShrink: 0 }} />}
       <div style={{
         maxWidth: '72%',
         padding: '14px 18px',
@@ -152,6 +160,14 @@ export function MessageBubble({
           </button>
         )}
       </div>
+      {isUser && (
+        <UserAvatar
+          avatarUrl={userAvatarUrl}
+          haloColor={userHaloColor}
+          name="You"
+          size={24}
+        />
+      )}
     </div>
   )
 }
