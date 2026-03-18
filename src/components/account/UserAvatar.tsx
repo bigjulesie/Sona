@@ -18,7 +18,7 @@ export function UserAvatar({ avatarUrl, haloColor, name, size }: UserAvatarProps
         const r = parseInt(haloColor.slice(1, 3), 16)
         const g = parseInt(haloColor.slice(3, 5), 16)
         const b = parseInt(haloColor.slice(5, 7), 16)
-        return `0 0 ${Math.round(size * 0.6)}px ${Math.round(size * 0.15)}px rgba(${r},${g},${b},0.30)`
+        return `0 0 ${Math.round(size * 0.35)}px ${Math.round(size * 0.08)}px rgba(${r},${g},${b},0.28)`
       })()
     : undefined
 

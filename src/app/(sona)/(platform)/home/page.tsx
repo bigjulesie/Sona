@@ -64,25 +64,17 @@ export default async function HomePage() {
       }}>
 
         {/* ── Page header ─────────────────────────────────────────── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 48 }}>
-          <UserAvatar
-            avatarUrl={userProfile?.avatar_url}
-            haloColor={userProfile?.avatar_halo_color}
-            name={userProfile?.full_name || user.email || 'You'}
-            size={44}
-          />
-          <h1 style={{
-            fontFamily: CORMORANT,
-            fontSize: 'clamp(2rem, 4vw, 2.75rem)',
-            fontWeight: 400,
-            fontStyle: 'italic',
-            letterSpacing: '-0.02em',
-            color: '#1a1a1a',
-            margin: 0,
-          }}>
-            My Circle
-          </h1>
-        </div>
+        <h1 style={{
+          fontFamily: CORMORANT,
+          fontSize: 'clamp(2rem, 4vw, 2.75rem)',
+          fontWeight: 400,
+          fontStyle: 'italic',
+          letterSpacing: '-0.02em',
+          color: '#1a1a1a',
+          margin: '0 0 48px',
+        }}>
+          My Circle
+        </h1>
 
         {/* ── Own Sona (creator only) ──────────────────────────────── */}
         {ownPortrait && (
@@ -99,20 +91,12 @@ export default async function HomePage() {
               padding: '16px 20px',
               border: '1px solid rgba(0,0,0,0.07)', borderRadius: 14,
             }}>
-              {ownPortrait.avatar_url ? (
-                <img src={ownPortrait.avatar_url} alt={ownPortrait.display_name}
-                  style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-              ) : (
-                <div style={{
-                  width: 44, height: 44, borderRadius: '50%',
-                  backgroundColor: 'rgba(0,0,0,0.04)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                }}>
-                  <span style={{ fontFamily: CORMORANT, fontSize: '1.25rem', fontStyle: 'italic', color: '#1a1a1a' }}>
-                    {ownPortrait.display_name?.[0] ?? '?'}
-                  </span>
-                </div>
-              )}
+              <UserAvatar
+                avatarUrl={userProfile?.avatar_url}
+                haloColor={userProfile?.avatar_halo_color}
+                name={userProfile?.full_name || user.email || 'You'}
+                size={44}
+              />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{
                   fontFamily: CORMORANT, fontSize: '1.125rem', fontWeight: 400,

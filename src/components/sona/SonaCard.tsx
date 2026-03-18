@@ -14,14 +14,19 @@ interface SonaCardProps {
   avg_rating: string | null
   rating_count: number
   monthly_price_cents: number | null
+  creatorAvatarUrl?: string | null
+  creatorHaloColor?: string | null
 }
 
 export function SonaCard({
   slug, display_name, tagline, avatar_url, category,
   subscriber_count, avg_rating, rating_count, monthly_price_cents,
+  creatorAvatarUrl, creatorHaloColor,
 }: SonaCardProps) {
   const isPaid = monthly_price_cents != null && monthly_price_cents > 0
   const initial = display_name?.[0] ?? '?'
+  const displayAvatarUrl = avatar_url ?? creatorAvatarUrl ?? null
+  const haloColor = !avatar_url && creatorHaloColor ? creatorHaloColor : null
 
   return (
     <Link href={`/sona/${slug}`} style={{ display: 'block', textDecoration: 'none' }}>
@@ -38,11 +43,19 @@ export function SonaCard({
 
         {/* Avatar */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-          {avatar_url ? (
+          {displayAvatarUrl ? (
             <img
-              src={avatar_url}
+              src={displayAvatarUrl}
               alt={display_name}
-              style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover' }}
+              style={{
+                width: 72, height: 72, borderRadius: '50%', objectFit: 'cover',
+                boxShadow: haloColor ? (() => {
+                  const r = parseInt(haloColor.slice(1, 3), 16)
+                  const g = parseInt(haloColor.slice(3, 5), 16)
+                  const b = parseInt(haloColor.slice(5, 7), 16)
+                  return `0 0 25px 6px rgba(${r},${g},${b},0.28)`
+                })() : undefined,
+              }}
             />
           ) : (
             <div style={{
