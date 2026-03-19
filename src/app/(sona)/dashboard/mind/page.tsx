@@ -20,7 +20,7 @@ export default async function MindPage() {
 
   if (!portrait) redirect('/dashboard')
 
-  const [{ data: dimensions }, { data: currents }] = await Promise.all([
+  const [{ data: dimensions }, { data: currents }, { count: sourceCount }] = await Promise.all([
     (admin as any).from('sona_dimensions')
       .select('dimension_category, dimension_key, narrative, confidence, confidence_flag, min_tier, evidence_count')
       .eq('portrait_id', portrait.id)
@@ -30,6 +30,9 @@ export default async function MindPage() {
       .eq('portrait_id', portrait.id)
       .is('superseded_at', null)
       .order('module_type'),
+    (admin as any).from('content_sources')
+      .select('id', { count: 'exact', head: true })
+      .eq('portrait_id', portrait.id),
   ])
 
   // Group dimensions by category label
@@ -45,6 +48,7 @@ export default async function MindPage() {
     last_synthesised_at: portrait.last_synthesised_at,
     dimensions: grouped,
     currents: currents ?? [],
+    sourceCount: sourceCount ?? 0,
   }
 
   return (
@@ -71,7 +75,7 @@ export default async function MindPage() {
           color: '#6b6b6b',
           marginBottom: '2.5rem',
         }}>
-          What your Sona knows about you.
+          The depth behind every conversation.
         </p>
       </div>
       <MindDashboard initialData={initialData} />
