@@ -1,6 +1,8 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { SonaCard } from '@/components/sona/SonaCard'
 
+export const dynamic = 'force-dynamic'
+
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
 
