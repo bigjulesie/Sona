@@ -18,6 +18,7 @@ interface ChatInputProps {
   textareaRef?: React.RefObject<HTMLTextAreaElement | null>
   // Session controls
   sessionStatus?: SessionStatus
+  isContributing?: boolean
   onInvite?: (stream: MediaStream) => void
   onPause?: () => void
   onResume?: (stream: MediaStream) => void
@@ -35,6 +36,7 @@ export function ChatInput({
   portraitName,
   textareaRef: textareaRefProp,
   sessionStatus = 'idle',
+  isContributing = false,
   onInvite,
   onPause,
   onResume,
@@ -260,7 +262,7 @@ export function ChatInput({
                 }}
                 aria-expanded={controlsOpen}
                 aria-label={isActive
-                  ? `${portraitName ?? 'Sona'} is in the room — tap to manage`
+                  ? `${portraitName ?? 'Sona'} is listening — tap to manage`
                   : `${portraitName ?? 'Sona'} has stepped out — tap to manage`}
               >
                 <span
@@ -273,7 +275,11 @@ export function ChatInput({
                     backgroundColor: isActive ? '#DE3E7B' : '#b0b0b0',
                     display: 'inline-block',
                     flexShrink: 0,
-                    animation: isActive ? 'presence-pulse 2.8s ease-in-out infinite' : 'none',
+                    animation: isActive
+                      ? isContributing
+                        ? 'presence-pulse 1.2s ease-in-out infinite'
+                        : 'presence-pulse 2.8s ease-in-out infinite'
+                      : 'none',
                     transition: 'background-color 0.2s ease',
                   }}
                 />
@@ -284,10 +290,27 @@ export function ChatInput({
                   color: '#6b6b6b',
                   letterSpacing: '0.01em',
                   flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1,
                 }}>
-                  {isActive
-                    ? `${portraitName ?? 'Sona'} is in the room`
-                    : `${portraitName ?? 'Sona'} has stepped out`}
+                  <span>
+                    {isActive
+                      ? `${portraitName ?? 'Sona'} is listening`
+                      : `${portraitName ?? 'Sona'} has stepped out`}
+                  </span>
+                  {isActive && (
+                    <span style={{
+                      fontFamily: GEIST,
+                      fontSize: '0.6875rem',
+                      fontWeight: 400,
+                      color: isContributing ? 'rgba(222,62,123,0.6)' : '#b0b0b0',
+                      letterSpacing: '0.01em',
+                      transition: 'color 0.2s ease',
+                    }}>
+                      {isContributing ? 'thinking\u2026' : 'will contribute when they have something to add'}
+                    </span>
+                  )}
                 </span>
 
                 {/* Single-tap pause/resume */}

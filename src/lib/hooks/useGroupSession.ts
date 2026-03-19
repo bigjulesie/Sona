@@ -7,7 +7,7 @@ export type SessionStatus = 'idle' | 'starting' | 'active' | 'paused' | 'ended' 
 interface GroupSessionMessage {
   id: string
   content: string
-  trigger: 'proactive' | 'direct'
+  trigger: 'proactive' | 'direct' | 'greeting'
   timestamp: number
 }
 
@@ -187,6 +187,41 @@ export function useGroupSession({
     recordChunk(stream, mimeType)
   }, [recordChunk])
 
+  const greet = useCallback(async (currentSessionId: string) => {
+    try {
+      const res = await fetch(`/api/group-sessions/${currentSessionId}/greet`, {
+        method: 'POST',
+      })
+
+      if (!res.ok || !res.body) return
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let fullText = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n\n').filter(l => l.startsWith('data: '))
+        for (const line of lines) {
+          const data = JSON.parse(line.slice(6))
+          if (data.text) fullText += data.text
+          if (data.done && fullText.trim()) {
+            onAsideRef.current({
+              id: crypto.randomUUID(),
+              content: fullText.trim(),
+              trigger: 'greeting',
+              timestamp: Date.now(),
+            })
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[useGroupSession] greet failed:', err)
+    }
+  }, [])
+
   const invite = useCallback(async (stream: MediaStream) => {
     if (status !== 'idle' || inviteInFlightRef.current) return
     inviteInFlightRef.current = true
@@ -213,6 +248,7 @@ export function useGroupSession({
 
       setStatus('active')
       scheduleContribution(session_id)
+      greet(session_id)
     } finally {
       inviteInFlightRef.current = false
     }

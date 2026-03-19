@@ -53,6 +53,7 @@ export function ChatInterface({
 
   const {
     status: sessionStatus,
+    isContributing,
     invite,
     pause,
     resume,
@@ -346,6 +347,7 @@ export function ChatInterface({
         portraitName={portraitName}
         textareaRef={textareaRef}
         sessionStatus={sessionStatus}
+        isContributing={isContributing}
         onInvite={invite}
         onPause={pause}
         onResume={resume}
