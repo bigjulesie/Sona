@@ -23,21 +23,6 @@ export default async function ExplorePage({ searchParams }: PageProps) {
   const { category, sort = 'popular', q } = await searchParams
   const supabase = await createServerSupabaseClient()
 
-  // Fetch logged-in user's portrait + profile avatar so their card shows their photo
-  const { data: { user } } = await supabase.auth.getUser()
-  let ownPortraitId: string | null = null
-  let creatorAvatarUrl: string | null = null
-  let creatorHaloColor: string | null = null
-  if (user) {
-    const [{ data: portrait }, { data: profile }] = await Promise.all([
-      supabase.from('portraits').select('slug').eq('creator_id', user.id).eq('brand', 'sona').maybeSingle(),
-      supabase.from('profiles').select('avatar_url, avatar_halo_color').eq('id', user.id).maybeSingle(),
-    ])
-    ownPortraitId = portrait?.slug ?? null   // use slug — avoids UUID type ambiguity
-    creatorAvatarUrl = profile?.avatar_url ?? null
-    creatorHaloColor = profile?.avatar_halo_color ?? null
-  }
-
   let query = supabase.from('portrait_discovery').select('*')
   if (category && category !== 'All') query = query.eq('category', category)
   if (q) query = query.ilike('display_name', `%${q}%`)
@@ -199,8 +184,8 @@ export default async function ExplorePage({ searchParams }: PageProps) {
               <SonaCard
                 key={sona.id}
                 {...(sona as any)}
-                creatorAvatarUrl={sona.slug === ownPortraitId ? creatorAvatarUrl : null}
-                creatorHaloColor={sona.slug === ownPortraitId ? creatorHaloColor : null}
+                creatorAvatarUrl={(sona as any).creator_avatar_url ?? null}
+                creatorHaloColor={(sona as any).creator_halo_color ?? null}
               />
             ))}
           </div>
