@@ -5,15 +5,13 @@
 -- and was never surfaced to the Discover page for cards other than the
 -- logged-in user's own portrait.
 --
--- Fix: join profiles on creator_id and expose the two avatar columns so
--- every SonaCard can display the creator's photo without extra queries.
+-- Fix: join profiles on creator_id and append two new columns at the end
+-- so every SonaCard can display the creator's photo without extra queries.
 --
--- Must DROP and recreate — CREATE OR REPLACE cannot insert new columns
--- between existing ones (Postgres error 42P16).
+-- New columns are appended after existing aggregates so CREATE OR REPLACE
+-- is safe — no column reordering, no DROP required.
 
-DROP VIEW IF EXISTS portrait_discovery;
-
-CREATE VIEW portrait_discovery
+CREATE OR REPLACE VIEW portrait_discovery
   WITH (security_invoker = true)
 AS
 SELECT
