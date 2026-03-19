@@ -31,7 +31,7 @@ export default async function HomePage() {
   // Subscribed Sonas
   const { data: subscriptions } = await supabase
     .from('subscriptions')
-    .select('id, portrait_id, portraits(id, slug, display_name, avatar_url)')
+    .select('id, portrait_id, portraits(id, slug, display_name, avatar_url, profiles!creator_id(avatar_url, avatar_halo_color))')
     .eq('subscriber_id', user.id)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
@@ -155,20 +155,19 @@ export default async function HomePage() {
                       textDecoration: 'none',
                     }}
                   >
-                    {portrait.avatar_url ? (
-                      <img src={portrait.avatar_url} alt={portrait.display_name}
-                        style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                    ) : (
-                      <div style={{
-                        width: 44, height: 44, borderRadius: '50%',
-                        backgroundColor: 'rgba(0,0,0,0.04)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                      }}>
-                        <span style={{ fontFamily: CORMORANT, fontSize: '1.25rem', fontStyle: 'italic', color: '#1a1a1a' }}>
-                          {portrait.display_name?.[0] ?? '?'}
-                        </span>
-                      </div>
-                    )}
+                    {(() => {
+                      const creatorProfile = Array.isArray(portrait.profiles) ? portrait.profiles[0] : portrait.profiles
+                      const creatorAvatarUrl = portrait.avatar_url ?? creatorProfile?.avatar_url ?? null
+                      const creatorHaloColor = creatorProfile?.avatar_halo_color ?? null
+                      return (
+                        <UserAvatar
+                          avatarUrl={creatorAvatarUrl}
+                          haloColor={creatorHaloColor}
+                          name={portrait.display_name}
+                          size={44}
+                        />
+                      )
+                    })()}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
                         fontFamily: CORMORANT, fontSize: '1.125rem', fontWeight: 400,
