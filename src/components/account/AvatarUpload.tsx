@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from 'react-image-crop'
+import ReactCrop, { type PercentCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import { UserAvatar } from './UserAvatar'
 import { extractHaloColor } from '@/lib/avatar/extract-halo-color'
@@ -20,7 +20,7 @@ export function AvatarUpload({ currentAvatarUrl, currentHaloColor, name }: Avata
   const [avatarUrl, setAvatarUrl] = useState(currentAvatarUrl ?? null)
   const [haloColor, setHaloColor] = useState(currentHaloColor ?? null)
   const [srcUrl, setSrcUrl] = useState<string | null>(null)
-  const [crop, setCrop] = useState<Crop>()
+  const [crop, setCrop] = useState<PercentCrop>()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const imgRef = useRef<HTMLImageElement>(null)
@@ -52,9 +52,7 @@ export function AvatarUpload({ currentAvatarUrl, currentHaloColor, name }: Avata
     const img = imgRef.current
     if (!img || !crop) return null
 
-    // Convert percentage crop to natural-image pixel coordinates directly.
-    // Do NOT multiply by scaleX/scaleY — those are display-to-natural ratios
-    // and the percentage-to-natural conversion already accounts for them.
+    // crop is always PercentCrop — convert to natural-image pixel coordinates.
     const srcX = (crop.x / 100) * img.naturalWidth
     const srcY = (crop.y / 100) * img.naturalHeight
     const srcW = (crop.width / 100) * img.naturalWidth
@@ -137,7 +135,7 @@ export function AvatarUpload({ currentAvatarUrl, currentHaloColor, name }: Avata
         </p>
         <ReactCrop
           crop={crop}
-          onChange={c => setCrop(c)}
+          onChange={(_px, pct) => setCrop(pct)}
           aspect={1}
           circularCrop
           style={{ maxWidth: '100%' }}
