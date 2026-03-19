@@ -7,8 +7,13 @@
 --
 -- Fix: join profiles on creator_id and expose the two avatar columns so
 -- every SonaCard can display the creator's photo without extra queries.
+--
+-- Must DROP and recreate — CREATE OR REPLACE cannot insert new columns
+-- between existing ones (Postgres error 42P16).
 
-CREATE OR REPLACE VIEW portrait_discovery
+DROP VIEW IF EXISTS portrait_discovery;
+
+CREATE VIEW portrait_discovery
   WITH (security_invoker = true)
 AS
 SELECT
@@ -21,8 +26,6 @@ SELECT
   p.tags,
   p.monthly_price_cents,
   p.brand,
-  prof.avatar_url       AS creator_avatar_url,
-  prof.avatar_halo_color AS creator_halo_color,
   COUNT(DISTINCT s.id) FILTER (
     WHERE s.status = 'active'
   )                                                       AS subscriber_count,
@@ -31,7 +34,9 @@ SELECT
     AND s.created_at > now() - interval '30 days'
   )                                                       AS new_subscribers_30d,
   ROUND(AVG(r.score)::numeric, 1)                        AS avg_rating,
-  COUNT(r.id)                                            AS rating_count
+  COUNT(r.id)                                            AS rating_count,
+  prof.avatar_url                                        AS creator_avatar_url,
+  prof.avatar_halo_color                                 AS creator_halo_color
 FROM portraits p
 LEFT JOIN profiles prof ON prof.id = p.creator_id
 LEFT JOIN subscriptions s ON s.portrait_id = p.id
