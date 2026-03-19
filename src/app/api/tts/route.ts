@@ -25,7 +25,30 @@ export async function POST(req: NextRequest) {
     return new Response('ELEVENLABS_API_KEY not configured', { status: 500 })
   }
 
-  const voiceId = process.env.ELEVENLABS_DEFAULT_VOICE_ID ?? process.env.ELEVENLABS_DEFAULT_VOICE
+  // Look up creator's voice preference for this portrait
+  const VOICE_IDS = {
+    male:   'L0Dsvb3SLTyegXwtm47J',
+    female: 'lcMyyd2HUfFzxdCaC4Ta',
+  }
+  const admin = createAdminClient()
+  const { data: portrait } = await (admin as any)
+    .from('portraits')
+    .select('creator_id')
+    .eq('id', portrait_id)
+    .single()
+  const creatorId = portrait?.creator_id
+  let voiceId: string | undefined
+  if (creatorId) {
+    const { data: creatorProfile } = await (admin as any)
+      .from('profiles')
+      .select('voice_gender')
+      .eq('id', creatorId)
+      .single()
+    const gender = creatorProfile?.voice_gender as 'male' | 'female' | null
+    voiceId = gender ? VOICE_IDS[gender] : undefined
+  }
+  // Fall back to env var default if no preference set
+  voiceId ??= process.env.ELEVENLABS_DEFAULT_VOICE_ID ?? process.env.ELEVENLABS_DEFAULT_VOICE
   if (!voiceId) {
     return new Response('No voice ID configured', { status: 500 })
   }

@@ -4,6 +4,7 @@ import { BillingPortalButton } from './BillingPortalButton'
 import { ProfileForm } from './ProfileForm'
 import { DeleteAccountButton } from './DeleteAccountButton'
 import { AvatarUpload } from '@/components/account/AvatarUpload'
+import { VoiceSelector } from './VoiceSelector'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
@@ -17,11 +18,11 @@ export default async function AccountPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
+  const { data: profile } = await (supabase as any)
     .from('profiles')
-    .select('full_name, stripe_customer_id, avatar_url, avatar_halo_color')
+    .select('full_name, stripe_customer_id, avatar_url, avatar_halo_color, voice_gender')
     .eq('id', user.id)
-    .single()
+    .single() as { data: { full_name: string; stripe_customer_id: string | null; avatar_url: string | null; avatar_halo_color: string | null; voice_gender: 'male' | 'female' | null } | null }
 
   const params = await searchParams
   const saved = params.saved === '1'
@@ -70,6 +71,24 @@ export default async function AccountPage({
             email={user.email ?? ''}
             saved={saved}
           />
+        </section>
+
+        <hr style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.07)', margin: '40px 0' }} />
+
+        {/* Voice section */}
+        <section>
+          <h2 style={{
+            fontFamily: GEIST,
+            fontSize: '0.6875rem',
+            fontWeight: 500,
+            letterSpacing: '0.09em',
+            textTransform: 'uppercase',
+            color: '#b0b0b0',
+            margin: '0 0 20px',
+          }}>
+            Voice
+          </h2>
+          <VoiceSelector currentGender={(profile as any)?.voice_gender ?? null} />
         </section>
 
         <hr style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.07)', margin: '40px 0' }} />

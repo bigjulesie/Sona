@@ -36,6 +36,20 @@ export async function deleteAccount() {
   redirect('/')
 }
 
+export async function updateVoice(gender: 'male' | 'female') {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ voice_gender: gender } as any)
+    .eq('id', user.id)
+
+  if (error) throw new Error('Failed to save voice preference')
+  revalidatePath('/account')
+}
+
 export async function updateAvatar(avatarUrl: string, haloColor: string) {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
