@@ -102,11 +102,11 @@ export function AvatarUpload({ currentAvatarUrl, currentHaloColor, name }: Avata
       // 5. Persist to profile via server action
       await updateAvatar(publicUrl, halo)
 
-      // 6. Update local state optimistically
-      // Append cache-buster so the browser re-fetches the new image
-      setAvatarUrl(`${publicUrl}?t=${Date.now()}`)
+      // 6. Update local state
+      setAvatarUrl(publicUrl)
       setHaloColor(halo)
       setSrcUrl(null)
+      if (fileInputRef.current) fileInputRef.current.value = ''
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed. Please try again.')
     } finally {

@@ -23,10 +23,15 @@ export async function GET() {
     return NextResponse.json({ error: 'Could not create upload URL' }, { status: 500 })
   }
 
-  // Public URL is the CDN URL used to display the avatar after upload
-  const { data: { publicUrl } } = admin.storage
+  // Public URL is the CDN URL used to display the avatar after upload.
+  // Append a version timestamp so each upload busts the CDN cache —
+  // without this, the CDN returns the stale image on page reload since
+  // the storage path is fixed (user.id/avatar.png).
+  const { data: { publicUrl: baseUrl } } = admin.storage
     .from('avatars')
     .getPublicUrl(path)
+
+  const publicUrl = `${baseUrl}?v=${Date.now()}`
 
   return NextResponse.json({ signedUrl: data.signedUrl, publicUrl })
 }
