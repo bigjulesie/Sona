@@ -48,7 +48,7 @@ export function ChatInterface({
   // Group session state
   const [groupError, setGroupError] = useState<string | null>(null)
   const [asideMessages, setAsideMessages] = useState<Array<{
-    id: string; content: string; trigger: 'proactive' | 'direct'; timestamp: number
+    id: string; content: string; trigger: 'proactive' | 'direct' | 'greeting'; timestamp: number
   }>>([])
 
   const {
