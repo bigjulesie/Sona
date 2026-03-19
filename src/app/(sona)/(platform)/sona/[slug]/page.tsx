@@ -56,7 +56,7 @@ export default async function SonaPage({ params }: PageProps) {
 
   const { data: portrait } = await supabase
     .from('portraits')
-    .select('id, display_name, tagline, bio, avatar_url, monthly_price_cents, slug')
+    .select('id, display_name, tagline, bio, avatar_url, monthly_price_cents, slug, profiles!creator_id(avatar_url, avatar_halo_color)')
     .eq('slug', slug)
     .eq('brand', 'sona')
     .eq('is_public', true)
@@ -98,6 +98,12 @@ export default async function SonaPage({ params }: PageProps) {
     .select('subscriber_count, avg_rating, rating_count')
     .eq('id', portrait.id)
     .maybeSingle()
+
+  const creatorProfile = Array.isArray((portrait as any).profiles)
+    ? (portrait as any).profiles[0]
+    : (portrait as any).profiles
+  const creatorAvatarUrl: string | null = creatorProfile?.avatar_url ?? null
+  const creatorHaloColor: string | null = creatorProfile?.avatar_halo_color ?? null
 
   const isPaid = portrait.monthly_price_cents != null && portrait.monthly_price_cents > 0
   const initial = portrait.display_name?.[0] ?? '?'
@@ -142,11 +148,11 @@ export default async function SonaPage({ params }: PageProps) {
                 alt={portrait.display_name}
                 style={{ width: 108, height: 108, borderRadius: '50%', objectFit: 'cover' }}
               />
-            ) : isCreator ? (
+            ) : (creatorAvatarUrl || isCreator) ? (
               <UserAvatar
-                avatarUrl={userAvatarUrl}
-                haloColor={userHaloColor}
-                name={userName}
+                avatarUrl={isCreator ? userAvatarUrl : creatorAvatarUrl}
+                haloColor={isCreator ? userHaloColor : creatorHaloColor}
+                name={portrait.display_name}
                 size={108}
               />
             ) : (
