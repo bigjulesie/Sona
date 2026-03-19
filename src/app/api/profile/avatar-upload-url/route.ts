@@ -17,7 +17,7 @@ export async function GET() {
 
   const { data, error } = await admin.storage
     .from('avatars')
-    .createSignedUploadUrl(path)
+    .createSignedUploadUrl(path, { upsert: true })
 
   if (error || !data) {
     return NextResponse.json({ error: 'Could not create upload URL' }, { status: 500 })
