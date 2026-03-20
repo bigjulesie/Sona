@@ -172,17 +172,32 @@ export async function runFullSynthesis(portraitId: string, triggeredBy: string) 
   const uniqueCategories = new Set((evidenceCheck ?? []).map((e: any) => e.dimension_category))
   if (uniqueCategories.size < 4) return // Not enough breadth yet
 
-  // Guard against concurrent runs
+  // Guard against concurrent runs.
+  // Also allow re-entry if a previous run was killed by a serverless timeout
+  // (synthesis_started_at > 15 minutes ago means the process was SIGKILL'd with
+  // no catch block running — the recovery cron resets these, but runFullSynthesis
+  // itself defends here too so a manual retry always works).
   const { data: current } = await (admin as any)
     .from('portraits')
-    .select('synthesis_status')
+    .select('synthesis_status, synthesis_started_at')
     .eq('id', portraitId)
     .single()
-  if (current?.synthesis_status === 'synthesising') return
 
-  // Mark portrait as synthesising
+  if (current?.synthesis_status === 'synthesising') {
+    // Allow re-entry only if the previous run appears to be stuck (>15 min old)
+    const startedAt = current.synthesis_started_at
+      ? new Date(current.synthesis_started_at)
+      : null
+    const isStuck = startedAt
+      ? Date.now() - startedAt.getTime() > 15 * 60 * 1000
+      : false
+    if (!isStuck) return
+    // Fall through: treat the stuck run as recoverable and restart
+  }
+
+  // Mark portrait as synthesising and record start time for stuck-run detection
   await (admin as any).from('portraits')
-    .update({ synthesis_status: 'synthesising' })
+    .update({ synthesis_status: 'synthesising', synthesis_started_at: new Date().toISOString() })
     .eq('id', portraitId)
 
   const jobId = await createJob(portraitId, 'dimension_synthesis', triggeredBy)
