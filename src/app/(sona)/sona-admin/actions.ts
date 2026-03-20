@@ -4,6 +4,18 @@ import { revalidatePath } from 'next/cache'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+export async function retrySynthesis(portraitId: string) {
+  await assertAdmin()
+  // 'error' is not 'synthesising', so the guard inside runFullSynthesis won't block.
+  // Call it directly — it will set synthesis_status to 'synthesising' at the start of its run.
+  const { runFullSynthesis } = await import('@/lib/synthesis/character-synthesise')
+  // Fire and forget — do not await so the server action returns immediately
+  runFullSynthesis(portraitId, 'admin_retry').catch((err: unknown) => {
+    console.error('[retrySynthesis] background synthesis failed:', err)
+  })
+  revalidatePath('/sona-admin')
+}
+
 async function assertAdmin() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()

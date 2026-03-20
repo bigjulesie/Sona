@@ -2,10 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { togglePortraitPublished, resetPortraitStatus } from './actions'
+import { togglePortraitPublished, resetPortraitStatus, retrySynthesis } from './actions'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
+
+// How old last_synthesised_at must be before "Reset stuck" appears (ms)
+const STUCK_THRESHOLD_MS = 2 * 60 * 60 * 1000 // 2 hours
 
 interface PortraitData {
   id: string
@@ -61,6 +64,15 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
   const [pending, setPending] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [resetDone, setResetDone] = useState(false)
+  const [retrying, setRetrying] = useState(false)
+  const [retryQueued, setRetryQueued] = useState(false)
+
+  // "Reset stuck" should only appear when synthesis has been running for more than 2 hours,
+  // or if it's been in 'synthesising' state with no last_synthesised_at at all.
+  const isStuck = portrait.synthesis_status === 'synthesising' && (
+    portrait.last_synthesised_at === null ||
+    Date.now() - new Date(portrait.last_synthesised_at).getTime() > STUCK_THRESHOLD_MS
+  )
 
   async function handleReset() {
     setResetting(true)
@@ -72,6 +84,19 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
       setError('Reset failed')
     } finally {
       setResetting(false)
+    }
+  }
+
+  async function handleRetry() {
+    setRetrying(true)
+    setError(null)
+    try {
+      await retrySynthesis(portrait.id)
+      setRetryQueued(true)
+    } catch {
+      setError('Retry failed')
+    } finally {
+      setRetrying(false)
     }
   }
 
@@ -118,16 +143,11 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
         </span>
       </td>
 
-      {/* Content */}
+      {/* Context — source count only; web_research_status is internal enrichment, not shown here */}
       <td style={{ padding: '14px 16px' }}>
         <span style={{ fontFamily: GEIST, fontSize: '0.8125rem', color: '#6b6b6b' }}>
           {portrait.content_count} source{portrait.content_count !== 1 ? 's' : ''}
         </span>
-        {portrait.web_research_status !== 'never' && (
-          <div style={{ marginTop: 4 }}>
-            <StatusBadge status={portrait.web_research_status} />
-          </div>
-        )}
       </td>
 
       {/* Synthesis */}
@@ -143,7 +163,9 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
             {formatDate(portrait.last_synthesised_at)}
           </div>
         )}
-        {portrait.synthesis_status === 'synthesising' && !resetDone && (
+
+        {/* Reset stuck — only when synthesis has been running longer than 2 hours */}
+        {isStuck && !resetDone && (
           <button
             onClick={handleReset}
             disabled={resetting}
@@ -168,6 +190,35 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
         {resetDone && (
           <div style={{ marginTop: 6, fontFamily: GEIST, fontSize: '0.625rem', color: '#2a7c4f' }}>
             Reset — reload to confirm
+          </div>
+        )}
+
+        {/* Retry — only when synthesis is in error state */}
+        {portrait.synthesis_status === 'error' && !retryQueued && (
+          <button
+            onClick={handleRetry}
+            disabled={retrying}
+            style={{
+              marginTop: 6,
+              fontFamily: GEIST,
+              fontSize: '0.625rem',
+              fontWeight: 500,
+              letterSpacing: '0.04em',
+              padding: '2px 8px',
+              borderRadius: '980px',
+              border: '1px solid rgba(222,62,123,0.3)',
+              background: 'rgba(222,62,123,0.06)',
+              color: '#DE3E7B',
+              cursor: retrying ? 'default' : 'pointer',
+              opacity: retrying ? 0.5 : 1,
+            }}
+          >
+            {retrying ? 'Queuing…' : 'Retry'}
+          </button>
+        )}
+        {retryQueued && (
+          <div style={{ marginTop: 6, fontFamily: GEIST, fontSize: '0.625rem', color: '#2a7c4f' }}>
+            Queued — reload shortly
           </div>
         )}
       </td>
