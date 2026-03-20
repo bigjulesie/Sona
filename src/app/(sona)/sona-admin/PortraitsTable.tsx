@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { togglePortraitPublished } from './actions'
 
 const GEIST = 'var(--font-geist-sans)'
@@ -139,9 +140,9 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
         {formatDate(portrait.created_at)}
       </td>
 
-      {/* Publish toggle */}
+      {/* Publish toggle + upload interview */}
       <td style={{ padding: '14px 16px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
           <button
             onClick={handleToggle}
             disabled={pending}
@@ -162,6 +163,19 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
           >
             {isPublic ? 'Live' : 'Draft'}
           </button>
+          <Link
+            href={`/sona-admin/${portrait.id}/upload`}
+            style={{
+              fontFamily: GEIST,
+              fontSize: '0.6875rem',
+              fontWeight: 400,
+              color: '#DE3E7B',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            + Upload interview
+          </Link>
           {error && (
             <span style={{ fontFamily: GEIST, fontSize: '0.6875rem', color: '#DE3E7B' }}>{error}</span>
           )}

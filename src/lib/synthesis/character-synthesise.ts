@@ -1,7 +1,7 @@
 // src/lib/synthesis/character-synthesise.ts
 import Anthropic from '@anthropic-ai/sdk'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createJob, updateJob, calculateRecencyWeight, getSourceTypeWeight, EVIDENCE_TYPE_WEIGHTS } from './jobs'
+import { createJob, updateJob, calculateRecencyWeight, getSourceTypeWeight, getPerspectiveMultiplier, EVIDENCE_TYPE_WEIGHTS } from './jobs'
 import type { SynthesisedDimension, ConfidenceFlag } from './types'
 import { TIER_PROMPT_DEPTH, DIMENSION_MIN_TIER } from './types'
 
@@ -13,6 +13,7 @@ interface EvidenceRow {
   confidence: number
   source_type: string
   source_date: string | null
+  source_perspective: string
 }
 
 interface WeightInput {
@@ -20,13 +21,15 @@ interface WeightInput {
   evidence_type: string
   source_type: string
   source_date: Date | null
+  source_perspective: string
 }
 
 export function computeWeightedConfidence(input: WeightInput): number {
   const typeWeight = EVIDENCE_TYPE_WEIGHTS[input.evidence_type] ?? 0.5
   const sourceWeight = getSourceTypeWeight(input.source_type)
   const recencyWeight = calculateRecencyWeight(input.source_date)
-  return input.raw_confidence * typeWeight * sourceWeight * recencyWeight
+  const perspectiveMultiplier = getPerspectiveMultiplier(input.source_perspective)
+  return input.raw_confidence * typeWeight * sourceWeight * recencyWeight * perspectiveMultiplier
 }
 
 export function groupEvidenceByDimension(
@@ -63,12 +66,14 @@ async function synthesiseDimension(
       evidence_type: e.evidence_type,
       source_type: e.source_type,
       source_date: e.source_date ? new Date(e.source_date) : null,
+      source_perspective: e.source_perspective,
     }),
     weighted: computeWeightedConfidence({
       raw_confidence: e.confidence,
       evidence_type: e.evidence_type,
       source_type: e.source_type,
       source_date: e.source_date ? new Date(e.source_date) : null,
+      source_perspective: e.source_perspective,
     }),
   }))
 
@@ -189,7 +194,7 @@ export async function runFullSynthesis(portraitId: string, triggeredBy: string) 
       .from('sona_evidence')
       .select(`
         dimension_key, dimension_category, evidence_text, evidence_type, confidence,
-        content_sources!inner(source_type, source_date)
+        content_sources!inner(source_type, source_date, source_perspective)
       `)
       .eq('portrait_id', portraitId)
 
@@ -201,6 +206,7 @@ export async function runFullSynthesis(portraitId: string, triggeredBy: string) 
       confidence: e.confidence,
       source_type: e.content_sources?.source_type ?? 'other',
       source_date: e.content_sources?.source_date ?? null,
+      source_perspective: e.content_sources?.source_perspective ?? 'first_person',
     }))
 
     const grouped = groupEvidenceByDimension(rows)

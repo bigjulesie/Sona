@@ -37,6 +37,17 @@ export function getSourceTypeWeight(sourceType: string): number {
   return SOURCE_TYPE_WEIGHTS[sourceType] ?? 0.9
 }
 
+// Third-party observations are filtered through another person's perception.
+// A 0.85 multiplier applies conservatively without fully discounting them.
+const PERSPECTIVE_MULTIPLIERS: Record<string, number> = {
+  first_person: 1.0,
+  third_party:  0.85,
+}
+
+export function getPerspectiveMultiplier(perspective: string): number {
+  return PERSPECTIVE_MULTIPLIERS[perspective] ?? 1.0
+}
+
 export async function createJob(
   portraitId: string,
   jobType: SynthesisJobType,
