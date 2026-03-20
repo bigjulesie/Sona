@@ -20,6 +20,12 @@ export async function createSonaIdentity(formData: FormData) {
     redirect(`/dashboard/create?step=2&portrait_id=${existing_portrait.id}`)
   }
 
+  // Consent is enforced by the required checkbox in the form — record the timestamp
+  await (createAdminClient() as any)
+    .from('profiles')
+    .update({ consent_given_at: new Date().toISOString() })
+    .eq('id', user.id)
+
   const display_name = formData.get('display_name') as string
   const tagline = formData.get('tagline') as string
   const bio = formData.get('bio') as string

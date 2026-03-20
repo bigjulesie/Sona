@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createSonaIdentity } from './actions'
-import { InterviewStep } from './InterviewStep'
+import { PhoneStep } from './PhoneStep'
 import { PricingStep } from './PricingStep'
 import { VerifyStep } from './VerifyStep'
 
@@ -13,7 +13,7 @@ const CATEGORIES = [
   'Sport', 'Politics', 'Education', 'Health', 'Other',
 ]
 
-const STEPS = ['Identity', 'Verify', 'Interview', 'Content', 'Pricing']
+const STEPS = ['Identity', 'Verify', 'Connect', 'Content', 'Pricing']
 
 interface PageProps {
   searchParams: Promise<{ step?: string; portrait_id?: string }>
@@ -372,6 +372,32 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
               />
             </div>
 
+            {/* Consent statement */}
+            <div style={{
+              border: '1px solid rgba(0,0,0,0.08)',
+              borderRadius: 12,
+              padding: '20px 20px 20px 16px',
+              backgroundColor: '#fafafa',
+            }}>
+              <label style={{ display: 'flex', gap: 14, cursor: 'pointer', alignItems: 'flex-start' }}>
+                <input
+                  type="checkbox"
+                  name="consent"
+                  required
+                  style={{ marginTop: 3, accentColor: '#DE3E7B', flexShrink: 0, width: 16, height: 16 }}
+                />
+                <span style={{
+                  fontFamily: GEIST,
+                  fontSize: '0.8125rem',
+                  fontWeight: 300,
+                  color: '#6b6b6b',
+                  lineHeight: 1.6,
+                }}>
+                  I confirm that I am the person I am creating a Sona for, and I take full responsibility for all content I upload to this profile.
+                </span>
+              </label>
+            </div>
+
             <div style={{ display: 'flex' }}>
               <button
                 type="submit"
@@ -426,7 +452,7 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
         </>
       )}
 
-      {/* ── Step 3: Interview ───────────────────────────────────── */}
+      {/* ── Step 3: Connect (phone verification) ────────────────── */}
       {step === '3' && verifiedPortraitId && (
         <>
           <h1 style={{
@@ -439,7 +465,7 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
             color: '#1a1a1a',
             margin: '0 0 8px',
           }}>
-            Schedule your interview
+            Connect with Sunny
           </h1>
           <p style={{
             fontFamily: GEIST,
@@ -449,9 +475,9 @@ export default async function CreateSonaPage({ searchParams }: PageProps) {
             margin: '0 0 40px',
             lineHeight: 1.6,
           }}>
-            We&apos;ll conduct a WhatsApp conversation to capture your voice, beliefs, and values.
+            Verify your WhatsApp number so Sunny from Sona can reach you to schedule your first conversation.
           </p>
-          <InterviewStep portraitId={verifiedPortraitId} />
+          <PhoneStep portraitId={verifiedPortraitId} />
         </>
       )}
 
