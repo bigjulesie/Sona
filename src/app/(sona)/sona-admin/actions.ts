@@ -18,6 +18,38 @@ async function assertAdmin() {
   if (!profile?.is_admin) throw new Error('Forbidden')
 }
 
+export async function resetPortraitStatus(portraitId: string) {
+  await assertAdmin()
+  const admin = createAdminClient()
+
+  // Reset stuck synthesis status
+  await (admin as any)
+    .from('portraits')
+    .update({ synthesis_status: 'error' })
+    .eq('id', portraitId)
+    .eq('synthesis_status', 'synthesising')
+
+  // Reset stuck web research status (only if still running)
+  await (admin as any)
+    .from('portraits')
+    .update({ web_research_status: 'error' })
+    .eq('id', portraitId)
+    .eq('web_research_status', 'running')
+
+  // Mark any orphaned running/pending synthesis jobs as errored
+  await (admin as any)
+    .from('sona_synthesis_jobs')
+    .update({
+      status: 'error',
+      error_msg: 'Reset by admin — job was stuck',
+      completed_at: new Date().toISOString(),
+    })
+    .eq('portrait_id', portraitId)
+    .in('status', ['running', 'pending'])
+
+  revalidatePath('/sona-admin')
+}
+
 export async function togglePortraitPublished(portraitId: string, isPublic: boolean) {
   await assertAdmin()
   const admin = createAdminClient()

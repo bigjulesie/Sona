@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { togglePortraitPublished } from './actions'
+import { togglePortraitPublished, resetPortraitStatus } from './actions'
 
 const GEIST = 'var(--font-geist-sans)'
 const CORMORANT = 'var(--font-cormorant)'
@@ -59,6 +59,21 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
   const [isPublic, setIsPublic] = useState(portrait.is_public)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  const [resetting, setResetting] = useState(false)
+  const [resetDone, setResetDone] = useState(false)
+
+  async function handleReset() {
+    setResetting(true)
+    setError(null)
+    try {
+      await resetPortraitStatus(portrait.id)
+      setResetDone(true)
+    } catch {
+      setError('Reset failed')
+    } finally {
+      setResetting(false)
+    }
+  }
 
   async function handleToggle() {
     const next = !isPublic
@@ -126,6 +141,33 @@ function PortraitTableRow({ portrait }: { portrait: PortraitData }) {
         {portrait.last_synthesised_at && (
           <div style={{ marginTop: 2, fontFamily: GEIST, fontSize: '0.6875rem', color: '#c0c0c0' }}>
             {formatDate(portrait.last_synthesised_at)}
+          </div>
+        )}
+        {portrait.synthesis_status === 'synthesising' && !resetDone && (
+          <button
+            onClick={handleReset}
+            disabled={resetting}
+            style={{
+              marginTop: 6,
+              fontFamily: GEIST,
+              fontSize: '0.625rem',
+              fontWeight: 500,
+              letterSpacing: '0.04em',
+              padding: '2px 8px',
+              borderRadius: '980px',
+              border: '1px solid rgba(222,62,123,0.3)',
+              background: 'rgba(222,62,123,0.06)',
+              color: '#DE3E7B',
+              cursor: resetting ? 'default' : 'pointer',
+              opacity: resetting ? 0.5 : 1,
+            }}
+          >
+            {resetting ? 'Resetting…' : 'Reset stuck'}
+          </button>
+        )}
+        {resetDone && (
+          <div style={{ marginTop: 6, fontFamily: GEIST, fontSize: '0.625rem', color: '#2a7c4f' }}>
+            Reset — reload to confirm
           </div>
         )}
       </td>
